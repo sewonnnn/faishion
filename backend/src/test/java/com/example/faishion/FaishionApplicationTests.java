@@ -1,10 +1,10 @@
-package com.example.shoppingmall;
+package com.example.faishion;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ShoppingmallApplicationTests {
+class FaishionApplicationTests {
 
     @Test
     void contextLoads() {
