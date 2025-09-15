@@ -19,6 +19,7 @@ import SellerProductFormPage from "./pages/SellerProductFormPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminSellerListPage from "./pages/AdminSellerListPage.jsx";
 import AdminSellerDetailPage from "./pages/AdminSellerDetailPage.jsx";
+import Gemini from "./pages/Gemini.jsx";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
                {/*로그인한 사용자만 접근 가능한 페이지들*/}
                <Route path="/cart" element={<CartPage />} />   {/*장바구니 페이지*/}
+               <Route path="/gemini" element={<Gemini />} />   {/*옷 피팅 페이지*/}
                <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
                <Route path="/order/new" element={<OrderFormPage />} />   {/*주문/결제 폼 페이지*/}
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
