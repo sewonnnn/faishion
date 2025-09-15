@@ -32,9 +32,11 @@ public class Review {
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Product product;
 
-    private String content;
+    private String content; //리뷰 내용
 
-    private Integer rating;
+    private Integer rating; //별점
+
+    private boolean isReported; //신고 여부
 
     @OneToOne
     @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

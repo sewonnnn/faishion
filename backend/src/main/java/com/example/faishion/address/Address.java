@@ -26,11 +26,11 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
-    private String phoneNumber;
-    private String zipcode;
-    private String street;
-    private String detail;
-    private Boolean isDefault;
+    private String zipcode; //우편번호
+    private String street; //도로명 주소
+    private String detail; //상세주소
+    private Boolean isDefault; //기본 배송지인가?
+    private String requestMsg; // 요청사항
 
     @CreationTimestamp
     @Column(updatable = false)

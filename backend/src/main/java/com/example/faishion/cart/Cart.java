@@ -29,9 +29,9 @@ public class Cart {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Stock stock;
+    private Stock stock; //재고
 
-    private Integer quantity;
+    private Integer quantity; //장바구니 수량
 
     @CreationTimestamp
     @Column(updatable = false)

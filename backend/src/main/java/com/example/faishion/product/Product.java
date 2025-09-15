@@ -24,17 +24,17 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String name; //상품명
     @Column(length = 2000)
-    private String description;
-    private Integer basePrice;
+    private String description; //상품 설명
+    private Integer price; //기본 가격
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Business business;
+    private Business business; //연관 판매자
 
     @CreationTimestamp
     @Column(updatable = false)

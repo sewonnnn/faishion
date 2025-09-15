@@ -31,17 +31,17 @@ public class Qna {
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Product product;
 
-    private String title;
+    private String title; //질문제목
 
     @Column(length = 2000)
-    private String content;
+    private String content; //질문내용
 
     @Column(length = 2000)
-    private String answer;
+    private String answer; //답변내용
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answered_by")
-    private User answeredBy;
+    private User answeredBy; //답변한 사용자(관리자 / 판매자)
 
     @CreationTimestamp
     @Column(updatable = false)

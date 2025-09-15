@@ -24,14 +24,14 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String name; //카테고리 이름
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Category parent;
+    private Category parent; //부모 카테고리
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Category> children = new ArrayList<>();
+    private List<Category> children = new ArrayList<>(); //자식 카테고리들 받아옴
 
     @CreationTimestamp
     @Column(updatable = false)

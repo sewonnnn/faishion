@@ -23,9 +23,9 @@ public class OAuth {
     private Long id;
 
     @Column(nullable = false)
-    private String oauthId;
+    private String oauthId; //oauth 고유 id
     @Column(nullable = false)
-    private String provider;
+    private String provider; //oauth 제공자 ex) naver, kakao
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

@@ -22,9 +22,9 @@ public class Business {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String registrationNumber;
-    private String ownerName;
+    private String businessName; //상호명
+    private String businessNum; //사업자번호
+    private String ownerName; //대표이름
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

@@ -21,6 +21,9 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String originName; //실제 파일 이름
+    private String savedName; //저장된 파일 이름
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

@@ -34,14 +34,9 @@ public class Order {
     @JoinColumn(name = "address_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Address address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
 
     private String status;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> items = new ArrayList<>();
 
     private Integer usedPoint;
 

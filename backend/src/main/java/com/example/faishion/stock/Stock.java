@@ -22,10 +22,9 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String color;
-    private String size;
-    private Integer quantity;
-    private Integer additionalPrice;
+    private String color; //상품 색상
+    private String size; //상품 사이즈
+    private Integer quantity; //상품 재고 수량
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
