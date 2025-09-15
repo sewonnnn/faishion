@@ -1,6 +1,7 @@
 package com.example.faishion.qna;
 
 import com.example.faishion.product.Product;
+import com.example.faishion.seller.Seller;
 import com.example.faishion.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class Qna {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Product product;
 
     private String title; //질문제목
@@ -40,8 +41,8 @@ public class Qna {
     private String answer; //답변내용
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answered_by")
-    private User answeredBy; //답변한 사용자(관리자 / 판매자)
+    @JoinColumn(name = "answered_by", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Seller answeredBy; //답변한 사람 (answer값이 있는데 이 필드가 null이면 관리자가 답변한 것으로 간주)
 
     @CreationTimestamp
     @Column(updatable = false)

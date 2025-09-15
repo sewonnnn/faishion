@@ -31,13 +31,11 @@ public class Payment {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
-    private String method;
+    private String method; //결제 방식
 
-    private String status;
+    private Integer amount; //결제 금액
 
-    private Integer amount;
-
-    private String transactionId;
+    private String transactionId; //고유 결제번호
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -1,15 +1,18 @@
-package com.example.faishion.product;
+package com.example.faishion.review;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "product_image")
-public class ProductImage {
+@Table(name = "review_image")
+public class ReviewImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,7 +21,7 @@ public class ProductImage {
     private String savedName;   // 저장된 파일 이름
     private String type;        // MAIN, DETAIL, THUMBNAIL 등
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Product product;
+    @OneToOne
+    @JoinColumn(name = "review_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Review review;
 }

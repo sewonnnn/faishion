@@ -1,6 +1,7 @@
 package com.example.faishion.product;
 
-import com.example.faishion.business.Business;
+import com.example.faishion.seller.Seller;
+import com.example.faishion.stock.Stock;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,12 +30,15 @@ public class Product {
     private String description; //상품 설명
     private Integer price; //기본 가격
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImageList = new ArrayList<>(); //상품 이미지
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Stock> stockList = new ArrayList<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Business business; //연관 판매자
+    @JoinColumn(name = "seller_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Seller seller; //연관 판매자
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -1,4 +1,4 @@
-package com.example.faishion.image;
+package com.example.faishion.notice;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,14 +15,15 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "image")
-public class Image {
+@Table(name = "notice")
+public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String originName; //실제 파일 이름
-    private String savedName; //저장된 파일 이름
+    private String title;        // 공지 제목
+    @Column(length = 2000)
+    private String content;      // 공지 내용
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -2,6 +2,7 @@ package com.example.faishion.order;
 
 import com.example.faishion.address.Address;
 import com.example.faishion.coupon.Coupon;
+import com.example.faishion.delivery.Delivery;
 import com.example.faishion.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order")
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +35,19 @@ public class Order {
     @JoinColumn(name = "address_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Address address;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)) // 쿠폰을 사용 안 할 수도 있으므로 nullable true
+    private Coupon coupon;
 
-    private String status;
+    private Integer usedPoint; //주문에 사용된 포인트
 
+    private String status; //주문 상태
 
-    private Integer usedPoint;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItemList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Delivery delivery;
 
     @CreationTimestamp
     @Column(updatable = false)

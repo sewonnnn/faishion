@@ -1,6 +1,5 @@
 package com.example.faishion.review;
 
-import com.example.faishion.image.Image;
 import com.example.faishion.product.Product;
 import com.example.faishion.user.User;
 import jakarta.persistence.*;
@@ -38,9 +37,8 @@ public class Review {
 
     private boolean isReported; //신고 여부
 
-    @OneToOne
-    @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Image image;
+    @OneToOne(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ReviewImage reviewImage;
 
     @CreationTimestamp
     @Column(updatable = false)
