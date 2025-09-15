@@ -1,4 +1,5 @@
 import './App.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
