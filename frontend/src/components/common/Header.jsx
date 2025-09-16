@@ -52,6 +52,9 @@ const Header = () => {
                             <li><a href={"/order/new"}>주문/결제 폼</a></li>
                             <li><a href={"/order/complete"}>주문완료</a></li>
                             <li><a href={"/order/:orderId"}>주문상세</a></li>
+                            <li><a href={"/notice/list"}>공지사항 목록</a></li>
+                            <li><a href={"/notice/:noticeId"}>공지사항 상세</a></li>
+                            <li><a href={"/qna/new"}>문의사항 폼</a></li>
                             <li><a href={"/mypage"}>마이페이지</a> </li>
                         </ul>
                     )}
@@ -65,6 +68,7 @@ const Header = () => {
                             <li><a href={"/seller/product/:productId"}>상품 상세조회</a></li>
                             <li><a href={"/seller/product/new"}>상품 등록 폼</a></li>
                             <li><a href={"/seller/product/edit/:productId"}>상품 편집</a></li>
+                            <li><a href={"/seller/qna/list"}>문의사항 목록</a></li>
                         </ul>
                     )}
                 </li>
@@ -76,6 +80,7 @@ const Header = () => {
                             <li><a href={"/admin"}>대시보드</a></li>
                             <li><a href={"/admin/seller/list"}>사용자 관리</a></li>
                             <li><a href={"/admin/seller/:sellerId"}>설정</a></li>
+                            <li><a href={"/admin/notice/list"}>공지사항</a></li>
                         </ul>
                     )}
                 </li>
