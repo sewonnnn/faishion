@@ -52,6 +52,7 @@ const Header = () => {
                             <li><a href={"/order/new"}>주문/결제 폼</a></li>
                             <li><a href={"/order/complete"}>주문완료</a></li>
                             <li><a href={"/order/:orderId"}>주문상세</a></li>
+                            <li><a href={"/mypage"}>마이페이지</a> </li>
                         </ul>
                     )}
                 </li>

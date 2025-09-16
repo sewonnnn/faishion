@@ -1,0 +1,149 @@
+.mypage-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: "Arial", sans-serif;
+    background: #fff;
+    color: #333;
+}
+
+/* 프로필 */
+.profile-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+
+.profile-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+}
+
+.profile-desc {
+    font-size: 13px;
+    color: #555;
+}
+
+.profile-desc .highlight {
+    color: #0072ff;
+    font-weight: bold;
+}
+
+.settings-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* 상태 박스 */
+.status-section {
+    display: flex;
+    justify-content: space-around;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background: #fff;
+    padding: 15px 0;
+}
+
+.status-box {
+    text-align: center;
+}
+
+.status-label {
+    font-size: 13px;
+    color: #666;
+}
+
+.status-value {
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+/* 주문 내역 */
+.order-section {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    background: #fff;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-item {
+    display: flex;
+    gap: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.order-thumb {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.order-info {
+    flex: 1;
+}
+
+.order-brand {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0;
+}
+
+.order-desc {
+    font-size: 13px;
+    margin: 3px 0;
+    color: #444;
+}
+
+.order-meta {
+    font-size: 12px;
+    color: #777;
+}
+
+.order-price-original {
+    font-size: 12px;
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+.order-price-sale {
+    font-size: 14px;
+    font-weight: bold;
+    color: #0072ff;
+}
