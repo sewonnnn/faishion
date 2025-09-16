@@ -29,6 +29,7 @@ import AdminNoticeListPage from "./pages/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
+import Footer from "./components/common/Footer.jsx";
 
 function Layout() {
     return (
