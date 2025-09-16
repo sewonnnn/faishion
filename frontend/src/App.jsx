@@ -23,6 +23,7 @@ import AdminHeader from "./components/common/AdminHeader.jsx";
 import SellerHeader from "./components/common/SellerHeader.jsx";
 import Header from "./components/common/Header.jsx";
 import Gemini from "./pages/Gemini.jsx";
+import Footer from "./components/common/Footer.jsx";
 import SellerQnaListPage from "./pages/SellerQnaListPage.jsx";
 import AdminNoticeListPage from "./pages/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
@@ -34,6 +35,7 @@ function Layout() {
         <>
             <Header />
             <Outlet />
+            <Footer />
         </>
     );
 }
@@ -96,7 +98,6 @@ function App() {
              {/*</Route>*/}
             {/*판매자 권한이 있는 사용자만 접근 가능한 페이지들*/}
             {/*<Route element={<SellerLayout/>}>*/}
-                 <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
                <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
                  <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
                  <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
@@ -105,7 +106,6 @@ function App() {
             {/*</Route>*/}
             {/* <Route element={<AdminLayout/>}>*/}
                {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
-                 <Route path="/admin/notice/list" element={<AdminNoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
                <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
                <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
                <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}

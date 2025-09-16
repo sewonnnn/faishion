@@ -28,7 +28,6 @@ function ProductCard() {
     return (
         <Card style={{ width: '18rem' }}>
             {productCard.map((item, index) => (
-                // 각 product item을 하나의 Fragment나 div로 감싸줍니다.
                 <div key={index}>
                     <Card.Img variant="top" src="react.svg/100px180" />
                     <Card.Body>

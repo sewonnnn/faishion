@@ -1,0 +1,13 @@
+.Footer_Container{
+    display: flex;
+    background: #aaaaaa;
+    width: 100%;
+    height: 200px; /* 헤더 높이 고정 */
+    border-bottom: 1px solid #333333; /* 하단 경계선 */
+    bottom: 0;
+    left: 0;
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 0 20px; /* 좌우 패딩 */
+    box-sizing: border-box; /* 패딩 포함하여 크기 계산 */
+    justify-content: space-around;
+}
