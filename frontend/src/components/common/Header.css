@@ -1,99 +1,130 @@
-/* 헤더 전체 컨테이너 */
-.Header_Container {
+/* Custom CSS for the Header */
+
+/* W컨셉 로고 스타일 */
+.top-nav {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.logo {
+    font-family: 'Arial Black', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    margin: 0;
+}
+/* 메인 메뉴와 드롭다운 메뉴를 감싸는 부모 요소 */
+.main-header-wrapper {
+    position: relative;
+    z-index: 1000; /* 다른 요소 위에 표시되도록 z-index를 높게 설정 */
+}
+
+/* 전체 화면 드롭다운 메뉴 스타일 */
+.full-screen-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #eee;
+    background-color: white;
+    z-index: 999; /* 메인 메뉴보다 낮게 설정하여 z-index 충돌 방지 */
+}
+
+/* 상단 아이콘 (하트, 사람, 가방) */
+.top-nav .nav-link i {
+    font-size: 1.25rem;
+    margin-left: 1rem;
+}
+
+/* 상단 메뉴와 하단 메뉴 구분선 */
+.header-divider {
+    margin: 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* 메인 메뉴 스타일 */
+.main-nav .nav-link,
+.main-nav .nav-item .nav-link {
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+}
+
+/* 검색창 스타일 */
+.search-bar .form-control {
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 20px 0 0 20px;
+}
+
+.search-bar .btn {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-radius: 0 20px 20px 0;
+    color: #333;
+}
+
+/* 전체 화면 드롭다운 메뉴 스타일 */
+.full-screen-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #eee;
+    background-color: white;
+    z-index: 1000;
+}
+
+.full-menu {
     display: flex;
-    background: #444444;
-    width: 100%;
-    height: 60px; /* 헤더 높이 고정 */
-    border-bottom: 1px solid #333333; /* 하단 경계선 */
-    position: fixed; /* 화면 상단에 고정 */
-    top: 0;
-    left: 0;
-    z-index: 1000; /* 다른 요소 위에 표시되도록 */
-    align-items: center; /* 세로 중앙 정렬 */
-    padding: 0 20px; /* 좌우 패딩 */
-    box-sizing: border-box; /* 패딩 포함하여 크기 계산 */
+    flex-wrap: nowrap; /* 컬럼들이 한 줄에 유지되도록 */
 }
 
-/* 메뉴 리스트 */
-.Header_List {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex; /* 메뉴 항목 가로 정렬 */
+.category-col {
+    flex: 1; /* 모든 컬럼이 동일한 너비를 갖도록 */
+    padding-right: 1.5rem;
 }
 
-/* 각 메뉴 항목 */
-.Header_Item {
-    position: relative; /* 서브 메뉴의 기준점 */
-    margin-right: 30px; /* 메뉴 항목 간 간격 */
+.category-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #000;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #555555;
+    display: inline-block; /* 너비를 내용에 맞게 조정 */
 }
 
-/* 메뉴 링크 */
-.Header_Item a {
-    color: whitesmoke;
+.dropdown-title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.list-unstyled {
+    padding-left: 0;
+}
+
+.category-col ul li a {
+    font-size: 0.8rem;
+    color: #666;
     text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px 0; /* 클릭 영역 확보 */
-    display: block; /* 링크 영역 확장 */
-    transition: color 0.3s ease; /* 색상 변경 애니메이션 */
+    line-height: 1.5;
 }
 
-.Header_Item a:hover {
-    color: #cccccc; /* 마우스 오버 시 색상 변경 */
+.category-col ul li a:hover {
+    text-decoration: underline;
 }
 
-/* 서브 메뉴 */
-.SubMenu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    position: absolute; /* 부모(.Header_Item) 기준 절대 위치 */
-    top: 100%; /* 부모 메뉴 바로 아래에 위치 */
-    left: 0;
-    background: #555555; /* 서브 메뉴 배경색 */
-    border: 1px solid #333333;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    min-width: 150px; /* 서브 메뉴 최소 너비 */
-    opacity: 0; /* 기본적으로 숨김 */
-    visibility: hidden; /* 기본적으로 숨김 */
-    transform: translateY(10px); /* 살짝 아래에서 올라오는 효과 */
-    transition: opacity 0.3s ease, transform 0.3s ease; /* 애니메이션 효과 */
-    z-index: 1001; /* 헤더보다 위에 표시 */
-}
-
-/* 서브 메뉴 아이템 */
-.SubMenu li {
-    margin: 0;
-}
-
-/* 서브 메뉴 링크 */
-.SubMenu li a {
-    color: whitesmoke;
-    padding: 10px 15px; /* 서브 메뉴 항목 패딩 */
-    display: block;
-    font-size: 14px;
-    font-weight: normal;
-    transition: background-color 0.3s ease;
-}
-
-.SubMenu li a:hover {
-    background-color: #666666; /* 서브 메뉴 호버 배경색 */
-    color: #ffffff;
-}
-
-/* 메뉴 항목에 마우스 오버 시 서브 메뉴 표시 */
-.Header_Item:hover .SubMenu,
-.Header_Item:focus-within .SubMenu { /* 키보드 접근성 고려 */
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0); /* 원래 위치로 */
-}
-
-/* 아래 로고/검색창 등 다른 요소와의 간격 확보 */
-/* body 태그에 margin-top을 주어 헤더 높이만큼 아래로 내립니다. */
-body {
-    margin-top: 60px; /* 헤더 높이와 동일하게 설정 */
-    padding-top: 0; /* body의 기본 padding-top 제거 */
+.user-info{
+    display: flex;
 }

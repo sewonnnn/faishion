@@ -1,115 +1,140 @@
-import { useState } from "react"; // useState 훅 추가
+import React, { useState } from 'react';
+import {
+    Navbar,
+    Container,
+    Nav,
+    Form,
+    FormControl,
+    Button,
+} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 
-const Header = () => {
-    // 각 메뉴 항목의 펼침 상태를 관리하는 state
-    const [isOpen, setIsOpen] = useState({
-        login: false,
-        adminPage: false,
-        product: false,
-        customer: false,
-        seller: false
-    });
+// 카테고리 데이터
+const categories = {
+    여성: {
+        의류: ['아우터', '원피스', '블라우스', '셔츠', '티셔츠', '니트', '스커트', '팬츠', '데님', '라운지웨어', '언더웨어'],
+        가방: ['숄더백', '에코/캔버스백', '크로스백', '토트백', '클러치', '백팩', '지갑', '백팩 액세서리', '기타가방'],
+        신발: ['스니커즈', '로퍼', '플랫슈즈', '펌프스', '샌들', '뮬/슬리퍼', '부츠', '시즌슈즈', '슈즈액세서리']
+    },
+    남성: {
+        의류: ['아우터', '상의', '니트', '팬츠', '데님', '라운지웨어'],
+        가방: ['백팩', '숄더백', '크로스백', '토트백', '클러치', '지갑', '백팩액세서리', '기타가방'],
+        신발: ['스니커즈', '샌들', '슬리퍼', '부츠', '시즌슈즈', '레이스업']
+    }
+};
 
-    // 마우스가 메뉴 항목에 들어왔을 때 호출되는 함수
-    const handleMouseEnter = (menu) => {
-        setIsOpen(prev => ({ ...prev, [menu]: true }));
+const Header = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // 드롭다운 메뉴 렌더링 함수
+    const renderSubCategories = (categoryData) => {
+        return (
+            <div className="row">
+                {Object.keys(categoryData).map((subCategory, index) => (
+                    <div className="col" key={index}>
+                        <h6 className="dropdown-title">{subCategory}</h6>
+                        <ul className="list-unstyled">
+                            {categoryData[subCategory].map((item, subIndex) => (
+                                <li key={subIndex}>
+                                    <a href="#">{item}</a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+        );
     };
 
-    // 마우스가 메뉴 항목에서 나갔을 때 호출되는 함수
-    const handleMouseLeave = (menu) => {
-        setIsOpen(prev => ({ ...prev, [menu]: false }));
+    // 전체 메뉴 렌더링 함수
+    const renderAllMenu = () => {
+        return (
+            <div className="row g-0 full-menu">
+                {Object.keys(categories).map(category => (
+                    <div className="col-2 category-col" key={category}>
+                        <h5 className="category-title">{category}</h5>
+                        {renderSubCategories(categories[category])}
+                    </div>
+                ))}
+            </div>
+        );
     };
 
     return (
-        <div className={"Header_Container"}>
-            <ul className={"Header_List"}>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('login')} onMouseLeave={() => handleMouseLeave('login')}>
-                    <a href={"/login"}>로그인 페이지</a>
-                    {/* isOpen.aiFitting이 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.login && (
-                        <ul className="SubMenu">
-                            <li><a href={"/register"}>회원가입</a></li>
-                            <li><a href={"/"}>홈페이지</a></li>
-                        </ul>
-                    )}
-                </li>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('product')} onMouseLeave={() => handleMouseLeave('product')}>
-                    <a href={"/product/list"}>상품조회 페이지</a>
-                    {/* isOpen.aiFitting이 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.product && (
-                        <ul className="SubMenu">
-                            <li><a href={"/product/:productId"}>상품상세</a></li>
-                        </ul>
-                    )}
-                </li>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('customer')} onMouseLeave={() => handleMouseLeave('customer')}>
-                    <a href={"/mypage"}>구매자 페이지</a>
-                    {/* isOpen.aiFitting이 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.customer && (
-                        <ul className="SubMenu">
-                            <li><a href={"/cart"}>장바구니</a></li>
-                            <li><a href={"/wishlist"}>찜 목록</a></li>
-                            <li><a href={"/order/new"}>주문/결제 폼</a></li>
-                            <li><a href={"/order/complete"}>주문완료</a></li>
-                            <li><a href={"/order/:orderId"}>주문상세</a></li>
-                            <li><a href={"/notice/list"}>공지사항 목록</a></li>
-                            <li><a href={"/notice/:noticeId"}>공지사항 상세</a></li>
-                            <li><a href={"/qna/new"}>문의사항 폼</a></li>
-                        </ul>
-                    )}
-                </li>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('seller')} onMouseLeave={() => handleMouseLeave('seller')}>
-                    <a href={"/seller"}>판매자 페이지</a>
-                    {/* isOpen.aiFitting이 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.seller && (
-                        <ul className="SubMenu">
-                            <li><a href={"/seller/product/list"}>상품 목록</a></li>
-                            <li><a href={"/seller/product/:productId"}>상품 상세조회</a></li>
-                            <li><a href={"/seller/product/new"}>상품 등록 폼</a></li>
-                            <li><a href={"/seller/product/edit/:productId"}>상품 편집</a></li>
-                            <li><a href={"/seller/qna/list"}>문의사항 목록</a></li>
-                        </ul>
-                    )}
-                </li>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('adminPage')} onMouseLeave={() => handleMouseLeave('adminPage')}>
-                    <a href={"/admin"}>관리자 페이지</a>
-                    {/* isOpen.adminPage가 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.adminPage && (
-                        <ul className="SubMenu">
-                            <li><a href={"/admin"}>대시보드</a></li>
-                            <li><a href={"/admin/seller/list"}>사용자 관리</a></li>
-                            <li><a href={"/admin/seller/:sellerId"}>설정</a></li>
-                            <li><a href={"/admin/notice/list"}>공지사항</a></li>
-                        </ul>
-                    )}
-                </li>
-                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('adminPage')} onMouseLeave={() => handleMouseLeave('adminPage')}>
-                    <a href={"/admin"}>햄버거 버튼</a>
-                    {/* isOpen.adminPage가 true일 때만 서브 메뉴 표시 */}
-                    {isOpen.adminPage && (
-                        <table className="SubMenu">
-                            <tr>
-                                <td><a href={"/admin"}>대시보드</a></td>
-                                <td><a href={"/admin"}>대시보드</a></td>
-                                <td><a href={"/admin"}>대시보드</a></td>
-                            </tr>
-                            <tr>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                            </tr>
-                            <tr>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
-                            </tr>
-                        </table>
-                    )}
-                </li>
-            </ul>
-        </div>
+        <>
+            <Navbar expand="lg" className="top-nav">
+                <Container fluid>
+                    {/* 상단 로고와 아이콘 */}
+                    <Navbar.Brand href="/">
+                        <h1 className="logo">fAIshion</h1>
+                    </Navbar.Brand>
+                    <Nav className="ms-auto">
+                        <Nav.Link href="#wishlist"><i className="bi bi-heart"></i></Nav.Link>
+                        <Nav.Link href="#user"><i className="bi bi-person"></i></Nav.Link>
+                        <Nav.Link href="#cart"><i className="bi bi-bag"></i></Nav.Link>
+                    </Nav>
+                </Container>
+            </Navbar>
+            <hr className="header-divider" />
+
+            <div
+                className="main-header-wrapper"
+                onMouseOver={(e) => {
+                    // 메인 내비게이션 링크에만 마우스 오버 시 메뉴를 엽니다.
+                    if (e.target.closest('.main-nav-links .nav-link')) {
+                        setIsMenuOpen(true);
+                    }
+                }}
+                onMouseOut={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                        setIsMenuOpen(false);
+                    }
+                }}
+            >
+                <Navbar expand="lg">
+                    <Container fluid>
+                        {/* 메인 내비게이션 링크에 새로운 클래스 적용 */}
+                        <Nav className="main-nav-links me-auto">
+                            <Nav.Link href="#best">베스트</Nav.Link>
+                            <Nav.Link href="#sale">세일</Nav.Link>
+                            <Nav.Link href="#new">신상품</Nav.Link>
+                            <Nav.Link href="#solo">단독</Nav.Link>
+                            <Nav.Link href="#recom">추천</Nav.Link>
+                            <Nav.Link href="/product/list?type=women">여성</Nav.Link>
+                            <Nav.Link href="/product/list?type=women">남성</Nav.Link>
+                        </Nav>
+                        <div className={"user-info"}>
+                            <Nav className="user-nav me-auto">
+                                <Nav.Link href="/login">로그인</Nav.Link>
+                                <Nav.Link href="#men">로그아웃</Nav.Link>
+                                <Nav.Link href="/wishlist">관심상품</Nav.Link>
+                                <Nav.Link href="/cart">장바구니</Nav.Link>
+                                <Nav.Link href="/mypage">마이페이지</Nav.Link>
+                            </Nav>
+                            <Form className="d-flex search-bar">
+                                <FormControl
+                                    type="search"
+                                    placeholder="상품을 검색하세요"
+                                    aria-label="Search"
+                                />
+                                <Button variant="outline-success">
+                                    <i className="bi bi-search"></i>
+                                </Button>
+                            </Form>
+                        </div>
+                    </Container>
+                </Navbar>
+                {isMenuOpen && (
+                    <div
+                        className="full-screen-dropdown"
+                    >
+                        {renderAllMenu()}
+                    </div>
+                )}
+            </div>
+        </>
     );
-}
+};
 
 export default Header;
