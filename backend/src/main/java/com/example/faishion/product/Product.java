@@ -21,6 +21,14 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "product")
 public class Product {
+    // ho 목데이터 적용용 추후에 지울 예정
+    public Product(Long id, String name, String description, Integer price) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
