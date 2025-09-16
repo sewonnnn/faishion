@@ -1,8 +1,19 @@
+import Banner from "../components/productlist/Banner.jsx";
+import ProductCard from "../components/productlist/ProductCard.jsx";
+
 const ProductListPage = () => {
     return (
-        <>
-            <h1>ProductListPage</h1>
-        </>
+        <div className="productListPage">
+            <div className="productListPage_Header">
+                <h1>ProductListPage</h1>
+            </div>
+            <div className="productListPage_Banners">
+                <Banner />
+            </div>
+            <div className="productListPage_ProductList">
+                <ProductCard/>
+            </div>
+        </div>
     );
 }
 
