@@ -42,7 +42,7 @@ public class Qna {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answered_by", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Seller answeredBy; //답변한 사람 (answer값이 있는데 이 필드가 null이면 관리자가 답변한 것으로 간주)
+    private Seller answeredBy; //답변한 판매자
 
     @CreationTimestamp
     @Column(updatable = false)
