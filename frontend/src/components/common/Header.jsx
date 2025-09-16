@@ -30,6 +30,7 @@ const Header = () => {
                     {isOpen.login && (
                         <ul className="SubMenu">
                             <li><a href={"/register"}>회원가입</a></li>
+                            <li><a href={"/"}>홈페이지</a></li>
                         </ul>
                     )}
                 </li>
@@ -76,6 +77,29 @@ const Header = () => {
                             <li><a href={"/admin/seller/list"}>사용자 관리</a></li>
                             <li><a href={"/admin/seller/:sellerId"}>설정</a></li>
                         </ul>
+                    )}
+                </li>
+                <li className={"Header_Item"} onMouseEnter={() => handleMouseEnter('adminPage')} onMouseLeave={() => handleMouseLeave('adminPage')}>
+                    <a href={"/admin"}>햄버거 버튼</a>
+                    {/* isOpen.adminPage가 true일 때만 서브 메뉴 표시 */}
+                    {isOpen.adminPage && (
+                        <table className="SubMenu">
+                            <tr>
+                                <td><a href={"/admin"}>대시보드</a></td>
+                                <td><a href={"/admin"}>대시보드</a></td>
+                                <td><a href={"/admin"}>대시보드</a></td>
+                            </tr>
+                            <tr>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                            </tr>
+                            <tr>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                                <td><a href={"/admin/seller/list"}>사용자 관리</a></td>
+                            </tr>
+                        </table>
                     )}
                 </li>
             </ul>

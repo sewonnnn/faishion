@@ -23,12 +23,14 @@ import AdminHeader from "./components/common/AdminHeader.jsx";
 import SellerHeader from "./components/common/SellerHeader.jsx";
 import Header from "./components/common/Header.jsx";
 import Gemini from "./pages/Gemini.jsx";
+import Footer from "./components/common/Footer.jsx";
 
 function Layout() {
     return (
         <>
             <Header />
             <Outlet />
+            <Footer />
         </>
     );
 }
