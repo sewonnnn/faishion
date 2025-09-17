@@ -13,10 +13,10 @@ const Footer = () => {
                         <h5 className="text-uppercase">고객센터</h5>
                         <ul className="list-unstyled mb-0">
                             <li>
-                                <a href="/admin/notice/list" className="text-dark">공지사항</a>
+                                <a href="/notice/list" className="text-dark">공지사항</a>
                             </li>
                             <li>
-                                <a href="/seller/qna/list" className="text-dark">QnA</a>
+                                <a href="/qna/list" className="text-dark">QnA</a>
                             </li>
                         </ul>
                     </Col>
