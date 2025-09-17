@@ -23,6 +23,7 @@ import AdminHeader from "./components/common/AdminHeader.jsx";
 import SellerHeader from "./components/common/SellerHeader.jsx";
 import Header from "./components/common/Header.jsx";
 import Gemini from "./pages/Gemini.jsx";
+import Footer from "./components/common/Footer.jsx";
 import SellerQnaListPage from "./pages/seller/SellerQnaListPage.jsx";
 import AdminNoticeListPage from "./pages/admin/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
@@ -34,6 +35,7 @@ function Layout() {
         <>
             <Header />
             <Outlet />
+            <Footer />
         </>
     );
 }
