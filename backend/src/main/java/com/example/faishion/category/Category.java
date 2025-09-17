@@ -13,19 +13,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "category")
+@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"group_id", "name"}))
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name; //카테고리 이름
+    @Column(nullable = false)
+    private String name; // 소분류 이름
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parent; //부모 카테고리
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Category> children = new ArrayList<>(); //자식 카테고리들 받아옴
+    @JoinColumn(name = "category_group_id", nullable = false)
+    private CategoryGroup categoryGroup; // 중분류
 }

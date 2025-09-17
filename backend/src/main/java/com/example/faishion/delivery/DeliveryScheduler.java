@@ -13,7 +13,7 @@ public class DeliveryScheduler {
 
     @Scheduled(fixedRate = 60 * 1000) //1분마다 실행
     public void updateDeliveryStatus() {
-        List<Delivery> deliveries = deliveryRepository.findAll();
+        List<Delivery> deliveries = deliveryRepository.findByStatusNot(DeliveryStatus.DELIVERED);
         deliveries.forEach(delivery -> {
             switch (delivery.getStatus()) {
                 case READY:
