@@ -30,7 +30,6 @@ import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
 
-
 function Layout() {
     return (
         <>
