@@ -2,6 +2,7 @@ import React from "react";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import "./QnaListPage.css";
+import { Link } from "react-router-dom";
 
 const QnaListPage = () => {
     const [qnaBoardList, setQnaBoardList] = useState([]);
@@ -54,7 +55,11 @@ const QnaListPage = () => {
                             <tr key={index}>
                                 <td>{item.id}</td>
                                 <td>이용방법</td>
-                                <td className="subject"><a href={"#"}>{item.title}</a></td>
+                                <td className="subject">
+                                    <Link to={`/qna/${item.id}`}>
+                                        {item.title}
+                                    </Link>
+                                </td>
                                 <td>2017-11-22</td>
                             </tr>
                     ))}
