@@ -1,0 +1,28 @@
+### 회원가입
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "email": "test1@x.com",
+  "password": "1234",
+  "name": "테스터",
+  "phoneNumber": "010-0000-0000"
+}
+
+### 로그인 (토큰 받기)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "test1@x.com",
+  "password": "1234"
+}
+
+> {%
+    // 로그인 응답에서 accessToken 값을 변수에 저장
+    client.global.set("accessToken", response.body.accessToken);
+%}
+
+### 보호 API 호출 (토큰 사용)
+GET http://localhost:8080/api/me
+Authorization: Bearer {{accessToken}}
