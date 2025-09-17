@@ -51,6 +51,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // REST API라 CSRF 비활성화
                 .cors(Customizer.withDefaults())
+
                 .sessionManagement(sm ->  // 세션 관리
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // JWT니까 무상태
                 .authorizeHttpRequests(auth -> auth // URL 권한 규칙

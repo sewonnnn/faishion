@@ -9,6 +9,8 @@ import {
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 // 카테고리 데이터
 const categories = {
@@ -70,9 +72,11 @@ const Header = () => {
                         <h1 className="logo">fAIshion</h1>
                     </Navbar.Brand>
                     <Nav className="ms-auto">
-                        <Nav.Link href="#wishlist"><i className="bi bi-heart"></i></Nav.Link>
-                        <Nav.Link href="#user"><i className="bi bi-person"></i></Nav.Link>
-                        <Nav.Link href="#cart"><i className="bi bi-bag"></i></Nav.Link>
+                        <Nav.Link href="/login">login</Nav.Link> {/* 로그인 */}
+                        <Nav.Link href="/cart">logout</Nav.Link> {/* 로그아웃 */}
+                        <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link> {/* 찜목록 */}
+                        <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link> {/* 마이페이지 */}
+                        <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link> {/* 장바구니 */}
                     </Nav>
                 </Container>
             </Navbar>
@@ -105,13 +109,6 @@ const Header = () => {
                             <Nav.Link href="/product/list?type=women">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
-                            <Nav className="user-nav me-auto">
-                                <Nav.Link href="/login">로그인</Nav.Link>
-                                <Nav.Link href="#men">로그아웃</Nav.Link>
-                                <Nav.Link href="/wishlist">관심상품</Nav.Link>
-                                <Nav.Link href="/cart">장바구니</Nav.Link>
-                                <Nav.Link href="/mypage">마이페이지</Nav.Link>
-                            </Nav>
                             <Form className="d-flex search-bar">
                                 <FormControl
                                     type="search"

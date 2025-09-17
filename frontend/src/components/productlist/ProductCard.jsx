@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Card, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ProductCard.css';
-import { BsStarFill } from 'react-icons/bs'; // 별 아이콘 추가
+import { BsStarFill } from 'react-icons/bs';
+import {useNavigate} from "react-router-dom"; // 별 아이콘 추가
+import reactLogo from "../../assets/react.svg"; // 이미지 표시용
 
 // 목 데이터 (Mock Data) 정의
 const mockProductData = [
     {
-        imageUrl: "https://image.wconcept.co.kr/productimg/image/img1/82/301772182.jpg",
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/82/301772182.jpg",
+        productId : 1,
         brandName: "COS",
         name: "오버사이즈 울 니트",
         discountRate: 20,
@@ -21,7 +23,8 @@ const mockProductData = [
         isRecommend: false
     },
     {
-        imageUrl: "https://image.wconcept.co.kr/productimg/image/img1/87/301732587.jpg",
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/87/301732587.jpg",
+        productId : 2,
         brandName: "ADER ERROR",
         name: "ZARA 콜라보 롱 슬리브",
         discountRate: 15,
@@ -34,7 +37,8 @@ const mockProductData = [
         isRecommend: true
     },
     {
-        imageUrl: "https://image.wconcept.co.kr/productimg/image/img1/81/301783881.jpg",
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/81/301783881.jpg",
+        productId : 3,
         brandName: "LEMAIRE",
         name: "크롭트 와이드 팬츠",
         discountRate: 0,
@@ -47,7 +51,8 @@ const mockProductData = [
         isRecommend: false
     },
     {
-        imageUrl: "https://image.wconcept.co.kr/productimg/image/img1/84/301772584.jpg",
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/84/301772584.jpg",
+        productId : 4,
         brandName: "TOTÊME",
         name: "토템 시그니처 셔츠",
         discountRate: 0,
@@ -60,7 +65,22 @@ const mockProductData = [
         isRecommend: false
     },
     {
-        imageUrl: "https://image.wconcept.co.kr/productimg/image/img1/80/301742480.jpg",
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/80/301742480.jpg",
+        productId : 5,
+        brandName: "STONEHENGE",
+        name: "스톤헨지 라운드 네클리스",
+        discountRate: 10,
+        finalPrice: 99000,
+        originalPrice: 110000,
+        hasCoupon: true,
+        rating: 4.9,
+        reviewCount: 120,
+        isExclusive: false,
+        isRecommend: true
+    },
+    {
+        savedName: "https://image.wconcept.co.kr/productimg/image/img1/80/301742480.jpg",
+        productId : 6,
         brandName: "STONEHENGE",
         name: "스톤헨지 라운드 네클리스",
         discountRate: 10,
@@ -75,7 +95,7 @@ const mockProductData = [
 ];
 
 const ProductCard = () => {
-
+    const nav = useNavigate();
     const [productCard, setProductCard] = useState([]);
 
     useEffect(() => {
@@ -101,15 +121,18 @@ const ProductCard = () => {
         return <p>상품 로딩 중...</p>;
     }
 
+    const productclick = (productId) =>{
+        nav(`/product/${productId}`);
+    }
     return (
         <div className="product-card-container">
             <Row xs={2} md={4} lg={5} className="g-4">
                 {productCard.map((item, index) => (
                     <Col key={index}>
-                        <Card className="product-card h-100 border-0">
+                        <Card className="product-card h-100 border-0" onClick={()=> productclick(item.productId)}>
                             {/* 상품 이미지 */}
                             <div className="card-img-wrapper">
-                                <Card.Img variant="top" src={item.imageUrl} alt={item.name} />
+                                <Card.Img variant="top" src={reactLogo} alt={item.name} />
                                 {item.isExclusive && <div className="exclusive-badge">단독</div>}
                                 {item.isRecommend && <div className="recommend-badge">추천</div>}
                             </div>

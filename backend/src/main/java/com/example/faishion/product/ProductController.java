@@ -1,11 +1,7 @@
 package com.example.faishion.product;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +12,7 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
+    // 테마에 맞는 배너 띄우기 ho
     @GetMapping("/banner")
     List<String> findAllBanner() {
         List<String> mockData = new ArrayList<>();
@@ -27,6 +24,7 @@ public class ProductController {
         return mockData;
     }
 
+    // 카테고리에 맞는 상품 목록 가져오기 ho
     @GetMapping("productcard")
     List<Product> findAllProductCard() {
         List<Product> mockData = new ArrayList<>();
@@ -36,5 +34,15 @@ public class ProductController {
         mockData.add(new Product(4l,"4번째 상품","테스트용 상품입니다.",40000));
         mockData.add(new Product(5l,"5번째 상품","테스트용 상품입니다.",50000));
         return mockData;
+    }
+
+    // ProductDetailPage에서 id에 일치하는 상품 가져오기 ho
+    @GetMapping("/{productId}")
+    Product productDetail(@PathVariable Long productId) {
+        Product findProduct  = productService.findById(productId); // db추가시 가져오기 ho
+        Product mockData = new Product();
+        mockData.setId(productId);
+
+        return findProduct;
     }
 }
