@@ -67,4 +67,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public void updateUser(UserDTO dto) {
+        // 추후 작성
+    }
 }
