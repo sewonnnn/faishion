@@ -18,10 +18,10 @@ public class Category {
     @Id @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name; // 소분류 이름
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false)
+    @JoinColumn(name = "category_group_id", nullable = false)
     private CategoryGroup categoryGroup; // 중분류
 }

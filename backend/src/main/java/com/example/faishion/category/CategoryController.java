@@ -3,15 +3,24 @@ package com.example.faishion.category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/category")
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping
-    public void GetCategory(){
+    // 전체 중분류 + 소분류 조회
+    @GetMapping("/groups")
+    public List<CategoryGroupDTO> getAllGroups() {
+        return categoryService.getAllGroupsWithCategories();
+    }
 
+    // 소분류 전체 조회
+    @GetMapping
+    public List<CategoryDTO> getAllCategories() {
+        return categoryService.getAllCategories();
     }
 
     // 중분류 추가

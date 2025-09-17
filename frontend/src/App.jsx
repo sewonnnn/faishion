@@ -29,6 +29,7 @@ import AdminNoticeListPage from "./pages/admin/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
+import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
 
 function Layout() {
     return (
@@ -97,21 +98,22 @@ function App() {
                 <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
              {/*</Route>*/}
             {/*판매자 권한이 있는 사용자만 접근 가능한 페이지들*/}
-            {/*<Route element={<SellerLayout/>}>*/}
-                 <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
-               <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
-                 <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
-                 <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
-                 <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
-                 <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
-            {/*</Route>*/}
-            {/* <Route element={<AdminLayout/>}>*/}
-               {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
-                 <Route path="/admin/notice/list" element={<AdminNoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
-               <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
-               <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
-               <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}
-             {/*</Route>*/}
+                <Route element={<SellerLayout/>}>
+                     <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
+                   <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
+                     <Route path="/seller/category" element={<SellerCategoryPage/>}/> {/*판매자 카테고리 페이지*/}
+                     <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
+                     <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
+                     <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
+                     <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
+                </Route>
+                <Route element={<AdminLayout/>}>
+                   {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
+                     <Route path="/admin/notice/list" element={<AdminNoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
+                   <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
+                   <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
+                   <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}
+                 </Route>
              </Route>
          </Routes>
      </BrowserRouter>
