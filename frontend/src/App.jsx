@@ -28,7 +28,8 @@ import SellerQnaListPage from "./pages/SellerQnaListPage.jsx";
 import AdminNoticeListPage from "./pages/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
-import QnaFormPage from "./pages/QnaFormPage.jsx";
+import QnaListPage from "./pages/QnaListPage.jsx";
+import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 
 
 function Layout() {
@@ -81,7 +82,10 @@ function App() {
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
                <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
-                 <Route path="/qna/new" element={<QnaFormPage/>}/>
+                 <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
+                 <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세 페이지*/}
+
+
                {/*판매자 권한이 있는 사용자만 접근 가능한 페이지들*/}
                  <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}
                  <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}

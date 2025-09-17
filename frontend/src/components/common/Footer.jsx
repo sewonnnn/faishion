@@ -6,8 +6,8 @@ const Footer = () => {
             <div className={"Left"}>
                 <table>
                     <tr>
-                        <td><a href={"#"}>공지사항</a></td>
-                        <td><a href={"#"}>QnA</a></td>
+                        <td><a href={"/notice/list"}>공지사항</a></td>
+                        <td><a href={"/qna/list"}>QnA</a></td>
                     </tr>
                 </table>
             </div>

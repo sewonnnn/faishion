@@ -1,4 +1,4 @@
-const QnaFormPage = () => {
+const QnaDetailPage = () => {
     return (
         <>
             <h1>QnaFormPage</h1>
@@ -6,4 +6,4 @@ const QnaFormPage = () => {
     );
 }
 
-export default QnaFormPage;
+export default QnaDetailPage;
