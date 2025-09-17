@@ -3,7 +3,9 @@ package com.example.faishion.qna;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,25 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/qna")
 public class QnaController {
+
     private final QnaService qnaService;
-
-    // 게시물 목록 조회
-    @GetMapping("/list")
-    public List<QnaDTO> findAllQnaList() {
-        return qnaService.findAll();
-    }
-
-    // 게시물 추가
-    @PostMapping
-    public void addQna(@RequestBody Qna qna) {
-        User user = new User();
-        user.setId("sewon");
-        qna.setUser(user);
-
-        qnaService.addQna(qna);
-    }
-
-    /*
+    private final UserRepository userRepository;
+    
     // 게시물 리스트 출력
     @GetMapping("/list")
     List<QnaDTO> findAllQnaList() {
@@ -47,6 +34,5 @@ public class QnaController {
         qnaList.add(new QnaDTO(1, savedUser, "제목", "내용"));
         return qnaList;
     }
-     */
 }
 

@@ -4,18 +4,27 @@ import com.example.faishion.seller.Seller;
 import com.example.faishion.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 public class QnaDTO {
-    private Long id; // 글번호
-    private String userId; // 회원 Id
+
+    private int id; // 글번호
+    private User user; // 회원 정보
     private String title;
     private String content;
     private String answer; // 답변 내용
 
-    private String answeredBy; //답변한 판매자
+    private Seller answeredBy; //답변한 판매자
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public QnaDTO(int id, User user, String title, String content) {
+        this.id = id;
+        this.user = user;
+        this.title = title;
+        this.content = content;
+    }
 }
