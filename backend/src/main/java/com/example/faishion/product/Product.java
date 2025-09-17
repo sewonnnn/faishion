@@ -54,4 +54,8 @@ public class Product {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public Product(Long productId) {
+        this.id = productId;
+    }
 }
