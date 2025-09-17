@@ -1,5 +1,9 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.product.Product;
+import com.example.faishion.product.ProductRepository;
+import com.example.faishion.user.User;
+import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

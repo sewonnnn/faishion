@@ -10,6 +10,7 @@ const QnaListPage = () => {
         const qnaBoardData = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/qna/list');
+                console.log(response);
                 if (Array.isArray(response.data)) {
                     setQnaBoardList(response.data);
                 } else {
@@ -23,22 +24,6 @@ const QnaListPage = () => {
         };
         qnaBoardData();
     }, []);
-
-    const write = async () => {
-        try {
-            await axios.post("http://localhost:8080/qna", {
-                product: {
-                    id: 123                 // 질문할 상품 ID
-                },
-                title: "사이즈 문의드립니다",
-                content: "이 제품 M사이즈는 언제 재입고되나요?",
-                answer: null,              // 처음엔 답변 없음
-                answeredBy: null           // 처음엔 답변한 판매자 없음
-            });
-        }catch(error){
-            console.error("Error fetching data", error);
-        }
-    };
 
     return (
         <section className="qa">
@@ -84,8 +69,7 @@ const QnaListPage = () => {
                             <button className="icon-search" aria-label="검색" type="submit"></button>
                         </div>
                     </form>
-                    <a className="btn-write" href="#" onClick={write}>글쓰기</a>
-                    {/*<a className="btn-write" href="/qna/new">글쓰기</a>*/}
+                    <a className="btn-write" href="/qna/new">글쓰기</a>
                 </div>
             </div>
         </section>

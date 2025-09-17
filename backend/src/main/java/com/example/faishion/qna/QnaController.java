@@ -1,5 +1,7 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.product.Product;
+import com.example.faishion.product.ProductRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,9 @@ import java.util.List;
 public class QnaController {
     private final QnaService qnaService;
 
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+
     // 게시물 목록 조회
     @GetMapping("/list")
     public List<QnaDTO> findAllQnaList() {
@@ -23,9 +28,11 @@ public class QnaController {
     // 게시물 추가
     @PostMapping
     public void addQna(@RequestBody Qna qna) {
-        User user = new User();
-        user.setId("sewon");
-        qna.setUser(user);
+
+        User user = userRepository.getReferenceById("sewon"); //임시 아이디
+        Product product = productRepository.getReferenceById(1L); //임시 상품
+        qna.setUser(user); //임시 아이디 qna에 설정
+        qna.setProduct(product); //임시 상품 qna에 설정
 
         qnaService.addQna(qna);
     }
