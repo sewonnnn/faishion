@@ -49,8 +49,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'    // 추가
     runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'    // 추가
     runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5' // 추가
-    // (소셜 로그인 붙일 때 추가)
-    // implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // 소셜 로그인
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 }
 
