@@ -3,7 +3,7 @@ package com.example.faishion.web;
 import com.example.faishion.security.JwtTokenProvider;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
-import com.example.faishion.web.dto.AuthDtos.*;
+import com.example.faishion.web.dto.AuthDto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

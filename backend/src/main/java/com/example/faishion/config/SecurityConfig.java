@@ -1,6 +1,8 @@
 package com.example.faishion.config;
 
+//import com.example.faishion.security.CustomOAuth2UserService;
 import com.example.faishion.security.JwtAuthenticationFilter;
+//import com.example.faishion.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,35 +29,44 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final UserDetailsService userDetailsService;
+//    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final OAuth2SuccessHandler  oAuth2SuccessHandler;
 
     @Bean
-    PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // BCrypt 해시 사용
+    }
 
     @Bean
-    AuthenticationManager authenticationManager(PasswordEncoder encoder) {
+    public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
         var provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(encoder);
-        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(encoder); // Bcrypt 설정
+        provider.setUserDetailsService(userDetailsService); // 사용자 로드 서비스 설정
         return new ProviderManager(provider);
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // csrfFilter
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // REST API라 CSRF 비활성화
                 .cors(Customizer.withDefaults())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/actuator/health").permitAll()
-                        .anyRequest().authenticated()
+                .sessionManagement(sm ->  // 세션 관리
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // JWT니까 무상태
+                .authorizeHttpRequests(auth -> auth // URL 권한 규칙
+                        .anyRequest().permitAll() // 허용
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // OAuth2 로그인
+//        .oauth2Login(oauth -> oauth
+//                .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
+//                .successHandler(oAuth2SuccessHandler));
         return http.build();
     }
 
     // CORS: 프론트(5173) 허용
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         var c = new CorsConfiguration();
         c.setAllowedOrigins(List.of("http://localhost:5173"));
         c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
