@@ -1,8 +1,28 @@
 import React from "react";
+import {useEffect, useState} from "react";
+import axios from "axios";
 import "./QnaListPage.css";
 
 const QnaListPage = () => {
+    const [qnaBoardList, setQnaBoardList] = useState([]);
 
+    useEffect(() => {
+        const qnaBoardData = async () => {
+            try {
+                const response = await axios.get('api/qna/list');
+                if (Array.isArray(response.data)) {
+                    setQnaBoardList(response.data);
+                } else {
+                    console.error('API response is not an array:', response.data);
+                    setQnaBoardList([]);
+                }
+            } catch (error) {
+                console.error('Error fetching qnaBoard data:', error);
+                setQnaBoardList([]);
+            }
+        };
+        qnaBoardData();
+    }, []);
 
     return (
         <section className="qa">
@@ -28,14 +48,15 @@ const QnaListPage = () => {
                         <th>작성시간</th>
                     </tr>
                     </thead>
-                    {/* 게시글 리스트 받아와서 뿌리기 */}
                     <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>이용방법</td>
-                        <td className="subject"><a href={"/qan/id"}>배송이 오지 않아요</a></td>
-                        <td>2017-11-22</td>
-                    </tr>
+                    {qnaBoardList.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.id}</td>
+                                <td>이용방법</td>
+                                <td className="subject"><a href={"#"}>{item.title}</a></td>
+                                <td>2017-11-22</td>
+                            </tr>
+                    ))}
                     </tbody>
                 </table>
 
@@ -51,7 +72,6 @@ const QnaListPage = () => {
                 </div>
             </div>
         </section>
-
     );
 }
 
