@@ -1,6 +1,9 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import ProductLiftInfo from "../components/productdetail/ProductLiftInfo.jsx";
+import ProductRightInfo from "../components/productdetail/ProductRightInfo.jsx";
+import "./ProductDetailPage.css";
 const mockdata = {
     id : 1,
     name : "목데이터",
@@ -32,8 +35,12 @@ const ProductDetailPage = () => {
     }, []);
 
     return (
-        <div className={ProductDetailPage}>
+        <div className={"ProductDetailPage"}>
             <h1>{product.name}</h1>
+            <div className={"productInfo"}>
+                <ProductLiftInfo />
+                <ProductRightInfo productId={productId}/>
+            </div>
         </div>
     );
 }

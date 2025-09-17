@@ -109,10 +109,6 @@ const Header = () => {
                             <Nav.Link href="/product/list?type=women">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
-                            <Nav className="user-nav me-auto">
-                                <Nav.Link href="/login">로그인</Nav.Link>
-                                <Nav.Link href="#men">로그아웃</Nav.Link>
-                            </Nav>
                             <Form className="d-flex search-bar">
                                 <FormControl
                                     type="search"
