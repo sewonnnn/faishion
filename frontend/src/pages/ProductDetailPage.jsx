@@ -1,41 +1,59 @@
-import {useEffect, useState} from "react";
+// ProductDetail.jsx
+import React from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
+import ProductLiftInfo from "../components/productdetail/ProductLiftInfo.jsx";
+import ProductRightInfo from "../components/productdetail/ProductRightInfo.jsx";
 import {useParams} from "react-router-dom";
-import axios from "axios";
-const mockdata = {
-    id : 1,
-    name : "목데이터",
-    description : "목데이터",
-    price : 20000
-}
-const ProductDetailPage = () => {
-    const { productId } = useParams(); // URL에서 productId 추출
-    const [product, setProduct] = useState(mockdata); // 이름 변경: banner -> bannerItems
-
-    useEffect(() => {
-        const productData = async () => {
-            try {
-                const response = await axios.get(`/api/product/${productId}`);
-                console.log("선택된 id " +productId);
-
-                if (Array.isArray(response.data)) {
-                    setProduct(response.data);
-                } else {
-                    console.error('API response is not an array:', response.data);
-                    setProduct(mockdata); // 에러 시 빈 배열로 초기화
-                }
-            } catch (error) {
-                console.error('Error fetching banner data:', error);
-                setProduct(mockdata); // 에러 시 빈 배열로 초기화
-            }
-        };
-        productData();
-    }, []);
+import ProductBody from "../components/productdetail/ProductBody.jsx";
+import ProductFooter from "../components/productdetail/ProductFooter.jsx";
+const ProductDetail = () => {
+    // 상품 정보를 가져오는 API 호출 로직 (mock data 사용)
+    const {productId} = useParams();
+    const productData = {
+        id: "123",
+        brand: "BEAKER ORIGINAL",
+        name: "Men Harry Cardigan - Brown",
+        price: 337250,
+        originalPrice: 355000,
+        discountRate: "5%",
+        colors: [
+            { name: 'Brown', value: 'brown', image: '../../assets/react.svg' },
+            { name: 'Navy', value: 'navy', image: '../../assets/react.svg' },
+        ],
+        sizes: ["S", "M", "L"],
+        images: [
+            '../../assets/react.svg',
+            '../../assets/react.svg',
+            '../../assets/react.svg',
+            '../../assets/react.svg',
+        ],
+    };
 
     return (
-        <div className={ProductDetailPage}>
-            <h1>{product.name}</h1>
-        </div>
-    );
-}
+        <Container className="my-5">
+            <Row>
+                {/* 왼쪽: 상품 이미지 (8/12 = 2/3) */}
+                <Col md={7}>
+                    <ProductLiftInfo images={productData.images} />
+                </Col>
 
-export default ProductDetailPage;
+                {/* 오른쪽: 상품 정보 (4/12 = 1/3) */}
+                <Col md={5}>
+                    <ProductRightInfo product={productData} productId={productId}/>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <ProductBody/>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <ProductFooter productId={productId}/>
+                </Col>
+            </Row>
+        </Container>
+    );
+};
+
+export default ProductDetail;

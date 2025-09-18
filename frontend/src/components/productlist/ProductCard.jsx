@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Card, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ProductCard.css';
 import { BsStarFill } from 'react-icons/bs';
 import {useNavigate} from "react-router-dom"; // 별 아이콘 추가
-import reactLogo from "../../assets/react.svg"; // 이미지 표시용
+import reactLogo from "../../assets/test.jpg"; // 이미지 표시용
 
 // 목 데이터 (Mock Data) 정의
 const mockProductData = [

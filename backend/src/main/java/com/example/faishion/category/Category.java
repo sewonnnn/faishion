@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"group_id", "name"}))
+@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"category_group_id", "name"}))
 public class Category {
     @Id @GeneratedValue
     private Long id;

@@ -109,11 +109,7 @@ const Header = () => {
                             <Nav.Link href="/product/list?type=women">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
-                            <Nav className="user-nav me-auto">
-                                <Nav.Link href="/login">로그인</Nav.Link>
-                                <Nav.Link href="#men">로그아웃</Nav.Link>
-                            </Nav>
-                            <Form className="d-flex search-bar">
+                            <Form className="d-flex seantrch-bar">
                                 <FormControl
                                     type="search"
                                     placeholder="상품을 검색하세요"
