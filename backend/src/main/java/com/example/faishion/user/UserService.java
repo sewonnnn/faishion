@@ -49,25 +49,25 @@ public class UserService {
 
     // 자체 로그인
 
-    // 자체 로그인 회원 정보 수정
-    @Transactional
-    public String updateUser(UserDTO dto) throws AccessDeniedException {
-
-        // 본인만 수정 가능 검증
-        String sessionUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!sessionUsername.equals(dto.getUsername())) {
-            throw new AccessDeniedException("본인 계정만 수정 가능");
-        }
-
-        // 조회
-        User entity = userRepository.findByUsernameAndIsLockAndIsSocial(dto.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(dto.getUsername()));
-
-        // 회원 정보 수정
-        entity.updateUser(dto);
-
-        return userRepository.save(entity).getId();
-    }
+//    // 자체 로그인 회원 정보 수정
+//    @Transactional
+//    public String updateUser(UserDTO dto) throws AccessDeniedException {
+//
+//        // 본인만 수정 가능 검증
+//        String sessionUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+//        if (!sessionUsername.equals(dto.getUsername())) {
+//            throw new AccessDeniedException("본인 계정만 수정 가능");
+//        }
+//
+//        // 조회
+//        User entity = userRepository.findByUsernameAndIsLockAndIsSocial(dto.getUsername())
+//                .orElseThrow(() -> new UsernameNotFoundException(dto.getUsername()));
+//
+//        // 회원 정보 수정
+//        entity.updateUser(dto);
+//
+//        return userRepository.save(entity).getId();
+//    }
 
     // 자체/소졀 로그인 회원 탈퇴
 
