@@ -57,4 +57,11 @@ public class QnaService {
     public void deleteQna(long id) {
         qnaRepository.deleteById(id);
     }
+
+    // 답변, 답변자(판매자) 추가하기
+    @Transactional
+    public void updateAnswer(long id, String answer, String answeredBy) {
+        System.out.println("답변자 서비스 넘어옴:"+answeredBy);
+        qnaRepository.updateAnswer(answer,answeredBy,id);
+    }
 }

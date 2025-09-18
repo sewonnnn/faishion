@@ -19,7 +19,7 @@ const QnaFormPage = () => {
                 answer: null,
                 answeredBy: null
             });
-
+            alert("게시글이 등록되었습니다.");
             // 등록 성공 시 QnA 목록 페이지로 이동
             navigate("/qna/list");
         } catch (error) {

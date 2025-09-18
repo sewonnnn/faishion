@@ -2,6 +2,8 @@ package com.example.faishion.qna;
 
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
+import com.example.faishion.seller.Seller;
+import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class QnaController {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final SellerRepository sellerRepository;
 
     // 게시물 목록 조회
     @GetMapping("/list")
@@ -31,10 +34,14 @@ public class QnaController {
 
         User user = userRepository.getReferenceById("sewon"); //임시 아이디
         Product product = productRepository.getReferenceById(1L); //임시 상품
+        Seller seller = sellerRepository.getReferenceById("boom"); ; // 임시 판매자
+
+
         qna.setUser(user); //임시 아이디 qna에 설정
         qna.setProduct(product); //임시 상품 qna에 설정
-
+        qna.setAnsweredBy(seller);
         qnaService.addQna(qna);
+
     }
 
     // 게시물 상세보기
@@ -60,6 +67,14 @@ public class QnaController {
         qnaService.deleteQna(id);
     }
 
+    // 답변 추가하기
+    @PutMapping("/answer/{id}")
+    // JSON에 있는 필드만 DTO에 매핑하고, 나머지는 그냥 비워두는 방식으로 처리
+    public void saveAnswer(@PathVariable long id, @RequestBody QnaDTO qnaDto) {
 
+
+        System.out.println("답변한 판매자:"+qnaDto.getAnsweredBy());
+        qnaService.updateAnswer(id, qnaDto.getAnswer(), qnaDto.getAnsweredBy());
+    }
 }
 

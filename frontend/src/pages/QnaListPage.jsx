@@ -48,6 +48,7 @@ const QnaListPage = () => {
                         </th>
                         <th>제목</th>
                         <th>작성일</th>
+                        <th>답변상태</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -65,8 +66,14 @@ const QnaListPage = () => {
                                     month: '2-digit',
                                     day: '2-digit'
                                 }).replace(/\. /g, '.').slice(0, -1)}</td>
+                                {item.answer ? (
+                                        <td>답변 완료</td>
+                                    ) : (
+                                        <td>답변 대기</td>
+                                    )}
                             </tr>
                     ))}
+
                     </tbody>
                 </table>
 
