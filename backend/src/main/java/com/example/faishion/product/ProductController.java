@@ -14,13 +14,15 @@ public class ProductController {
 
     // 테마에 맞는 배너 띄우기 ho
     @GetMapping("/banner")
-    List<String> findAllBanner() {
-        List<String> mockData = new ArrayList<>();
-        mockData.add("1");
-        mockData.add("2");
-        mockData.add("3");
-        mockData.add("4");
-        mockData.add("5");
+    List<ProductImage> findAllBanner() {
+        List<ProductImage> mockData = new ArrayList<>();
+        for(int i = 1; i <=5 ; i++){
+            ProductImage productImage = new ProductImage();
+            productImage.setOriginName("사진제목"+i);
+            productImage.setSavedName("../../assets/test.jpg");
+            mockData.add(productImage);
+        }
+
         return mockData;
     }
 

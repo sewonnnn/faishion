@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Carousel } from 'react-bootstrap'; // Bootstrap Carousel 컴포넌트 import
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS import
-
+import king from "../../assets/king.jpg"
 const Banner = () => {
     const [bannerItems, setBannerItems] = useState([]); // 이름 변경: banner -> bannerItems
 
@@ -11,6 +11,7 @@ const Banner = () => {
         const fetchBannerData = async () => {
             try {
                 const response = await axios.get('/api/product/banner');
+                console.log(response.data);
                 // API 응답 데이터 구조 예시:
                 // [{ imageUrl: "url1", title: "PAULA'S CHOICE", description: "과학과 진실에 근거한 브랜드" }, ...]
                 if (Array.isArray(response.data)) {
@@ -43,14 +44,13 @@ const Banner = () => {
                     <Carousel.Item key={index}>
                         <img
                             className="d-block w-100 banner-image"
-                            src={item.imageUrl} // API에서 받아온 이미지 URL
+                            src={king} // API에서 받아온 이미지 URL
                             alt={`Banner ${index}`}
                         />
                         <Carousel.Caption className="banner-caption">
                             {/* 이미지의 텍스트 오버레이와 유사한 스타일 */}
-                            <h3>{item.title}</h3>
-                            <p>{item.description}</p>
-                            {/* 필요하다면 추가 버튼 등 */}
+                            <h3>{item.originName}</h3>
+                            <p>설명란</p>                            {/* 필요하다면 추가 버튼 등 */}
                             <button className="banner-button">자세히 보기</button>
                         </Carousel.Caption>
                     </Carousel.Item>
