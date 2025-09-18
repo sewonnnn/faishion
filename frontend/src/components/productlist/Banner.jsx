@@ -11,7 +11,6 @@ const Banner = () => {
         const fetchBannerData = async () => {
             try {
                 const response = await axios.get('/api/product/banner');
-                console.log(response.data);
                 // API 응답 데이터 구조 예시:
                 // [{ imageUrl: "url1", title: "PAULA'S CHOICE", description: "과학과 진실에 근거한 브랜드" }, ...]
                 if (Array.isArray(response.data)) {
