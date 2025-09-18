@@ -23,35 +23,38 @@ import java.util.List;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
-                @UniqueConstraint(name = "uk_users_phone", columnNames = "phone_number"),
-                @UniqueConstraint(name = "uk_users_provider_uid", columnNames = {"provider", "provider_user_id"})
+                @UniqueConstraint(name="uk_users_email", columnNames="email"),
+                @UniqueConstraint(name="uk_users_phone", columnNames="phone_number"),
+                @UniqueConstraint(name="uk_users_username", columnNames="username"),
+                @UniqueConstraint(name="uk_users_provider_uid", columnNames={"provider","provider_user_id"})
         })
 public class User {
-    // 소셜에서 받은 UUID 저장 -> ID로 , 소셜 식별자 분리
+
     @Id
     @Column(length = 36)
-    private String id;  //oauth일 때 oauth의 고유 id가 여기에 들어감 // UUID 문자열
+    private String id; // 항상 UUID (LOCAL/소셜 모두)
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 20, nullable = false)
     private AuthProvider provider; // LOCAL, NAVER, KAKAO
 
-    @Column(length = 100)
-    private String providerUserId; // 소셜에서 내려온 고유 식별자 (nullable: LOCAL일 때 null)
+    @Column(name="provider_user_id", length=100)
+    private String providerUserId; // LOCAL일 땐 null
 
-    //private String provider; //oauth 제공자 ex) naver, kakao, 일반사용자 일시 null
+    // 로컬 로그인용 사용자 아이디 // 소셜은 null 가능
+    @Column(length = 30)
+    private String username;
 
     @Column(nullable = false, length = 60)
     private String name;
 
     @Column(nullable = false, length = 100)
-    private String email; //사용자 이메일
+    private String email;
 
-    @Column(nullable = false, length = 20)
+    @Column(name="phone_number", nullable=false, length=20)
     private String phoneNumber;
 
-    @Column(length = 100)
+    @Column(name="pw_hash", length=100) // LOCAL만 사용 // 소셜은 null
     private String pwHash; //Spring Security 암호화
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -76,14 +79,10 @@ public class User {
     private UserImage userImage;
 
 
-    @CreationTimestamp
-    @Column(updatable = false)
+    @CreationTimestamp  @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public void updateUser(UserDTO dto) {
-        // 추후 작성
-    }
 }

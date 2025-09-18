@@ -1,8 +1,10 @@
 package com.example.faishion.config;
 
 //import com.example.faishion.security.CustomOAuth2UserService;
+import com.example.faishion.security.CustomOAuth2UserService;
 import com.example.faishion.security.JwtAuthenticationFilter;
 //import com.example.faishion.security.OAuth2SuccessHandler;
+import com.example.faishion.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +31,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final UserDetailsService userDetailsService;
-//    private final CustomOAuth2UserService customOAuth2UserService;
-//    private final OAuth2SuccessHandler  oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     // 비밀번호 단방향(BCrypt) 암호화용 Bean
     @Bean
