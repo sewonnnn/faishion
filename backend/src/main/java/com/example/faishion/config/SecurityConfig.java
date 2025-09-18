@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth // URL 권한 규칙
                         .anyRequest().permitAll() // 허용
                 )
+                // jwt 필터 등록
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
                 // OAuth2 로그인
 //        .oauth2Login(oauth -> oauth
@@ -72,8 +73,10 @@ public class SecurityConfig {
         var c = new CorsConfiguration();
         c.setAllowedOrigins(List.of("http://localhost:5173"));
         c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        c.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        c.setAllowedHeaders(List.of("Authorization","Content-Type", "X-Requested-With"));
+        c.setExposedHeaders(List.of("Authorization","Location")); // 토큰/리다이렉트 헤더 노출
         c.setAllowCredentials(true);
+        c.setMaxAge(3600L);
         var s = new UrlBasedCorsConfigurationSource();
         s.registerCorsConfiguration("/**", c);
         return s;

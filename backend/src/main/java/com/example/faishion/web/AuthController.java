@@ -1,6 +1,7 @@
 package com.example.faishion.web;
 
 import com.example.faishion.security.JwtTokenProvider;
+import com.example.faishion.user.AuthProvider;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import com.example.faishion.web.dto.AuthDto.*;
@@ -28,7 +29,8 @@ public class AuthController {
         }
         var user = new User();
         user.setId(UUID.randomUUID().toString());   // PK(String) 생성
-        user.setProvider("local");
+        user.setProvider(AuthProvider.LOCAL);
+        user.setProviderUserId(null);
         user.setName(req.name());
         user.setEmail(req.email());
         user.setPhoneNumber(req.phoneNumber());
