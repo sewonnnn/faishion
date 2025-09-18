@@ -32,6 +32,7 @@ const QnaFormPage = () => {
         <section className="qa-form">
             <div className="qa-inner">
                 <h1>Q&A 작성하기</h1>
+                <div>작성자(로그인 유저 아이디)</div>
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label>제목</label><br/>
@@ -42,7 +43,6 @@ const QnaFormPage = () => {
                             required
                         />
                     </div>
-
                     <div>
                         <label>내용</label><br/>
                         <textarea
@@ -52,7 +52,6 @@ const QnaFormPage = () => {
                             required
                         />
                     </div>
-
                     <button type="submit">등록하기</button>
                 </form>
             </div>

@@ -1,3 +1,4 @@
+/*
 package com.example.faishion.gemini;
 
 import org.springframework.stereotype.Controller;
@@ -177,3 +178,4 @@ public class GeminiController {
         }
     }
 }
+*/
