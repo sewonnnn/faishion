@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"category_group_id", "name"}))
 public class Category {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

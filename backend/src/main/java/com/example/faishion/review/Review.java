@@ -1,5 +1,6 @@
 package com.example.faishion.review;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.product.Product;
 import com.example.faishion.user.User;
 import jakarta.persistence.*;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -37,8 +37,9 @@ public class Review {
 
     private boolean isReported; //신고 여부
 
-    @OneToOne(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ReviewImage reviewImage;
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Image image;
 
     @CreationTimestamp
     @Column(updatable = false)

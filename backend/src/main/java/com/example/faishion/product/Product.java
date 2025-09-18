@@ -1,5 +1,6 @@
 package com.example.faishion.product;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.stock.Stock;
 import jakarta.persistence.*;
@@ -38,14 +39,14 @@ public class Product {
     private String description; //상품 설명
     private Integer price; //기본 가격
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImageList = new ArrayList<>(); //상품 이미지
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> imageList = new ArrayList<>(); //상품 이미지
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stock> stockList = new ArrayList<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "seller_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Seller seller; //연관 판매자
 
     @CreationTimestamp

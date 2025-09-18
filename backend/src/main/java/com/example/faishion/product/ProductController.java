@@ -1,7 +1,10 @@
 package com.example.faishion.product;
 
+import com.example.faishion.image.ImageService;
+import com.example.faishion.seller.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +14,8 @@ import java.util.List;
 @RequestMapping("/product")
 public class ProductController {
     private final ProductService productService;
-
     // 테마에 맞는 배너 띄우기 ho
+    /*
     @GetMapping("/banner")
     List<ProductImage> findAllBanner() {
         List<ProductImage> mockData = new ArrayList<>();
@@ -24,6 +27,18 @@ public class ProductController {
         }
 
         return mockData;
+    }
+
+     */
+
+    @PostMapping
+    void createProduct(@RequestPart("product") Product product, @RequestPart("images") List<MultipartFile> images){
+        productService.createProduct(product, images);
+    }
+
+    @GetMapping("/list")
+    public List<ProductDTO> getAllProducts() {
+        return productService.findAll();
     }
 
     // 카테고리에 맞는 상품 목록 가져오기 ho
