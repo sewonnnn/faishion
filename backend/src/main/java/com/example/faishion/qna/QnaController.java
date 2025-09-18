@@ -40,9 +40,26 @@ public class QnaController {
     // 게시물 상세보기
     @GetMapping("/{id}")
     public QnaDTO findQnaById(@PathVariable long id) {
-        System.out.println("해당 게시물 아이디"+id);
-
         return qnaService.findQnaById(id);
+
     }
+    
+    // 게시물 수정하기
+    @PutMapping("/{id}")
+    public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
+        System.out.println("수정할 게시물 작성일:"+qnaDTO.getCreated_at()); /*상세, 수정 페이지에서 시간null 나옴*/
+        String title = qnaDTO.getTitle();
+        String content = qnaDTO.getContent();
+        qnaService.updateBoard(title, content, id);
+    }
+
+    // 게시물 삭제하기
+    @DeleteMapping("/{id}")
+    public void deleteQna(@PathVariable long id) {
+        System.out.println("삭제 게시물 id:"+id);
+        qnaService.deleteQna(id);
+    }
+
+
 }
 

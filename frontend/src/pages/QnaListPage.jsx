@@ -43,24 +43,28 @@ const QnaListPage = () => {
                         <th>No</th>
                         <th>
                             <button className="th-sort" type="button" aria-sort="none">
-                                카테고리 <span className="caret"></span>
+                                작성자
                             </button>
                         </th>
                         <th>제목</th>
-                        <th>작성시간</th>
+                        <th>작성일</th>
                     </tr>
                     </thead>
                     <tbody>
                     {qnaBoardList.map((item, index) => (
                             <tr key={index}>
                                 <td>{item.id}</td>
-                                <td>이용방법</td>
+                                <td>{item.user_id}</td>
                                 <td className="subject">
                                     <Link to={`/qna/${item.id}`}>
                                         {item.title}
                                     </Link>
                                 </td>
-                                <td>2017-11-22</td>
+                                <td> {new Date(item.created_at).toLocaleDateString('ko-KR', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit'
+                                }).replace(/\. /g, '.').slice(0, -1)}</td>
                             </tr>
                     ))}
                     </tbody>

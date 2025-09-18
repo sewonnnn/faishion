@@ -18,5 +18,7 @@ public class QnaDTO {
     private String content;
     private String answer; // 답변 내용
     private String answeredBy; //답변한 판매자
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
 
 }
