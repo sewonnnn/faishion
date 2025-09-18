@@ -10,6 +10,7 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useNavigate } from 'react-router-dom';
 
 
 // 카테고리 데이터
@@ -28,20 +29,28 @@ const categories = {
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // 검색 입력창의 값을 관리하기 위한 상태
+    const [searchQuery, setSearchQuery] = useState('');
+    // URL 변경을 위한 navigate 훅 사용
+    const navigate = useNavigate();
 
     // 드롭다운 메뉴 렌더링 함수
-    const renderSubCategories = (categoryData) => {
+    const renderSubCategories = (category, categoryData) => {
         return (
             <div className="row">
                 {Object.keys(categoryData).map((subCategory, index) => (
                     <div className="col" key={index}>
                         <h6 className="dropdown-title">{subCategory}</h6>
                         <ul className="list-unstyled">
-                            {categoryData[subCategory].map((item, subIndex) => (
-                                <li key={subIndex}>
-                                    <a href="#">{item}</a>
-                                </li>
-                            ))}
+                            {categoryData[subCategory].map((item, subIndex) => {
+                                // 동적 URL 생성: '/product/list' 경로로 통일
+                                const url = `/product/list?category=${category}&subCategory=${subCategory}&item=${item}`;
+                                return (
+                                    <li key={subIndex}>
+                                        <a href={url}>{item}</a>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 ))}
@@ -56,11 +65,24 @@ const Header = () => {
                 {Object.keys(categories).map(category => (
                     <div className="col-2 category-col" key={category}>
                         <h5 className="category-title">{category}</h5>
-                        {renderSubCategories(categories[category])}
+                        {/* renderSubCategories 함수에 상위 카테고리 정보 전달 */}
+                        {renderSubCategories(category, categories[category])}
                     </div>
                 ))}
             </div>
         );
+    };
+
+    // 검색 핸들러 함수
+    const handleSearch = (e) => {
+        // 폼의 기본 제출 동작(페이지 새로고침) 방지
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            // trim()으로 공백 제거 후 검색어가 있을 때만 navigate 실행
+            navigate(`/product/list?searchQuery=${searchQuery.trim()}`);
+            // 검색 후 입력창 비우기
+            setSearchQuery('');
+        }
     };
 
     return (
@@ -106,16 +128,20 @@ const Header = () => {
                             <Nav.Link href="#solo">단독</Nav.Link>
                             <Nav.Link href="#recom">추천</Nav.Link>
                             <Nav.Link href="/product/list?type=women">여성</Nav.Link>
-                            <Nav.Link href="/product/list?type=women">남성</Nav.Link>
+                            <Nav.Link href="/product/list?type=men">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
-                            <Form className="d-flex seantrch-bar">
+                            {/* onSubmit 핸들러 추가 */}
+                            <Form className="d-flex seantrch-bar" onSubmit={handleSearch}>
                                 <FormControl
                                     type="search"
                                     placeholder="상품을 검색하세요"
                                     aria-label="Search"
+                                    // 입력 값과 상태를 연결
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                 />
-                                <Button variant="outline-success">
+                                <Button variant="outline-success" type="submit">
                                     <i className="bi bi-search"></i>
                                 </Button>
                             </Form>
