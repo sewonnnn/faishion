@@ -16,7 +16,6 @@ const ProductFooter = ({ productId }) => {
         try {
             const response = await axios.get(`/api/review/${productId}`);
             setReviews(response.data);
-            console.log(response.data);
         } catch (error) {
             console.error('리뷰 목록을 불러오는 데 실패했습니다:', error);
             setReviews([]);

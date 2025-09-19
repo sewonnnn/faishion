@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,38 +24,79 @@ public class ReviewController {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    // 리뷰 저장: POST 요청을 받도록 변경하고 @RequestBody로 JSON을 받음
     @PostMapping("/save")
-    public ResponseEntity<String> saveReview(@RequestBody ReviewDTO reviewDto) {
-        Review review = new Review();
-        review.setContent(reviewDto.getContent());
-        review.setRating(reviewDto.getRating());
-        User user = userRepository.getReferenceById("sewon");
-        Product product = productRepository.getReferenceById(reviewDto.getProductId());
-        review.setUser(user);
-        review.setProduct(product);
-        reviewService.save(review);
-        return ResponseEntity.status(HttpStatus.CREATED).body("리뷰가 성공적으로 등록되었습니다.");
-    }
+    public ResponseEntity<String> saveReview(
+            @RequestPart("reviewData") ReviewDTO reviewDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles
+    ) {
 
-    // 특정 상품의 리뷰 목록 조회: GET 요청으로 productId를 받아 DTO 목록을 반환
+        try {
+            // Optional 객체를 반환받아 isPresent()로 존재 여부를 먼저 확인
+            Optional<User> userOptional = userRepository.findByName(reviewDto.getUserId());
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                // 찾은 사용자의 ID와 Name을 출력하여 확인
+                System.out.println("[Controller] 찾은 사용자 ID: " + user.getId());
+                System.out.println("[Controller] 찾은 사용자 Name: " + user.getName());
+
+                Product product = productRepository.findById(reviewDto.getProductId())
+                        .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+                Review review = new Review();
+                review.setContent(reviewDto.getContent());
+                review.setRating(reviewDto.getRating());
+                review.setUser(user);
+                review.setProduct(product);
+
+                reviewService.saveReviewWithImages(review, imageFiles);
+                return ResponseEntity.status(HttpStatus.CREATED).body("리뷰가 성공적으로 등록되었습니다.");
+
+            } else {
+                throw new RuntimeException("사용자를 찾을 수 없습니다.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(); // 전체 스택 트레이스 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰 등록 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
     @GetMapping("/{productId}")
     public List<ReviewResponseDTO> getReviewsByProductId(@PathVariable Long productId) {
+
         List<Review> reviews = reviewService.findByProduct_Id(productId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
         if (reviews == null || reviews.isEmpty()) {
-            // 리뷰가 없을 경우 빈 리스트 반환
             return List.of();
         }
-
-        // Review 엔티티 목록을 ReviewResponseDTO 목록으로 변환
         return reviews.stream()
                 .map(review -> new ReviewResponseDTO(
                         review.getId(),
-                        review.getUser().getName(),
+                        review.getUser().getId(),
                         review.getContent(),
                         review.getRating(),
-                        review.getCreatedAt().toString() // LocalDateTime을 String으로 변환
+                        review.getCreatedAt().format(formatter),
+                        review.getReviewImage().stream()
+                                .map(image -> "/uploads/" + image.getSavedName())
+                                .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
+    }
+    @GetMapping("/isReported/{reviewId}")
+    public boolean isReported(@PathVariable Long reviewId) {
+        System.out.println("reviewid : " + reviewId);
+        if(reviewId == null) {
+            return false; // null 체크
+        }
+        // reviewService.reportReview의 반환값을 그대로 반환
+        boolean success = reviewService.reportReview(reviewId);
+        if(success) {
+            System.out.println("신고에 성공했습니다.");
+        } else {
+            System.out.println("신고 실패");
+        }
+        return success;
     }
 }

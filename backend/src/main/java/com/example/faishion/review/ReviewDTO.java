@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ReviewDTO {
     private Long productId;
+    private String userId;
     private String content;
     private int rating;
 }
