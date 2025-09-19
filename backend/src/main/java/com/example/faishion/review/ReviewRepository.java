@@ -2,6 +2,11 @@ package com.example.faishion.review;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewRepository extends JpaRepository<Review,Integer> {
+import java.util.List;
+import java.util.Optional;
+
+public interface ReviewRepository extends JpaRepository<Review,Long> {
+
+    List<Review> findByProduct_Id(Long productId);
 
 }

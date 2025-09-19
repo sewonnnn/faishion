@@ -15,16 +15,14 @@ import {
 } from "react-bootstrap";
 import "./ProductRightInfo.css";
 
-const ProductRightInfo = ({ product: initialProduct, productId }) => {
+const ProductRightInfo = ({ productId, product }) => {
     const navigate = useNavigate();
-    const [product] = useState(initialProduct);
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState(null);
-    const [selectedSize, setSelectedSize] = useState(null);
-    console.log(productId)
+    const [color, setColor] = useState(null);
+    const [size, setSize] = useState(null);
+
     const onAIForm = () => {
         navigate(`/gemini/${productId}`);
-        //... (기존 로직 유지)
     };
 
     const onOrderForm = () => {
@@ -42,7 +40,20 @@ const ProductRightInfo = ({ product: initialProduct, productId }) => {
     };
 
     const onCartSave = async () => {
-        //... (기존 로직 유지)
+        try {
+            const stock = {
+                quantity: quantity,
+                color: color,
+                size: size,
+                productId: productId
+            }
+                const response = await axios.post('/api/cart/save',stock);
+                if(response){
+                    console.log("카트에 저장 성공");
+                }
+            } catch (error) {
+                console.error('Error fetching banner data:', error);
+            }
     };
 
     const formatPrice = (price) => {
@@ -105,8 +116,8 @@ const ProductRightInfo = ({ product: initialProduct, productId }) => {
                 <ToggleButtonGroup
                     type="radio"
                     name="colors"
-                    value={selectedColor}
-                    onChange={(val) => setSelectedColor(val)}
+                    value={color}
+                    onChange={(val) => setColor(val)}
                 >
                     {currentProduct.colors && currentProduct.colors.map((color) => (
                         <ToggleButton
@@ -127,8 +138,8 @@ const ProductRightInfo = ({ product: initialProduct, productId }) => {
                 <ToggleButtonGroup
                     type="radio"
                     name="sizes"
-                    value={selectedSize}
-                    onChange={(val) => setSelectedSize(val)}
+                    value={size}
+                    onChange={(val) => setSize(val)}
                 >
                     {currentProduct.sizes && currentProduct.sizes.map((size) => (
                         <ToggleButton

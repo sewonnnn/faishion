@@ -28,7 +28,7 @@ public class AuthController {
         }
         var user = new User();
         user.setId(UUID.randomUUID().toString());   // PK(String) 생성
-        user.setProvider("local");
+//        user.setProvider("local");
         user.setName(req.name());
         user.setEmail(req.email());
         user.setPhoneNumber(req.phoneNumber());

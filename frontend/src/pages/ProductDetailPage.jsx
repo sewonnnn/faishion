@@ -1,16 +1,16 @@
-// ProductDetail.jsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import ProductLiftInfo from "../components/productdetail/ProductLiftInfo.jsx";
 import ProductRightInfo from "../components/productdetail/ProductRightInfo.jsx";
 import {useParams} from "react-router-dom";
 import ProductBody from "../components/productdetail/ProductBody.jsx";
 import ProductFooter from "../components/productdetail/ProductFooter.jsx";
+import axios from "axios";
 const ProductDetail = () => {
     // 상품 정보를 가져오는 API 호출 로직 (mock data 사용)
     const {productId} = useParams();
     const productData = {
-        id: "123",
+        id: "1",
         brand: "BEAKER ORIGINAL",
         name: "Men Harry Cardigan - Brown",
         price: 337250,
@@ -28,6 +28,19 @@ const ProductDetail = () => {
             '../../assets/react.svg',
         ],
     };
+    // useEffect(() => {
+    //     const findProduct = async () => {
+    //         try {
+    //             const response = await axios.get(`/api/product/${productId}`);
+    //             console.log(response.data);
+    //
+    //         } catch (error) {
+    //             console.error('Error fetching banner data:', error);
+    //             setBannerItems([]); // 에러 시 빈 배열로 초기화
+    //         }
+    //     };
+    //     fetchBannerData();
+    // }, []);
 
     return (
         <Container className="my-5">

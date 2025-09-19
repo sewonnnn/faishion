@@ -2,29 +2,23 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const QnaFormPage = () => {
+const NoticeFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [login, setLogin] = useState("sewon"); // 로그인 유저 관리 (임시)
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            await axios.post("http://localhost:8080/qna", {
-                user: { id: "test-user" }, // 로그인된 사용자 ID (임시)
-                product: { id: 1 },        // 질문할 상품 ID (임시)
+            await axios.post("http://localhost:8080/notice", {
                 title,
-                content,
-                answer: null,
-                answeredBy: null
+                content
             });
             alert("게시글이 등록되었습니다.");
             // 등록 성공 시 QnA 목록 페이지로 이동
-            navigate("/qna/list");
+            navigate("/notice/list");
         } catch (error) {
-            console.error("Error posting QnA", error);
+            console.error("Error posting notice", error);
             alert("등록 중 오류가 발생했습니다.");
         }
     };
@@ -32,8 +26,7 @@ const QnaFormPage = () => {
     return (
         <section className="qa-form">
             <div className="qa-inner">
-                <h1>Q&A 작성하기</h1>
-                <div>{login}</div>
+                <h1>공지사항 작성하기</h1>
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label>제목</label><br/>
@@ -60,4 +53,4 @@ const QnaFormPage = () => {
     );
 };
 
-export default QnaFormPage;
+export default NoticeFormPage;
