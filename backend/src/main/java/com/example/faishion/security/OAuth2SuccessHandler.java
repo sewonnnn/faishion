@@ -8,14 +8,20 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+    // JwtTokenProvider 주입
+    private final JwtTokenProvider jwt;
+
     // React 콜백 페이지
+    // 토큰을 URL에 담지 않으므로, 더이상 query param이 필요 없습니다.
     private static final String FRONT_SUCCESS_URL = "http://localhost:5173/login/success";
 
     @Override
@@ -30,11 +36,26 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
 
-        // 토큰은 보내지 않고 userId만 React로 넘김
-        String redirect = UriComponentsBuilder.fromUriString(FRONT_SUCCESS_URL)
-                .queryParam("userId", appUserId)
-                .build().toUriString();
+        // 👇️ 소셜 로그인 성공 직후 JWT를 생성
+        String accessToken  = jwt.generateAccess(appUserId, List.of("ROLE_USER"));
+        String refreshToken = jwt.generateRefresh(appUserId);
 
-        response.sendRedirect(redirect);
+        // 👇️ 생성된 JWT를 HttpOnly 쿠키에 담아 응답
+        Cookie accessCookie = new Cookie("accessToken", accessToken);
+        accessCookie.setHttpOnly(true);
+        // accessCookie.setSecure(true); // HTTPS 환경에서는 활성화
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(3600); // 1시간
+        response.addCookie(accessCookie);
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        // refreshCookie.setSecure(true); // HTTPS 환경에서는 활성화
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(86400); // 24시간
+        response.addCookie(refreshCookie);
+
+        // 👇️ 토큰 없이 성공 페이지로 리디렉션
+        response.sendRedirect(FRONT_SUCCESS_URL);
     }
 }

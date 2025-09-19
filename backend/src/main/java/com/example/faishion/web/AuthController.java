@@ -5,7 +5,8 @@ import com.example.faishion.user.AuthProvider;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import com.example.faishion.web.dto.AuthDto;
-import com.example.faishion.web.dto.AuthDto.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-// 로컬 + 소셜 jwt 발급 API
+    // 로컬 + 소셜 jwt 발급 API
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtTokenProvider jwt;
@@ -48,8 +48,9 @@ public class AuthController {
     }
 
     // 로컬 로그인: username 또는 email 둘 다 허용
+    // HttpServletResponse를 주입하여 쿠키를 설정
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
         var login = req.login();
         var userOpt = (login.contains("@"))
                 ? userRepo.findByEmail(login)
@@ -60,19 +61,28 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
+        // JWT 생성
         String access  = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));
         String refresh = jwt.generateRefresh(u.getId());
-        return ResponseEntity.ok(new AuthDto.TokenRes(access, refresh));
+
+        // HttpOnly 쿠키에 토큰을 담아 응답
+        Cookie accessCookie = new Cookie("accessToken", access);
+        accessCookie.setHttpOnly(true);
+        // accessCookie.setSecure(true); // HTTPS 환경에서는 활성화
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(3600); // 1시간
+        response.addCookie(accessCookie);
+
+        Cookie refreshCookie = new Cookie("refreshToken", refresh);
+        refreshCookie.setHttpOnly(true);
+        // refreshCookie.setSecure(true); // HTTPS 환경에서는 활성화
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(86400); // 24시간
+        response.addCookie(refreshCookie);
+
+        // 응답 본문에는 토큰을 담지 않고, 성공 응답만 보냄
+        return ResponseEntity.ok().build();
     }
 
-    // 소셜 로그인 이후 React에서 JWT 요청
-    @PostMapping("/social/callback")
-    public ResponseEntity<?> socialCallback(@RequestBody Map<String,String> body) {
-        String appUserId = body.get("userId"); // React에서 전달한 UUID
-        var u = userRepo.findById(appUserId).orElseThrow();
 
-        String access  = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));
-        String refresh = jwt.generateRefresh(u.getId());
-        return ResponseEntity.ok(new AuthDto.TokenRes(access, refresh));
-    }
 }
