@@ -42,7 +42,7 @@ public class Review {
     private boolean isReported; //신고 여부
 
     @OneToOne
-    @JoinColumn(name = "image_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Image image;
 
     @CreationTimestamp

@@ -32,7 +32,8 @@ public class ReviewController {
 
         try {
             // Optional 객체를 반환받아 isPresent()로 존재 여부를 먼저 확인
-            Optional<User> userOptional = userRepository.findByName(reviewDto.getUserId());
+            System.out.println(reviewDto.getUserId());
+            Optional<User> userOptional = userRepository.findById(reviewDto.getUserId());
 
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
@@ -77,10 +78,10 @@ public class ReviewController {
                         review.getUser().getId(),
                         review.getContent(),
                         review.getRating(),
-                        review.getCreatedAt().format(formatter),
-                        review.getReviewImage().stream()
-                                .map(image -> "/uploads/" + image.getSavedName())
-                                .collect(Collectors.toList())
+                        review.getCreatedAt().format(formatter)
+//                        review.getReviewImage().stream()
+//                                .map(image -> "/uploads/" + image.getSavedName())
+//                                .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
     }

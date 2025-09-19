@@ -28,7 +28,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
-    private final UserDetailsService userDetailsService;
+    //private final UserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
@@ -38,11 +38,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // BCrypt 해시 사용
     }
 
+
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
         var provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(encoder); // Bcrypt 설정
-        provider.setUserDetailsService(userDetailsService); // 사용자 로드 서비스 설정
+        //provider.setUserDetailsService(userDetailsService); // 사용자 로드 서비스 설정
         return new ProviderManager(provider);
     }
 

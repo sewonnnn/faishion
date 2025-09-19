@@ -19,7 +19,6 @@ import java.util.UUID;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final ReviewImageRepository reviewImageRepository;
 
     // 리뷰 저장
     @Transactional
@@ -27,47 +26,47 @@ public class ReviewService {
         // 1. Review 엔티티 먼저 저장
         Review savedReview = reviewRepository.save(review);
 
-        // 2. 이미지 파일 처리
-        List<ReviewImage> reviewImages = new ArrayList<>();
-        if (imageFiles != null && !imageFiles.isEmpty()) {
-            for (MultipartFile file : imageFiles) {
-                if (!file.isEmpty()) {
-                    // 파일 저장 및 ReviewImage 엔티티 생성
-                    ReviewImage reviewImage = saveImage(file, savedReview);
-                    reviewImages.add(reviewImage);
-                }
-            }
-        }
-
-        // 3. 모든 이미지 엔티티를 한 번에 저장
-        if (!reviewImages.isEmpty()) {
-            reviewImageRepository.saveAll(reviewImages);
-        }
+//        // 2. 이미지 파일 처리
+//        List<ReviewImage> reviewImages = new ArrayList<>();
+//        if (imageFiles != null && !imageFiles.isEmpty()) {
+//            for (MultipartFile file : imageFiles) {
+//                if (!file.isEmpty()) {
+//                    // 파일 저장 및 ReviewImage 엔티티 생성
+//                    ReviewImage reviewImage = saveImage(file, savedReview);
+//                    reviewImages.add(reviewImage);
+//                }
+//            }
+//        }
+//
+//        // 3. 모든 이미지 엔티티를 한 번에 저장
+//        if (!reviewImages.isEmpty()) {
+//            reviewImageRepository.saveAll(reviewImages);
+//        }
 
         return savedReview;
     }
 
-    // 리뷰 이미지 저장
-    private ReviewImage saveImage(MultipartFile file, Review review) throws IOException {
-        String uploadDir = "C:/uploads/"; // 실제 서버 경로로 변경 (운영 환경에서는 S3 등 클라우드 스토리지 사용 권장)
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        String savedFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-        Path filePath = uploadPath.resolve(savedFilename);
-
-        Files.copy(file.getInputStream(), filePath); // 파일 저장
-
-        ReviewImage reviewImage = new ReviewImage();
-        reviewImage.setOriginName(originalFilename);
-        reviewImage.setSavedName(savedFilename);
-        reviewImage.setReview(review); // 리뷰 엔티티와 연결
-
-        return reviewImage;
-    }
+//    // 리뷰 이미지 저장
+//    private ReviewImage saveImage(MultipartFile file, Review review) throws IOException {
+//        String uploadDir = "C:/uploads/"; // 실제 서버 경로로 변경 (운영 환경에서는 S3 등 클라우드 스토리지 사용 권장)
+//        Path uploadPath = Paths.get(uploadDir);
+//        if (!Files.exists(uploadPath)) {
+//            Files.createDirectories(uploadPath);
+//        }
+//
+//        String originalFilename = file.getOriginalFilename();
+//        String savedFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+//        Path filePath = uploadPath.resolve(savedFilename);
+//
+//        Files.copy(file.getInputStream(), filePath); // 파일 저장
+//
+//        ReviewImage reviewImage = new ReviewImage();
+//        reviewImage.setOriginName(originalFilename);
+//        reviewImage.setSavedName(savedFilename);
+//        reviewImage.setReview(review); // 리뷰 엔티티와 연결
+//
+//        return reviewImage;
+//    }
 
     // 리뷰목록 불러오기
     List<Review> findByProduct_Id(Long productId){
