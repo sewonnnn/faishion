@@ -1,11 +1,9 @@
 package com.example.faishion.qna;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.example.faishion.qna.QnaDTO.*;
 
 @Service
@@ -13,20 +11,19 @@ import static com.example.faishion.qna.QnaDTO.*;
 public class QnaService {
     private final QnaRepository qnaRepository;
 
-    public List<QnaDTO> findAll() {
-        return qnaRepository.findAll()
-                .stream()
-                .map(q -> new QnaDTO(q.getId(),
-                        q.getUser().getId(),   // user_id에 맞게 Long을 String으로 변환
-                        q.getTitle(),
-                        q.getContent(),
-                        q.getAnswer(),
-                        q.getAnsweredBy() != null ? q.getAnsweredBy().getId() : null,
-                        q.getCreatedAt(),
-                        q.getUpdatedAt()))
-                .collect(Collectors.toList());
-    }
+    public Page<QnaDTO> getQnaList(String searchQuery, Pageable pageable) {
+        Page<Qna> qnaPage;
 
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            qnaPage = qnaRepository.findByTitleContaining(searchQuery, pageable);
+        } else {
+            qnaPage = qnaRepository.findAll(pageable);
+        }
+
+        // Qna Page를 QnaDTO Page로 변환하여 반환
+        return qnaPage.map(QnaDTO::new);
+    }
+    
     public void addQna(Qna qna) {
         qnaRepository.save(qna);
     }
@@ -43,7 +40,8 @@ public class QnaService {
                 .title(qnaEntity.getTitle())
                 .content(qnaEntity.getContent())
                 .answer(qnaEntity.getAnswer())
-                .answeredBy(qnaEntity.getAnsweredBy() != null ? qnaEntity.getAnsweredBy().getId() : null)
+                .answered_by(qnaEntity.getAnsweredBy() != null ? qnaEntity.getAnsweredBy().getId() : null)
+                .created_at(qnaEntity.getCreatedAt())
                 .build();
     }
 

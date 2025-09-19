@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const QnaFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [login, setLogin] = useState("sewon"); // 로그인 유저 관리 (임시)
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -32,7 +33,7 @@ const QnaFormPage = () => {
         <section className="qa-form">
             <div className="qa-inner">
                 <h1>Q&A 작성하기</h1>
-                <div>작성자(로그인 유저 아이디)</div>
+                <div>{login}</div>
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label>제목</label><br/>

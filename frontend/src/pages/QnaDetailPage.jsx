@@ -30,7 +30,7 @@ const QnaDetailPage = () => {
                     // 상세보기 데이터 불러온 후 useState에 저장
                     setEditedTitle(res.data.title);
                     setEditedContent(res.data.content);
-                    setAnsweredBy(res.data.answeredBy);
+                  //  setAnsweredBy(res.data.answeredBy);
                 }
             } catch (e) {
                 if (!ignore) setError(e);
@@ -171,7 +171,7 @@ const QnaDetailPage = () => {
                    <div className="answer-box">
                        <p>{qna.answer}</p>
                        <small className="answered-by">
-                           답변자: {answeredBy}
+                           답변자:{answeredBy}
                        </small>
                    </div>
                ) : (
