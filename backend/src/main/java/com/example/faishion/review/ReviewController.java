@@ -85,18 +85,16 @@ public class ReviewController {
                 .collect(Collectors.toList());
     }
     @GetMapping("/isReported/{reviewId}")
-    public boolean isReported(@PathVariable Long reviewId) {
-        System.out.println("reviewid : " + reviewId);
-        if(reviewId == null) {
-            return false; // null 체크
+    public boolean isReported(@PathVariable Long reviewid) {
+        System.out.println("reviewid : " +reviewid);
+        if(reviewid == null){
+            return false;
         }
-        // reviewService.reportReview의 반환값을 그대로 반환
-        boolean success = reviewService.reportReview(reviewId);
-        if(success) {
+        if(reviewService.reportReview(reviewid)){
             System.out.println("신고에 성공했습니다.");
-        } else {
+        }else{
             System.out.println("신고 실패");
         }
-        return success;
+        return true;
     }
 }

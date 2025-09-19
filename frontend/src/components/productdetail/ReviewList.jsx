@@ -1,9 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { ListGroup, Image, Button } from 'react-bootstrap'; // Button 컴포넌트 추가
 import { BsStar, BsStarFill } from 'react-icons/bs';
-import axios from "axios";
+import ReportModal from "./ReportModal.jsx";
 
 const ReviewList = ({ reviews }) => {
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [modalReviews, setModalReviews] = useState(null);
+    const handleShow = (reviewId) => {
+        setModalReviews(reviewId)
+        setShowReportModal(true);
+    }
     // 별점 렌더링 함수
     const renderStars = (rating) => {
         const stars = [];
@@ -15,28 +21,6 @@ const ReviewList = ({ reviews }) => {
             );
         }
         return stars;
-    };
-
-    // 신고하기 버튼 클릭 핸들러
-    const handleReport = async (reviewId) => {
-        console.log(`리뷰 ID ${reviewId}를 신고합니다.`);
-        try {
-            // 비동기 요청을 기다림
-            const response = await axios.get(`/api/review/isReported/${reviewId}`);
-
-            // 서버에서 반환하는 데이터(true/false)에 따라 로직 처리
-            if (response.data) {
-                console.log("신고에 성공했습니다.");
-                alert(`리뷰 ID ${reviewId}가 신고되었습니다.`);
-            } else {
-                console.log("신고 실패");
-                alert(`리뷰 ID ${reviewId} 신고에 실패했습니다.`);
-            }
-        } catch (error) {
-            // 네트워크 오류, 서버 오류 등 예외 처리
-            console.error("신고 중 오류 발생:", error);
-            alert("신고 처리 중 오류가 발생했습니다.");
-        }
     };
 
     return (
@@ -71,7 +55,7 @@ const ReviewList = ({ reviews }) => {
                                 <Button
                                     variant="link"
                                     size="sm"
-                                    onClick={() => handleReport(review.id)}
+                                    onClick={()=> handleShow(review.id)}
                                     style={{ padding: '0', textDecoration: 'none' }}
                                 >
                                     신고하기
@@ -79,6 +63,12 @@ const ReviewList = ({ reviews }) => {
                             </div>
                         </ListGroup.Item>
                     ))}
+                    <ReportModal
+                        show={showReportModal}
+                        setShow={setShowReportModal}
+                        // handleClose={handleClose}
+                        reviewId={modalReviews}
+                    />
                 </ListGroup>
             ) : (
                 <p className="text-center text-muted">아직 작성된 리뷰가 없습니다.</p>
