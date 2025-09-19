@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/qna")
 public class QnaController {
     private final QnaService qnaService;
-
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
@@ -26,9 +25,6 @@ public class QnaController {
                                    @PageableDefault(size = 10,
                                            direction = Sort.Direction.DESC) Pageable pageable) {
         System.out.println("컨트롤러 검색어: " + searchQuery);
-        System.out.println("페이지 번호: " + pageable.getPageNumber());
-        System.out.println("페이지 크기: " + pageable.getPageSize());
-
         return qnaService.getQnaList(searchQuery, pageable);
     }
 
@@ -54,7 +50,6 @@ public class QnaController {
     // 게시물 수정하기
     @PutMapping("/{id}")
     public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
-        System.out.println("수정할 게시물 작성일:"+qnaDTO.getCreated_at());
         String title = qnaDTO.getTitle();
         String content = qnaDTO.getContent();
         qnaService.updateBoard(title, content, id);

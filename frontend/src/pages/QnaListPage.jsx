@@ -59,30 +59,24 @@ const QnaListPage = () => {
                     <colgroup>
                         <col style={{width:80}}/>
                         <col style={{width:160}}/>
-                        <col/>
                         <col style={{width:160}}/>
+                        <col style={{width:120}}/>
                     </colgroup>
                     <thead>
                     <tr>
                         <th>No</th>
-                        <th>
-                            <button className="th-sort" type="button" aria-sort="none">
-                                작성자
-                            </button>
-                        </th>
                         <th>제목</th>
-                        <th>작성일</th>
+                        <th>작성시간</th>
                         <th>답변상태</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {qnaBoardList.map((item, index) => {
+                    {qnaBoardList && qnaBoardList.map((item, index) => {
                         // 페이지 번호와 배열 인덱스를 더해 전체 순번을 계산
                         const sequentialNumber = (page * pageSize) + (index + 1);
                         return (
                             <tr key={index}>
                                 <td>{sequentialNumber}</td>
-                                <td>{item.user_id}</td>
                                 <td className="subject">
                                     <Link to={`/qna/${item.id}`}>
                                         {item.title}
@@ -115,21 +109,20 @@ const QnaListPage = () => {
                                 type="text"
                                 placeholder="Search"
                                 value={searchText}
-                                onChange={handleSearchChange} //  입력값 변경 핸들러 연결
+                                onChange={handleSearchChange}
                             />
-                            {/* 7. button의 type을 "submit"으로 변경 */}
-                            <button className="icon-search" aria-label="검색" type="submit">검색</button>
+                            <button className="icon-search" aria-label="검색" type="submit"></button>
                         </div>
                     </form>
                     <a className="btn-write" href="/qna/new">글쓰기</a>
-                    {/* 페이징 버튼 */}
-                    <div className="pagination">
-                        {Array.from({ length: totalPages }, (_, i) => (
-                            <button key={i} onClick={() => handlePageChange(i)} disabled={i === page}>
-                                {i + 1}
-                            </button>
-                        ))}
-                    </div>
+                </div>
+                {/* 페이징 버튼 (기능 유지를 위해 별도로 배치) */}
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button key={i} onClick={() => handlePageChange(i)} disabled={i === page}>
+                            {i + 1}
+                        </button>
+                    ))}
                 </div>
             </div>
         </section>

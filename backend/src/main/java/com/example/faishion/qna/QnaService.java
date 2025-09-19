@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import static com.example.faishion.qna.QnaDTO.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,21 +27,12 @@ public class QnaService {
         qnaRepository.save(qna);
     }
 
-        // 아이디로 상세보기
+    // 아이디로 상세보기
     public QnaDTO findQnaById(Long id) {
         Qna qnaEntity = qnaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
 
-        // DTO 빌더 패턴으로 변환
-        return builder()
-                .id(qnaEntity.getId())
-                .user_id(qnaEntity.getUser().getId()) // user 엔티티에서 ID를 가져오기
-                .title(qnaEntity.getTitle())
-                .content(qnaEntity.getContent())
-                .answer(qnaEntity.getAnswer())
-                .answered_by(qnaEntity.getAnsweredBy() != null ? qnaEntity.getAnsweredBy().getId() : null)
-                .created_at(qnaEntity.getCreatedAt())
-                .build();
+        return new QnaDTO(qnaEntity);
     }
 
     // 게시물 수정

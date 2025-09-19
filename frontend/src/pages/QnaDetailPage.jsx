@@ -110,81 +110,90 @@ const QnaDetailPage = () => {
 
     return (
        <>
-        <section className="qa-form">
-            <div className="qa-inner">
-                <h1>Q&A</h1>
-                <div>
-                    <div>작성자 {qna.user_id}</div>
-                    <div> 작성일{new Date(qna.created_at).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                    }).replace(/\. /g, '.').slice(0, -1)}</div>
-
-                    <label>제목</label><br/>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            value={editedTitle}
-                            onChange={(e) => setEditedTitle(e.target.value)}
-                        />
-                    ) : (
-                        <span>{qna.title}</span>
-                    )}
-                </div>
-
-                <div>
-                    <label>내용</label><br />
-                    {isEditing ? (
-                        <textarea
-                            value={editedContent}
-                            onChange={(e) => setEditedContent(e.target.value)}
-                        ></textarea>
-                    ) : (
-                        <p>{qna.content}</p>
-                    )}
-                </div>
-                {login === "sewon" ? (
-                    isEditing ? (
-                        <>
-                            <button onClick={handleUpdate}>수정 완료</button>
-                            <button onClick={() => setIsEditing(false)}>취소</button>
-                        </>
-                    ) : (
-                        <>  <button onClick={handleDelete}>삭제</button>
-                            <button onClick={() => setIsEditing(true)}>수정</button>
-                            <button onClick={() => navigate("/qna/list")}>목록</button>
-                        </>
-                    )
-                ) : (
-                    <>
-                        <button onClick={() => navigate("/qna/list")}>목록</button>
-                    </>
-                )}
-            </div>
-        </section>
-           {/* 답변 영역 */}
-           <div className="answer-section">
-               <label>답변</label><br />
-               {qna.answer ? (
-                   // 이미 답변이 있을 경우
-                   <div className="answer-box">
-                       <p>{qna.answer}</p>
-                       <small className="answered-by">
-                           답변자:{answeredBy}
-                       </small>
+           <section className="qa-form">
+               <div className="qa-inner">
+                   <h1>Q&A</h1>
+                   <div className="info-row">
+                       <div>작성자 {qna.user_id}</div>
+                       <div>
+                           작성일 {new Date(qna.created_at).toLocaleDateString('ko-KR', {
+                           year: 'numeric',
+                           month: '2-digit',
+                           day: '2-digit'
+                       }).replace(/\. /g, '.').slice(0, -1)}
+                       </div>
                    </div>
-               ) : (
-                   // 답변이 없을 경우에만 답변 폼 표시
-                   <div className="answer-form">
-                            <textarea
-                                onChange={(e) => setAnswer(e.target.value)}
-                                placeholder="답변 내용을 입력하세요..."
-                            ></textarea>
-                       <button onClick={handleAnswerSubmit}>답변 등록</button>
+                   <div className="mb-3">
+                       <label className="form-label">제목</label>
+                       {isEditing ? (
+                           <input
+                               type="text"
+                               className="form-control"
+                               value={editedTitle}
+                               onChange={(e) => setEditedTitle(e.target.value)}
+                           />
+                       ) : (
+                           <p className="form-control-plaintext">{qna.title}</p>
+                       )}
                    </div>
-               )}
-           </div>
+
+                   <div className="mb-4">
+                       <label className="form-label">내용</label>
+                       {isEditing ? (
+                           <textarea
+                               className="form-control"
+                               value={editedContent}
+                               onChange={(e) => setEditedContent(e.target.value)}
+                           ></textarea>
+                       ) : (
+                           <p className="form-control-plaintext">{qna.content}</p>
+                       )}
+                   </div>
+
+                   <div className="btn-group">
+                       {login === "sewon" ? (
+                           isEditing ? (
+                               <>
+                                   <button className="btn btn-primary" onClick={handleUpdate}>수정 완료</button>
+                                   <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>취소</button>
+                               </>
+                           ) : (
+                               <>
+                                   <button className="btn btn-primary" onClick={handleDelete}>삭제</button>
+                                   <button className="btn btn-secondary" onClick={() => setIsEditing(true)}>수정</button>
+                                   <button className="btn btn-secondary" onClick={() => navigate("/qna/list")}>목록</button>
+                               </>
+                           )
+                       ) : (
+                           <button className="btn btn-secondary" onClick={() => navigate("/qna/list")}>목록</button>
+                       )}
+                   </div>
+
+                   {/* 답변 영역 */}
+                   <div className="answer-section">
+                       <label className="form-label">답변</label>
+                       {qna.answer ? (
+                           // 이미 답변이 있을 경우
+                           <div className="answer-box">
+                               <p>{qna.answer}</p>
+                               <small className="answered-by">
+                                   답변자: {answeredBy}
+                               </small>
+                           </div>
+                       ) : (
+                           // 답변이 없을 경우에만 답변 폼 표시
+                           <div className="answer-form">
+                                <textarea
+                                    className="form-control"
+                                    onChange={(e) => setAnswer(e.target.value)}
+                                    placeholder="답변 내용을 입력하세요..."
+                                ></textarea>
+                               <button className="btn btn-primary" onClick={handleAnswerSubmit}>답변 등록</button>
+                           </div>
+                       )}
+                   </div>
+               </div>
+           </section>
        </>
     );
 };
