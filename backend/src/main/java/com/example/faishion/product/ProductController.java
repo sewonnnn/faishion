@@ -1,12 +1,11 @@
 package com.example.faishion.product;
 
-import com.example.faishion.image.ImageService;
-import com.example.faishion.seller.SellerRepository;
+import com.example.faishion.stock.Stock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,12 +27,15 @@ public class ProductController {
 
         return mockData;
     }
-
      */
 
     @PostMapping
-    void createProduct(@RequestPart("product") Product product, @RequestPart("images") List<MultipartFile> images){
-        productService.createProduct(product, images);
+    void createProduct(@RequestPart("product") Product product,
+                       @RequestPart("mainImages") List<MultipartFile> mainImages,
+                       @RequestPart("detailImages") List<MultipartFile> detailImages,
+                       @RequestPart("stockList") List<Stock> stockList,
+                       @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
+        productService.createProduct(product, mainImages, detailImages, stockList, stockImages);
     }
 
     @GetMapping("/list")
@@ -41,17 +43,17 @@ public class ProductController {
         return productService.findAll();
     }
 
-    // 카테고리에 맞는 상품 목록 가져오기 ho
-    @GetMapping("productcard")
-    List<Product> findAllProductCard() {
-        List<Product> mockData = new ArrayList<>();
-        mockData.add(new Product(1l,"1번째 상품","테스트용 상품입니다.",30000));
-        mockData.add(new Product(2l,"2번째 상품","테스트용 상품입니다.",20000));
-        mockData.add(new Product(3l,"3번째 상품","테스트용 상품입니다.",10000));
-        mockData.add(new Product(4l,"4번째 상품","테스트용 상품입니다.",40000));
-        mockData.add(new Product(5l,"5번째 상품","테스트용 상품입니다.",50000));
-        return mockData;
-    }
+//    // 카테고리에 맞는 상품 목록 가져오기 ho
+//    @GetMapping("productcard")
+//    List<Product> findAllProductCard() {
+//        List<Product> mockData = new ArrayList<>();
+//        mockData.add(new Product(1l,"1번째 상품","테스트용 상품입니다.",30000));
+//        mockData.add(new Product(2l,"2번째 상품","테스트용 상품입니다.",20000));
+//        mockData.add(new Product(3l,"3번째 상품","테스트용 상품입니다.",10000));
+//        mockData.add(new Product(4l,"4번째 상품","테스트용 상품입니다.",40000));
+//        mockData.add(new Product(5l,"5번째 상품","테스트용 상품입니다.",50000));
+//        return mockData;
+//    }
 
     // ProductDetailPage에서 id에 일치하는 상품 가져오기 ho
     @GetMapping("/{productId}")
