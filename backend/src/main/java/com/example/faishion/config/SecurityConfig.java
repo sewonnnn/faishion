@@ -1,8 +1,8 @@
 package com.example.faishion.config;
 
-//import com.example.faishion.security.CustomOAuth2UserService;
+import com.example.faishion.security.CustomOAuth2UserService;
 import com.example.faishion.security.JwtAuthenticationFilter;
-//import com.example.faishion.security.OAuth2SuccessHandler;
+import com.example.faishion.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +29,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final UserDetailsService userDetailsService;
-//    private final CustomOAuth2UserService customOAuth2UserService;
-//    private final OAuth2SuccessHandler  oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     // 비밀번호 단방향(BCrypt) 암호화용 Bean
     @Bean
@@ -47,22 +47,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    // csrfFilter
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // REST API라 CSRF 비활성화
+                .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-
-                .sessionManagement(sm ->  // 세션 관리
-                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // JWT니까 무상태
-                .authorizeHttpRequests(auth -> auth // URL 권한 규칙
-                        .anyRequest().permitAll() // 허용
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-                // OAuth2 로그인
-//        .oauth2Login(oauth -> oauth
-//                .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
-//                .successHandler(oAuth2SuccessHandler));
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // OAuth2 로그인 설정 활성화
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler));
         return http.build();
     }
 
@@ -72,8 +70,11 @@ public class SecurityConfig {
         var c = new CorsConfiguration();
         c.setAllowedOrigins(List.of("http://localhost:5173"));
         c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        c.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        // 'Cookie' 헤더 추가
+        c.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Cookie"));
+        c.setExposedHeaders(List.of("Authorization","Location"));
         c.setAllowCredentials(true);
+        c.setMaxAge(3600L);
         var s = new UrlBasedCorsConfigurationSource();
         s.registerCorsConfiguration("/**", c);
         return s;

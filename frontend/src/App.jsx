@@ -32,6 +32,7 @@ import QnaFormPage from "./pages/QnaFormPage.jsx";
 import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
 import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
+import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 
 
@@ -68,9 +69,11 @@ function App() {
     <>
      <BrowserRouter>
          <Routes>
+             <Route path="/oauthcallback" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
              <Route element={<Layout/>}>
                  <Route path="/" element={<HomePage/>}/>   {/*홈페이지*/}
                  <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}
+
                  <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
 
                <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}

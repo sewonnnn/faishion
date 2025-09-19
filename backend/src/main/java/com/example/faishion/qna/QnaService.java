@@ -1,4 +1,5 @@
 package com.example.faishion.qna;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
