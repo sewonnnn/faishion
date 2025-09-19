@@ -1,0 +1,115 @@
+:root {
+    --text: #222;
+    --muted: #777;
+    --border: #e6e6e6;
+    --border-strong: #d4d4d4;
+    --bg: #fff;
+    --hover: #fafafa;
+    --black: #111;
+}
+
+body { margin: 0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, sans-serif; color: var(--text); }
+
+.qa-form {
+    background: var(--bg);
+    padding: 64px 20px 56px;
+}
+.qa-inner { max-width: 960px; margin: 0 auto; }
+.qa-form h1 {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 28px;
+}
+.qa-form .row { margin-bottom: 20px; }
+.qa-form .form-label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+}
+.qa-form .form-control, .qa-form .form-control-plaintext {
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 10px 12px;
+    width: 100%;
+}
+.qa-form .form-control-plaintext {
+    border: none;
+    background-color: #f9f9f9;
+}
+
+.qa-form .mb-4 p{
+    height: 300px;
+}
+.qa-form textarea.form-control {
+    min-height: 50px;
+}
+.qa-form .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+.qa-form .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.qa-form .btn-primary {
+    background-color: var(--black);
+    color: #fff;
+}
+.qa-form .btn-secondary {
+    background-color: #ccc;
+    color: #444;
+}
+.qa-form .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.answer-section {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border-strong);
+}
+.answer-section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+.answer-box {
+    background-color: #f8f8f8;
+    border-left: 4px solid #333;
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+.answer-box p {
+    margin-bottom: 10px;
+}
+.answered-by {
+    font-size: 12px;
+    color: #777;
+    text-align: right;
+    display: block;
+}
+.answer-form textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    resize: vertical;
+}
+.answer-form .btn-primary {
+    margin-top: 10px;
+    float: right;
+}

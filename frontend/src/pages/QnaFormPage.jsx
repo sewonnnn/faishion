@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const QnaFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [login, setLogin] = useState("sewon"); // 로그인 유저 관리 (임시)
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -19,7 +20,7 @@ const QnaFormPage = () => {
                 answer: null,
                 answeredBy: null
             });
-
+            alert("게시글이 등록되었습니다.");
             // 등록 성공 시 QnA 목록 페이지로 이동
             navigate("/qna/list");
         } catch (error) {
@@ -32,6 +33,7 @@ const QnaFormPage = () => {
         <section className="qa-form">
             <div className="qa-inner">
                 <h1>Q&A 작성하기</h1>
+                <div>{login}</div>
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label>제목</label><br/>
@@ -42,7 +44,6 @@ const QnaFormPage = () => {
                             required
                         />
                     </div>
-
                     <div>
                         <label>내용</label><br/>
                         <textarea
@@ -52,7 +53,6 @@ const QnaFormPage = () => {
                             required
                         />
                     </div>
-
                     <button type="submit">등록하기</button>
                 </form>
             </div>

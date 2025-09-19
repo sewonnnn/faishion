@@ -1,5 +1,6 @@
 package com.example.faishion.stock;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.product.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,10 @@ public class Stock {
     private String color; //상품 색상
     private String size; //상품 사이즈
     private Integer quantity; //상품 재고 수량
+
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

@@ -1,24 +1,26 @@
-:root{
-    --text:#222;
-    --muted:#777;
-    --border:#e6e6e6;
-    --border-strong:#d4d4d4;
-    --bg:#fff;
-    --hover:#fafafa;
-    --black:#111;
+:root {
+    --text: #222;
+    --muted: #777;
+    --border: #e6e6e6;
+    --border-strong: #d4d4d4;
+    --bg: #fff;
+    --hover: #fafafa;
+    --black: #111;
 }
 
-* { box-sizing: border-box; }
-body { margin:0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, sans-serif; color:var(--text); }
+body { margin: 0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, sans-serif; color: var(--text); }
 
 .qa { background: var(--bg); }
 .qa-inner { max-width: 960px; margin: 0 auto; padding: 64px 20px 56px; }
 
 .qa-title {
-    text-align:center; font-size: 32px; font-weight: 600; margin: 0 0 28px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 28px;
 }
 
-/* table */
+/* 테이블 */
 .qa-table { width:100%; border-collapse: separate; border-spacing:0; font-size:14px; }
 .qa-table thead th {
     text-align:left; font-weight:600; padding:14px 16px; color:#444; border-bottom:1px solid var(--border-strong);
@@ -33,33 +35,35 @@ body { margin:0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, s
 
 .qa-table .subject { color:#333; }
 
-/* 카테고리 정렬 버튼 스타일(화살표) */
-.th-sort {
-    display:inline-flex; align-items:center; gap:6px;
-    padding:0; margin:0; background:none; border:none; font:inherit; color:inherit; cursor:pointer;
-}
-.th-sort .caret {
-    width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent;
-    border-top:6px solid #bbb; /* ▼ */
-}
-
 /* 검색 + 글쓰기 */
 .qa-actions {
     margin-top:24px;
     display:flex;
-    justify-content:center;
+    justify-content:flex-end;
     align-items:center;
     gap:12px;
 }
 
+.qa-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    width: 320px;
+    max-width: 70vw;
+    height: 38px;
+}
+
 .qa-search .search-input {
-    position:relative; width: 320px; max-width: 70vw;
+    position: relative;
+    width: 100%;
 }
-.qa-search input[type="search"]{
-    width:100%; height:38px; padding:0 40px 0 12px;
-    border:1px solid var(--border-strong); border-radius:4px; outline:none;
+
+.qa-search input[type="text"]{
+    width:100%; height:36px; padding:0 40px 0 12px;
+    border:none; border-radius:4px; outline:none;
 }
-.qa-search input[type="search"]::placeholder{ color:#b9b9b9; }
+.qa-search input[type="text"]::placeholder{ color:#b9b9b9; }
 .icon-search{
     position:absolute; right:6px; top:50%; transform:translateY(-50%);
     width:28px; height:28px; border:none; background:#fff; border-radius:4px; cursor:pointer;
@@ -80,15 +84,42 @@ body { margin:0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, s
 }
 .btn-write:hover{ opacity:.9; }
 
-/* 스크린리더 전용 */
 .sr-only{
     position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
 }
 
-/* 반응형: 모바일에서 No 열 숨김 */
+/* 페이징 버튼 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+.pagination button {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 12px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.pagination button:hover {
+    background-color: #ddd;
+}
+.pagination button:disabled {
+    background-color: #333;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+/* 반응형: 모바일 */
 @media (max-width: 640px){
     .qa-table colgroup col:first-child,
     .qa-table thead th:first-child,
     .qa-table tbody td:first-child{ display:none; }
     .qa-title{ font-size:26px; }
+    .qa-actions { justify-content: flex-start; }
+    .qa-search { width: 100%; }
 }

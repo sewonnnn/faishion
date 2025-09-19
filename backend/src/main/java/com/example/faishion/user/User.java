@@ -3,6 +3,7 @@ package com.example.faishion.user;
 import com.example.faishion.address.Address;
 import com.example.faishion.cart.Cart;
 import com.example.faishion.coupon.Coupon;
+import com.example.faishion.image.Image;
 import com.example.faishion.notification.Notification;
 import com.example.faishion.order.Order;
 import com.example.faishion.wish.Wish;
@@ -15,6 +16,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +59,10 @@ public class User {
     @Column(name="pw_hash", length=100) // LOCAL만 사용 // 소셜은 null
     private String pwHash; //Spring Security 암호화
 
+    @OneToOne
+    @JoinColumn(name = "image_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Image image;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Address> addressList = new ArrayList<>();
 
@@ -75,11 +81,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Notification> notificationList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserImage userImage;
 
-
-    @CreationTimestamp  @Column(updatable = false)
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
