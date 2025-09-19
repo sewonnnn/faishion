@@ -32,6 +32,7 @@ import QnaFormPage from "./pages/QnaFormPage.jsx";
 import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
 import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
+import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 
 
 function Layout() {
@@ -75,7 +76,8 @@ function App() {
                <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
                <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
                 <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
-                 <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세 페이지 */ }
+                 <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
+                 <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
                {/*로그인한 사용자만 접근 가능한 페이지들*/}
                <Route path="/cart" element={<CartPage />} />   {/*장바구니 페이지*/}
                <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
