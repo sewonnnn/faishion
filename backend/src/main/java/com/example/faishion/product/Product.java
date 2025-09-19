@@ -1,5 +1,7 @@
 package com.example.faishion.product;
 
+import com.example.faishion.category.Category;
+import com.example.faishion.image.Image;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.stock.Stock;
 import jakarta.persistence.*;
@@ -22,14 +24,6 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "product")
 public class Product {
-    // ho 목데이터 적용용 추후에 지울 예정
-    public Product(Long id, String name, String description, Integer price) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,14 +33,21 @@ public class Product {
     private String description; //상품 설명
     private Integer price; //기본 가격
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImageList = new ArrayList<>(); //상품 이미지
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> mainImageList = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> detailImageList = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stock> stockList = new ArrayList<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Seller seller; //연관 판매자
 
     @CreationTimestamp
