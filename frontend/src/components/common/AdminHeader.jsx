@@ -1,5 +1,6 @@
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 const AdminHeader = () => {
+
     return (
         <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
             <Container>
@@ -28,15 +29,9 @@ const AdminHeader = () => {
                     </Nav>
 
                     <Nav>
-                        <NavDropdown title="내 계정" id="account-dropdown" align="end">
-                            <a className="dropdown-item" href="#">
-                                프로필
-                            </a>
-                            <NavDropdown.Divider />
-                            <a className="dropdown-item" href="#">
-                                로그아웃
-                            </a>
-                        </NavDropdown>
+                        <a className="dropdown-item" href="#">
+                            로그아웃
+                        </a>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

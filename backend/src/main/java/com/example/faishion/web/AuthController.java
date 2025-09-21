@@ -9,11 +9,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -84,5 +87,25 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/temp/token")
+    public ResponseEntity<String> tempLogin(@RequestBody Map<String, String> req){
+        String id = req.get("id");
+        String role = req.get("role");
+        String accessToken = jwt.generateAccess(id, List.of(role));
+        // 리프레시 토큰 생성
+        String refreshToken = jwt.generateRefresh(id);
+        // 리프레시 토큰을 HttpOnly 쿠키로 설정
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                //.secure(true) // HTTPS 환경에서만 전송, 개발환경이 HTTP이므로 임시 주석처리
+                .path("/")
+                .maxAge(86400)
+                .build();
+        // 액세스 토큰은 JSON 응답으로, 리프레시 토큰은 쿠키 헤더에 담아 전송
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(accessToken);
+    }
 
 }

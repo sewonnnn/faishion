@@ -31,18 +31,6 @@ const SellerHeader = () => {
                             </a>
                         </NavDropdown>
                     </Nav>
-
-                    <Nav>
-                        <NavDropdown title="내 계정" id="account-dropdown" align="end">
-                            <a className="dropdown-item" href="#">
-                                프로필
-                            </a>
-                            <NavDropdown.Divider />
-                            <a className="dropdown-item" href="#">
-                                로그아웃
-                            </a>
-                        </NavDropdown>
-                    </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
