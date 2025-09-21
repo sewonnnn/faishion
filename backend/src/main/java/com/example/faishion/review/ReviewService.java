@@ -1,5 +1,7 @@
 package com.example.faishion.review;
 
+import com.example.faishion.image.Image;
+import com.example.faishion.image.ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,18 @@ import java.util.UUID;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ImageService imageService;
 
     // 리뷰 저장
     @Transactional
     public Review saveReviewWithImages(Review review, List<MultipartFile> imageFiles) throws IOException {
         // 1. Review 엔티티 먼저 저장
         Review savedReview = reviewRepository.save(review);
+
+        for (MultipartFile file : imageFiles) {
+            Image image = imageService.saveImage(file);
+            savedReview.getImageList().add(image);
+        }
 
 //        // 2. 이미지 파일 처리
 //        List<ReviewImage> reviewImages = new ArrayList<>();

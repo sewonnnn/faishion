@@ -2,35 +2,39 @@ package com.example.faishion.product;
 
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageService;
+import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final SellerRepository sellerRepository;
     private final StockRepository stockRepository;
     private final ImageService imageService;
 
+    public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
+        return productRepository.sellerProducts(pageable);
+    }
+
     // 상품목록 전체 불러오기 ho
-    public List<ProductDTO> findAll() {
-        return productRepository.findAll().stream()
-                .map(product -> new ProductDTO(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getMainImageList().stream()
-                                .map(Image::getId)  // 이미지 id만
-                                .toList()
-                ))
-                .toList();
+    public Page<Object[]> findProductsBySearch(String searchQuery, Long categoryId, Pageable pageable) {
+       return productRepository.findProductsBySearch(searchQuery, categoryId, pageable);
     }
 
     // 아이디에 맞는 상품 불러오기 ho
@@ -39,11 +43,13 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProduct(Product product,
+    public void createProduct(String sellerId,
+                              Product product,
                               List<MultipartFile> mainImages,
                               List<MultipartFile> detailImages,
                               List<Stock> stockList,
                               List<MultipartFile> stockImages) throws IOException {
+        product.setSeller(sellerRepository.getReferenceById(sellerId));
         // 1. 상품(Product) 정보 저장
         Product savedProduct = productRepository.save(product);
         // 2. 메인, 상세 이미지 처리 및 저장

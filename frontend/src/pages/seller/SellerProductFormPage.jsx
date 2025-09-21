@@ -10,6 +10,7 @@ const SellerProductFormPage = () => {
     const [product, setProduct] = useState({
         name: '',
         status: 1, // '판매 게시'를 의미하는 정수 1로 초기화
+        description: '',
         price: '',
         category: null,
         discountPrice: '',
@@ -178,7 +179,29 @@ const SellerProductFormPage = () => {
         e.preventDefault();
         const price = Number(product.price);
         const discountPrice = Number(product.discountPrice);
-        const { discountStartDate, discountEndDate, stocks } = product;
+        const { discountStartDate, discountEndDate, stocks, category } = product;
+
+        // 카테고리 유효성 검사
+        if (!category) {
+            alert('상품 카테고리를 선택해야 합니다.');
+            return;
+        }
+
+        // 이미지 유효성 검사
+        if (product.mainImages.length === 0) {
+            alert('상품 대표 이미지를 1개 이상 등록해야 합니다.');
+            return;
+        }
+
+        if (product.detailImages.length === 0) {
+            alert('상품 상세 이미지를 1개 이상 등록해야 합니다.');
+            return;
+        }
+
+        if (product.stocks.length === 0) {
+            alert('상품 재고 이미지를 1개 이상 등록해야 합니다.');
+            return;
+        }
 
         // 할인 기간 유효성 검사
         if (discountPrice > 0) {
@@ -215,6 +238,7 @@ const SellerProductFormPage = () => {
         const productData = {
             name: product.name,
             status: product.status,
+            description: product.description, // 상품 설명 추가
             price: product.price,
             category: product.category,
             discountPrice: product.discountPrice,
@@ -234,10 +258,8 @@ const SellerProductFormPage = () => {
         });
 
         // 5. Append stock information and images
-        // The stock information (count, color, size) should be sent as JSON.
-        // You can create a new array with only the necessary data.
         const stockData = product.stocks.map(stock => ({
-            count: stock.count,
+            quantity: stock.count,
             color: stock.color,
             size: stock.size,
         }));
@@ -279,6 +301,21 @@ const SellerProductFormPage = () => {
                             value={product.name}
                             onChange={handleChange}
                             placeholder="상품명 입력"
+                            required
+                        />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3" controlId="formProductDescription">
+                    <Form.Label column sm="2">상품 설명 :</Form.Label>
+                    <Col sm="10">
+                        <Form.Control
+                            as="textarea"
+                            name="description"
+                            value={product.description}
+                            onChange={handleChange}
+                            placeholder="상품 설명 입력"
+                            rows={5}
                             required
                         />
                     </Col>

@@ -18,6 +18,10 @@ const SellerHeader = () => {
                             카테고리 관리
                         </a>
 
+                        <a className="nav-link" href="/seller/order/list">
+                            주문 현황 관리
+                        </a>
+
                         <NavDropdown title="상품 관리" id="product-dropdown">
                             <a className="dropdown-item" href="/seller/product/list">
                                 상품 목록

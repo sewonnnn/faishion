@@ -15,5 +15,5 @@ public class ReviewResponseDTO {
     private String content; // 리뷰 내용
     private Integer rating; // 별점
     private String createdAt; // 작성 날짜
-//    private List<String> imageUrls; // 이미지 경로
+    private List<String> imageUrls; // 이미지 경로
 }

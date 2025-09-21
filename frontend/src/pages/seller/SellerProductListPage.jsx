@@ -1,90 +1,130 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Table, Image, Button } from "react-bootstrap";
+import { Container, Table, Button, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 
 const SellerProductListPage = () => {
     const [products, setProducts] = useState([]);
-
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageSize] = useState(5);
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/product/list");
-                setProducts(response.data);
+                const response = await axios.get(`http://localhost:8080/product/seller/list?page=${page}&size=${pageSize}`);
+                console.log(response.data.content);
+                setProducts(response.data.content);
+                setTotalPages(response.data.totalPages);
+                setTotalElements(response.data.totalElements);
             } catch (error) {
                 console.error("상품 목록 조회 실패:", error);
             }
         };
-
         fetchProducts();
-    }, []);
+    }, [page, pageSize]);
+
+    const handlePageChange = (pageNumber) => {
+        setPage(pageNumber);
+    };
+
+    const renderPaginationItems = () => {
+        let items = [];
+        for (let number = 0; number < totalPages; number++) {
+            items.push(
+                <Pagination.Item
+                    key={`page-${number}`}
+                    active={number === page}
+                    onClick={() => handlePageChange(number)}
+                >
+                    {number + 1}
+                </Pagination.Item>
+            );
+        }
+        return items;
+    };
 
     return (
         <Container className="my-5">
             <h1 className="mb-4">Seller Product List</h1>
-            {products.length === 0 ? (
+            {totalElements === 0 ? (
                 <p>상품이 없습니다.</p>
             ) : (
-                <Table bordered hover responsive>
-                    <thead>
-                    <tr className="text-center">
-                        <th>NO</th>
-                        <th>상품명</th>
-                        <th>판매가</th>
-                        <th>카테고리</th>
-                        <th>상태</th>
-                        <th>재고</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {products.map((product, index) => (
-                        <tr key={product.id} className="align-middle">
-                            <td className="text-center">{index + 1}</td>
-                            <td className="d-flex align-items-center">
-                                {/* 첫 번째 이미지가 존재하면 표시 */}
-                                {product.imageList && product.imageList.length > 0 ? (
-                                    <img
-                                        src={`http://localhost:8080/image/${product.imageList[0]}`}
-                                        alt={product.name}
-                                        style={{
-                                            width: "50px",
-                                            height: "50px",
-                                            objectFit: "cover",
-                                            marginRight: "10px",
-                                        }}
-                                        className="rounded"
-                                    />
-                                ) : (
-                                    <div
-                                        style={{
-                                            width: "50px",
-                                            height: "50px",
-                                            backgroundColor: "#e9ecef",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            marginRight: "10px",
-                                        }}
-                                        className="rounded"
-                                    >
-                                        <small>사진</small>
-                                    </div>
-                                )}
-                                <span>{product.name}</span>
-                            </td>
-                            <td>{product.price}원</td>
-                            <td>{product.category}</td>
-                            <td>{product.status}</td>
-                            <td>{product.stock}</td>
-                            <td>
-                                <Button variant="light">수정</Button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </Table>
+                <>
+                    {/* The problem is here. Remove the nested div and table tags. */}
+                    <Table bordered hover responsive>
+                        <thead>
+                            <tr className="text-center">
+                                <th>NO</th>
+                                <th>상품명</th>
+                                <th>판매가</th>
+                                <th>카테고리</th>
+                                <th>상태</th>
+                                <th>재고 (옵션별)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((product, index) => (
+                                <tr key={`product-${product.id}`} className="align-middle">
+                                    <td className="text-center">{product.id}</td>
+                                    <td className="d-flex align-items-center">
+                                        <img
+                                            src={`http://localhost:8080/image/${product.mainImageId}`}
+                                            style={{
+                                                width: "50px",
+                                                height: "50px",
+                                                objectFit: "cover",
+                                                marginRight: "10px",
+                                            }}
+                                            className="rounded"
+                                        />
+                                        <span>{product.name}</span>
+                                    </td>
+                                    <td>
+                                        {product.discountPrice && product.discountPrice != product.price && product.discountStartDate && product.discountEndDate && new Date() >= new Date(product.discountStartDate) && new Date() <= new Date(product.discountEndDate) ? (
+                                            <div>
+                                                <div style={{ textDecoration: "line-through", color: "gray" }}>
+                                                    {product.price}원
+                                                </div>
+                                                <div style={{ color: "red" }}>
+                                                    {product.discountPrice}원
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                {product.price}원
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>{product.categoryGroupName} > {product.categoryName}</td>
+                                    <td>{product.status === 1 ? '판매 중' : '판매 중지'}</td>
+                                    <td>
+                                        <ul className="list-unstyled mb-0">
+                                            {product.stockList && product.stockList.map(stock => (
+                                                <li key={`stock-${stock.id}`}>
+                                                    {stock.color} / {stock.size}: {stock.quantity}개
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <Button variant="light">수정</Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+
+                    <div className="d-flex justify-content-center">
+                        <Pagination>
+                            <Pagination.Prev onClick={() => handlePageChange(page - 1)} disabled={page === 0} />
+                            {renderPaginationItems()}
+                            <Pagination.Next onClick={() => handlePageChange(page + 1)} disabled={page >= totalPages - 1} />
+                        </Pagination>
+                    </div>
+                </>
             )}
         </Container>
     );
