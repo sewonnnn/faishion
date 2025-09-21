@@ -57,11 +57,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
                 // OAuth2 로그인 설정 활성화
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler));
+//                .oauth2Login(oauth -> oauth
+//                        .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
+//                        .successHandler(oAuth2SuccessHandler));
         return http.build();
     }
 
