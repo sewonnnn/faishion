@@ -25,6 +25,7 @@ const ProductCard = ({ product }) => {
         reviewCount
     } = product;
 
+    // 상품 선택시 상품 상세로 이동
     const productClick = () => {
         nav(`/product/${productId}`);
     };

@@ -9,7 +9,7 @@ function ReportModal({show, setShow, reviewId}) {
     const [description, setDescription] = React.useState(null);
     const handleClose = () => setShow(false);
 
-    // 저장하기 버튼 클릭 핸들러
+    // 신고 저장 버튼 핸들러
     const handleReport = async (reviewId) => {
 
         try {
@@ -20,16 +20,8 @@ function ReportModal({show, setShow, reviewId}) {
             }
             // 비동기 요청을 기다림
             const response = await axios.post("/api/report/isReported",result);
-
-            // 서버에서 반환하는 데이터(true/false)에 따라 로직 처리
-            if (response.data) {
-                console.log("신고에 성공했습니다.");
-                alert(`리뷰 ID ${reviewId}가 신고되었습니다.`);
-                handleClose();
-            } else {
-                console.log("신고 실패");
-                alert(`리뷰 ID ${reviewId} 신고에 실패했습니다.`);
-            }
+            alert(response.data);
+            handleClose();
         } catch (error) {
             // 네트워크 오류, 서버 오류 등 예외 처리
             console.error("신고 중 오류 발생:", error);

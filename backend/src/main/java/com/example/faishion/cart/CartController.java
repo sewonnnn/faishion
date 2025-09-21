@@ -23,10 +23,6 @@ public class CartController {
 
     @PostMapping("/save")
     public boolean cartSave(@RequestBody StockDTO stockDTO) {
-        System.out.println("DTO 수량: " + stockDTO.getQuantity());
-        System.out.println("DTO 색상: " + stockDTO.getColor());
-        System.out.println("DTO 사이즈: " + stockDTO.getSize());
-        System.out.println("DTO 상품 ID: " + stockDTO.getProductId());
 
         /*
         // DTO에서 받은 상품 ID로 Product 객체 조회
