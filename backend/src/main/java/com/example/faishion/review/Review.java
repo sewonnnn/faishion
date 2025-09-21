@@ -1,5 +1,6 @@
 package com.example.faishion.review;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.product.Product;
 import com.example.faishion.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,10 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -41,8 +43,8 @@ public class Review {
 
     private boolean isReported; //신고 여부
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewImage> reviewImage = new ArrayList<>(); // 리스트로 변경
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> imageList = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)

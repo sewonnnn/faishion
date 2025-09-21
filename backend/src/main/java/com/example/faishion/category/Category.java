@@ -1,5 +1,6 @@
 package com.example.faishion.category;
 
+import com.example.faishion.product.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,11 +16,15 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"category_group_id", "name"}))
 public class Category {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String name; // 소분류 이름
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> productList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_group_id", nullable = false)

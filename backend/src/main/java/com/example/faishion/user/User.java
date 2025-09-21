@@ -3,6 +3,7 @@ package com.example.faishion.user;
 import com.example.faishion.address.Address;
 import com.example.faishion.cart.Cart;
 import com.example.faishion.coupon.Coupon;
+import com.example.faishion.image.Image;
 import com.example.faishion.notification.Notification;
 import com.example.faishion.order.Order;
 import com.example.faishion.wish.Wish;
@@ -13,31 +14,54 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "users")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(name="uk_users_email", columnNames="email"),
+                @UniqueConstraint(name="uk_users_phone", columnNames="phone_number"),
+                @UniqueConstraint(name="uk_users_username", columnNames="username"),
+                @UniqueConstraint(name="uk_users_provider_uid", columnNames={"provider","provider_user_id"})
+        })
 public class User {
+
     @Id
-    private String id;  //oauth일 때 oauth의 고유 id가 여기에 들어감
+    @Column(length = 36)
+    private String id; // 항상 UUID (LOCAL/소셜 모두)
 
-    private String provider; //oauth 제공자 ex) naver, kakao, 일반사용자 일시 null
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private AuthProvider provider; // LOCAL, NAVER, KAKAO
 
+    @Column(name="provider_user_id", length=100)
+    private String providerUserId; // LOCAL일 땐 null
+
+    // 로컬 로그인용 사용자 아이디 // 소셜은 null 가능
+    @Column(length = 30)
+    private String username;
+
+    @Column(nullable = false, length = 60)
     private String name;
 
-    @Column(nullable = false)
-    private String email; //사용자 이메일
+    @Column(nullable = false, length = 100)
+    private String email;
 
-    @Column(nullable = false)
+    @Column(name="phone_number", nullable=false, length=20)
     private String phoneNumber;
 
+    @Column(name="pw_hash", length=100) // LOCAL만 사용 // 소셜은 null
     private String pwHash; //Spring Security 암호화
+
+    @OneToOne
+    @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Image image;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Address> addressList = new ArrayList<>();
@@ -57,8 +81,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Notification> notificationList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserImage userImage;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -67,7 +89,4 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public void updateUser(UserDTO dto) {
-        // 추후 작성
-    }
 }

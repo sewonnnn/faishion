@@ -1,5 +1,8 @@
 package com.example.faishion.product;
 
+import com.example.faishion.category.Category;
+import com.example.faishion.image.Image;
+import com.example.faishion.review.Review;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.stock.Stock;
 import jakarta.persistence.*;
@@ -13,7 +16,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,14 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "product")
 public class Product {
-    // ho 목데이터 적용용 추후에 지울 예정
-    public Product(Long id, String name, String description, Integer price) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,15 +35,29 @@ public class Product {
     @Column(length = 2000)
     private String description; //상품 설명
     private Integer price; //기본 가격
+    private Integer status; // '판매 게시' 또는 '판매 중지' 상태
+    private Integer discountPrice;
+    private LocalDateTime discountStartDate;
+    private LocalDateTime discountEndDate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Image> mainImageList = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Image> detailImageList = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImageList = new ArrayList<>(); //상품 이미지
+    private Set<Stock> stockList = new HashSet<>(); //상품 옵션(재고)
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Stock> stockList = new ArrayList<>(); //상품 옵션(재고)
+    private Set<Review> reviewList = new HashSet<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Seller seller; //연관 판매자
 
     @CreationTimestamp
