@@ -30,6 +30,7 @@ import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
 import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
+import SellerOrderListPage from "./pages/seller/SellerOrderListPage.jsx";
 import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
@@ -94,6 +95,7 @@ function App() {
                  <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
             {/*판매자 권한이 있는 사용자만 접근 가능한 페이지들*/}
                 <Route element={<SellerLayout/>}>
+                    <Route path="/seller/order/list" element={<SellerOrderListPage/>}/>
                      <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
                    <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
                      <Route path="/seller/category" element={<SellerCategoryPage/>}/> {/*판매자 카테고리 페이지*/}

@@ -35,11 +35,13 @@ public class Order {
     @JoinColumn(name = "address_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Address address;
 
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)) // 쿠폰을 사용 안 할 수도 있으므로 nullable true
     private Coupon coupon;
 
     private Integer usedPoint; //주문에 사용된 포인트
+     */
 
     private String status; //주문 상태
 

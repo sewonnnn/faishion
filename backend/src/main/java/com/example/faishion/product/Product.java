@@ -2,6 +2,7 @@ package com.example.faishion.product;
 
 import com.example.faishion.category.Category;
 import com.example.faishion.image.Image;
+import com.example.faishion.review.Review;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.stock.Stock;
 import jakarta.persistence.*;
@@ -15,7 +16,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -32,15 +35,22 @@ public class Product {
     @Column(length = 2000)
     private String description; //상품 설명
     private Integer price; //기본 가격
+    private Integer status; // '판매 게시' 또는 '판매 중지' 상태
+    private Integer discountPrice;
+    private LocalDateTime discountStartDate;
+    private LocalDateTime discountEndDate;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> mainImageList = new ArrayList<>();
+    private Set<Image> mainImageList = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> detailImageList = new ArrayList<>();
+    private Set<Image> detailImageList = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Stock> stockList = new ArrayList<>(); //상품 옵션(재고)
+    private Set<Stock> stockList = new HashSet<>(); //상품 옵션(재고)
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviewList = new HashSet<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

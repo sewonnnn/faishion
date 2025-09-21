@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Navbar,
     Container,
@@ -11,62 +11,63 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
-
-// 카테고리 데이터
-const categories = {
-    여성: {
-        의류: ['아우터', '원피스', '블라우스', '셔츠', '티셔츠', '니트', '스커트', '팬츠', '데님', '라운지웨어', '언더웨어'],
-        가방: ['숄더백', '에코/캔버스백', '크로스백', '토트백', '클러치', '백팩', '지갑', '백팩 액세서리', '기타가방'],
-        신발: ['스니커즈', '로퍼', '플랫슈즈', '펌프스', '샌들', '뮬/슬리퍼', '부츠', '시즌슈즈', '슈즈액세서리']
-    },
-    남성: {
-        의류: ['아우터', '상의', '니트', '팬츠', '데님', '라운지웨어'],
-        가방: ['백팩', '숄더백', '크로스백', '토트백', '클러치', '지갑', '백팩액세서리', '기타가방'],
-        신발: ['스니커즈', '샌들', '슬리퍼', '부츠', '시즌슈즈', '레이스업']
-    }
-};
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     // 검색 입력창의 값을 관리하기 위한 상태
     const [searchQuery, setSearchQuery] = useState('');
+    // API에서 가져올 카테고리 데이터를 위한 상태
+    const [categories, setCategories] = useState([]);
     // URL 변경을 위한 navigate 훅 사용
     const navigate = useNavigate();
 
-    // 드롭다운 메뉴 렌더링 함수
-    const renderSubCategories = (category, categoryData) => {
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get('/api/category/groups');
+                setCategories(response.data);
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+                // 에러 발생 시 초기 데이터를 사용하거나 다른 처리를 할 수 있습니다.
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    const renderSubCategories = (subCategories) => {
         return (
             <div className="row">
-                {Object.keys(categoryData).map((subCategory, index) => (
-                    <div className="col" key={index}>
-                        <h6 className="dropdown-title">{subCategory}</h6>
-                        <ul className="list-unstyled">
-                            {categoryData[subCategory].map((item, subIndex) => {
-                                // 동적 URL 생성: '/product/list' 경로로 통일
-                                const url = `/product/list?category=${category}&subCategory=${subCategory}&item=${item}`;
-                                return (
-                                    <li key={subIndex}>
-                                        <a href={url}>{item}</a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                ))}
+                <div className="col">
+                    <ul className="list-unstyled">
+                        {subCategories.map((item) => {
+                            // url 생성 시 categoryName과 item.name을 사용합니다.
+                            const url = `/product/list?categoryId=${item.id}`;
+                            return (
+                                <li key={item.id}>
+                                    <a href={url}>{item.name}</a>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
             </div>
         );
     };
 
     // 전체 메뉴 렌더링 함수
+    // categories 상태는 이제 CategoryGroupDTO 배열입니다.
     const renderAllMenu = () => {
         return (
             <div className="row g-0 full-menu">
-                {Object.keys(categories).map(category => (
-                    <div className="col-2 category-col" key={category}>
-                        <h5 className="category-title">{category}</h5>
-                        {/* renderSubCategories 함수에 상위 카테고리 정보 전달 */}
-                        {renderSubCategories(category, categories[category])}
+                {categories.map(group => (
+                    <div className="col-2 category-col" key={group.id}>
+                        {/* group.name을 제목으로 사용합니다. */}
+                        <h5 className="category-title">{group.name}</h5>
+                        {/* group.categoryList를 하위 카테고리 데이터로 전달합니다. */}
+                        {renderSubCategories(group.categories)}
                     </div>
                 ))}
             </div>
@@ -75,12 +76,9 @@ const Header = () => {
 
     // 검색 핸들러 함수
     const handleSearch = (e) => {
-        // 폼의 기본 제출 동작(페이지 새로고침) 방지
         e.preventDefault();
         if (searchQuery.trim()) {
-            // trim()으로 공백 제거 후 검색어가 있을 때만 navigate 실행
             navigate(`/product/list?searchQuery=${searchQuery.trim()}`);
-            // 검색 후 입력창 비우기
             setSearchQuery('');
         }
     };
@@ -89,16 +87,15 @@ const Header = () => {
         <>
             <Navbar expand="lg" className="top-nav">
                 <Container fluid>
-                    {/* 상단 로고와 아이콘 */}
                     <Navbar.Brand href="/">
                         <h1 className="logo">fAIshion</h1>
                     </Navbar.Brand>
                     <Nav className="ms-auto">
-                        <Nav.Link href="/login">login</Nav.Link> {/* 로그인 */}
-                        <Nav.Link href="/cart">logout</Nav.Link> {/* 로그아웃 */}
-                        <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link> {/* 찜목록 */}
-                        <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link> {/* 마이페이지 */}
-                        <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link> {/* 장바구니 */}
+                        <Nav.Link href="/login">login</Nav.Link>
+                        <Nav.Link href="/cart">logout</Nav.Link>
+                        <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link>
+                        <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link>
+                        <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
@@ -107,7 +104,6 @@ const Header = () => {
             <div
                 className="main-header-wrapper"
                 onMouseOver={(e) => {
-                    // 메인 내비게이션 링크에만 마우스 오버 시 메뉴를 엽니다.
                     if (e.target.closest('.main-nav-links .nav-link')) {
                         setIsMenuOpen(true);
                     }
@@ -120,7 +116,6 @@ const Header = () => {
             >
                 <Navbar expand="lg">
                     <Container fluid>
-                        {/* 메인 내비게이션 링크에 새로운 클래스 적용 */}
                         <Nav className="main-nav-links me-auto">
                             <Nav.Link href="#best">베스트</Nav.Link>
                             <Nav.Link href="#sale">세일</Nav.Link>
@@ -131,13 +126,11 @@ const Header = () => {
                             <Nav.Link href="/product/list?type=men">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
-                            {/* onSubmit 핸들러 추가 */}
                             <Form className="d-flex seantrch-bar" onSubmit={handleSearch}>
                                 <FormControl
                                     type="search"
                                     placeholder="상품을 검색하세요"
                                     aria-label="Search"
-                                    // 입력 값과 상태를 연결
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />

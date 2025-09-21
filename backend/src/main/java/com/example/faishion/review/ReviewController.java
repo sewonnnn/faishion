@@ -1,9 +1,11 @@
 package com.example.faishion.review;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +66,7 @@ public class ReviewController {
         }
     }
     @GetMapping("/{productId}")
-    public List<ReviewResponseDTO> getReviewsByProductId(@PathVariable Long productId) {
+    public List<ReviewResponseDTO> getReviewsByProductId(@PathVariable Long productId, HttpServletRequest request) {
 
         List<Review> reviews = reviewService.findByProduct_Id(productId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -72,16 +74,20 @@ public class ReviewController {
         if (reviews == null || reviews.isEmpty()) {
             return List.of();
         }
+
+        String domain = request.getScheme() + "://" + request.getServerName() +
+                (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
+
         return reviews.stream()
                 .map(review -> new ReviewResponseDTO(
                         review.getId(),
                         review.getUser().getId(),
                         review.getContent(),
                         review.getRating(),
-                        review.getCreatedAt().format(formatter)
-//                        review.getReviewImage().stream()
-//                                .map(image -> "/uploads/" + image.getSavedName())
-//                                .collect(Collectors.toList())
+                        review.getCreatedAt().format(formatter),
+                        review.getImageList().stream()
+                                .map(image -> domain + "/image/" + image.getId()) // Image 객체를 ID로 변환
+                                .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
     }
