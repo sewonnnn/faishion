@@ -1,6 +1,7 @@
 package com.example.faishion.category;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +14,8 @@ public class CategoryController {
 
     // 전체 중분류 + 소분류 조회
     @GetMapping("/groups")
-    public List<CategoryGroupDTO> getAllGroups() {
+    public List<CategoryGroupDTO> getAllGroups(@AuthenticationPrincipal String userId) {
+        System.out.println(userId);
         return categoryService.getAllGroupsWithCategories();
     }
 

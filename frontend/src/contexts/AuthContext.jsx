@@ -15,7 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // 👈 New loading state
+    const [isLoading, setIsLoading] = useState(true);
 
     // Initial check for a token on component mount
     useEffect(() => {
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
                 sessionStorage.removeItem("accessToken");
             }
         }
-        setIsLoading(false); // 👈 Set loading to false after the check
+        setIsLoading(false);
     }, []);
 
     // 로그인 함수
@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         sessionStorage.removeItem("accessToken");
         setUser(null);
-        navigate("/login");
     };
 
     // axios API 인스턴스
@@ -62,6 +61,7 @@ export const AuthProvider = ({ children }) => {
         instance.interceptors.response.use(
             (response) => {
                 const newToken = response.headers.authorization;
+                console.log(newToken);
                 if (newToken) {
                     sessionStorage.setItem("accessToken", newToken);
                     const decodedUser = jwtDecode(newToken);

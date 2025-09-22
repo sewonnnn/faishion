@@ -49,6 +49,17 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateRefresh(String subject, List<String> roles) {
+        long now = System.currentTimeMillis();
+        return Jwts.builder()
+                .setSubject(subject)
+                .addClaims(Map.of("roles", roles))
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + refreshExp))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public Jws<Claims> parse(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
