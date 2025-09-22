@@ -44,6 +44,7 @@ public class Qna {
     @JoinColumn(name = "answered_by", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Seller answeredBy; //답변한 판매자
 
+    private boolean isSecret;
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

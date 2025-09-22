@@ -1,3 +1,5 @@
+// ProductRightInfo.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -17,7 +19,6 @@ const ProductRightInfo = ({ productId, product }) => {
     const [quantity, setQuantity] = useState(1);
     const [color, setColor] = useState(null);
     const [size, setSize] = useState(null);
-
     const onAIForm = () => {
         navigate(`/gemini/${productId}`);
     };
@@ -129,14 +130,15 @@ const ProductRightInfo = ({ productId, product }) => {
                     value={color}
                     onChange={(val) => setColor(val)}
                 >
-                    {currentProduct.colors && currentProduct.colors.map((color) => (
+                    {/* 이미지 대신 <span> 태그 사용 */}
+                    {currentProduct.colors && currentProduct.colors.map((c) => (
                         <ToggleButton
-                            key={color.value}
-                            id={`color-radio-${color.value}`}
-                            value={color.value}
+                            key={c}
+                            id={`color-radio-${c}`}
+                            value={c}
                             variant="outline-secondary"
                         >
-                            <img src={color.image} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt={color.name} />
+                            <span>{c}</span>
                         </ToggleButton>
                     ))}
                 </ToggleButtonGroup>

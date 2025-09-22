@@ -19,6 +19,7 @@ public class ProductDetailDTO {
     private Integer discountRate; // 할인율
     private List<String> imageUrls;
     private List<String> sizes;
+    private List<String> colors;
 
     // ... 다른 필드
 
@@ -52,6 +53,11 @@ public class ProductDetailDTO {
         // 사이즈 정보 추출 (기존 로직 유지)
         this.sizes = product.getStockList().stream()
                 .map(stock -> stock.getSize())
+                .distinct()
+                .collect(Collectors.toList());
+        // 컬러 정보 추출 (기존 로직 유지)
+        this.colors = product.getStockList().stream()
+                .map(stock -> stock.getColor())
                 .distinct()
                 .collect(Collectors.toList());
     }

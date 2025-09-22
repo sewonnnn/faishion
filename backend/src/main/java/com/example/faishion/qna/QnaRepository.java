@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QnaRepository extends JpaRepository<Qna, Long> {
@@ -30,4 +31,6 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
     @Query("UPDATE Qna q SET q.answer = :answer, q.answeredBy = :answeredBy WHERE q.id = :id")
     void updateAnswer(@Param("answer") String answer, @Param("answeredBy") String answeredBy,@Param("id") long id);
 
+    // 상품 개별 문의 리스트 가져오기
+    List<Qna> findByProduct_Id(Long productId);
 }
