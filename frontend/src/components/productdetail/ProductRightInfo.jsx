@@ -13,6 +13,7 @@ import {
     Col,
     Card,
 } from "react-bootstrap";
+import { FaHeart } from 'react-icons/fa';
 import "./ProductRightInfo.css";
 
 const ProductRightInfo = ({ productId, product }) => {
@@ -47,35 +48,38 @@ const ProductRightInfo = ({ productId, product }) => {
                 size: size,
                 productId: productId
             }
-                const response = await axios.post('/api/cart/save',stock);
-                if(response){
-                    console.log("카트에 저장 성공");
-                }
-            } catch (error) {
-                console.error('Error fetching banner data:', error);
+            const response = await axios.post('/api/cart/save',stock);
+            if(response){
+                alert("카트 상품이 담겼습니다.");
             }
+        } catch (error) {
+            console.error('Error fetching banner data:', error);
+        }
     };
 
     const formatPrice = (price) => {
+        if (price === null || price === undefined || isNaN(price)) {
+            return "0";
+        }
         return price.toLocaleString("ko-KR");
     };
+    const onWishSave = async () => {
+        try{
+            const response = await axios.post(`/api/wish/save/${productId}`);
+            alert(response.data);
 
-    // mockProduct 객체를 명확하게 정의
-    const mockProduct = {
-        id: "123",
-        brand: "BEAKER ORIGINAL",
-        name: "Men Harry Cardigan - Brown",
-        price: 337250,
-        originalPrice: 355000,
-        discountRate: "5%",
-        colors: [
-            { name: 'Brown', value: 'brown', image: '/images/brown_thumb.png' },
-            { name: 'Navy', value: 'navy', image: '/images/navy_thumb.png' },
-        ],
-        sizes: ["S", "M", "L"],
-    };
+        }catch (error) {
+            console.error('Error fetching banner data:', error);
+        }
+    }
 
-    const currentProduct = product || mockProduct;
+    const currentProduct = product;
+    if (!currentProduct) {
+        return <div>상품 정보를 로드 중입니다...</div>;
+    }
+
+    // `isDiscounting` 변수로 할인이 적용 중인지 확인
+    const isDiscounting = currentProduct.originalPrice > currentProduct.price;
 
     return (
         <div className="ProductRightInfo">
@@ -91,17 +95,27 @@ const ProductRightInfo = ({ productId, product }) => {
 
             {/* 가격 및 할인 영역 */}
             <div className="price-info mb-4">
-                <div className="d-flex align-items-center mb-1">
-                    <h4 className="fw-bold me-2" style={{ color: 'red' }}>
-                        {currentProduct.discountRate}
-                    </h4>
-                    <p className="text-decoration-line-through text-muted mb-0">
-                        {formatPrice(currentProduct.originalPrice)}
-                    </p>
-                </div>
-                <h3 className="final-price">
-                    {formatPrice(currentProduct.price)}원
-                </h3>
+                {isDiscounting ? (
+                    // 할인이 있는 경우
+                    <>
+                        <div className="d-flex align-items-center mb-1">
+                            <h4 className="fw-bold me-2" style={{ color: 'red' }}>
+                                {currentProduct.discountRate}%
+                            </h4>
+                            <p className="text-decoration-line-through text-muted mb-0">
+                                {formatPrice(currentProduct.originalPrice)}원
+                            </p>
+                        </div>
+                        <h3 className="final-price">
+                            {formatPrice(currentProduct.price)}원
+                        </h3>
+                    </>
+                ) : (
+                    // 할인이 없는 경우 (최종 가격만 표시)
+                    <h3 className="final-price">
+                        {formatPrice(currentProduct.price)}원
+                    </h3>
+                )}
             </div>
             <Col className="text-end">
                 <Button variant="outline-dark" onClick={onAIForm}>
@@ -178,7 +192,18 @@ const ProductRightInfo = ({ productId, product }) => {
 
             {/* 버튼 영역 */}
             <div className="d-grid gap-2 mt-4">
-                <Button variant="dark" size="lg" onClick={onCartSave}>장바구니</Button>
+                <div className="d-flex align-items-center">
+                    <div className="col-2">
+                        <Button variant="light" size="lg" onClick={onWishSave} className="w-100 me-2">
+                            <FaHeart color="dark" />
+                        </Button>
+                    </div>
+                    <div className="col-10">
+                        <Button variant="dark" size="lg" onClick={onCartSave} className="w-100">
+                            장바구니
+                        </Button>
+                    </div>
+                </div>
                 <Button variant="primary" size="lg" onClick={onOrderForm}>바로 구매</Button>
             </div>
         </div>

@@ -16,5 +16,4 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     boolean existsByPhoneNumber(String phoneNumber);
 
-    AuthProvider provider(AuthProvider provider);
 }

@@ -26,6 +26,7 @@ public class ReviewController {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    // 리뷰저장
     @PostMapping("/save")
     public ResponseEntity<String> saveReview(
             @RequestPart("reviewData") ReviewDTO reviewDto,
@@ -65,6 +66,8 @@ public class ReviewController {
                     .body("리뷰 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    // 화면에 보여주기용
     @GetMapping("/{productId}")
     public List<ReviewResponseDTO> getReviewsByProductId(@PathVariable Long productId, HttpServletRequest request) {
 
@@ -91,6 +94,8 @@ public class ReviewController {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 신고 메서드
     @GetMapping("/isReported/{reviewId}")
     public boolean isReported(@PathVariable Long reviewid) {
         System.out.println("reviewid : " +reviewid);

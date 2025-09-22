@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportDTO {
-    private String reviewId; // 신고된 리뷰번호
+    private Long reviewId; // 신고된 리뷰번호
     private String reason; // 신고 종류
     private String description; // 신고 사유
 

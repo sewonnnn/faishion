@@ -120,25 +120,19 @@ public class ProductController {
         //return productService.findAll(searchQuery, categoryId, pageable);
     }
 
-//    // 카테고리에 맞는 상품 목록 가져오기 ho
-//    @GetMapping("productcard")
-//    List<Product> findAllProductCard() {
-//        List<Product> mockData = new ArrayList<>();
-//        mockData.add(new Product(1l,"1번째 상품","테스트용 상품입니다.",30000));
-//        mockData.add(new Product(2l,"2번째 상품","테스트용 상품입니다.",20000));
-//        mockData.add(new Product(3l,"3번째 상품","테스트용 상품입니다.",10000));
-//        mockData.add(new Product(4l,"4번째 상품","테스트용 상품입니다.",40000));
-//        mockData.add(new Product(5l,"5번째 상품","테스트용 상품입니다.",50000));
-//        return mockData;
-//    }
-
     // ProductDetailPage에서 id에 일치하는 상품 가져오기 ho
     @GetMapping("/{productId}")
-    Product productDetail(@PathVariable Long productId) {
-        Product findProduct  = productService.findById(productId); // db추가시 가져오기 ho
-        Product mockData = new Product();
-        mockData.setId(productId);
+    public ProductDetailDTO productDetail(@PathVariable Long productId, HttpServletRequest request) {
+        // findById 메서드가 Optional을 반환한다고 가정
+        Product findProduct = productService.findById(productId);
 
-        return findProduct;
+        if (findProduct != null) {
+            // 도메인 정보를 동적으로 가져옵니다.
+            String domain = request.getScheme() + "://" + request.getServerName() +
+                    (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
+
+            return new ProductDetailDTO(findProduct, domain);
+        }
+        return null;
     }
 }

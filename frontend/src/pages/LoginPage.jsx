@@ -41,7 +41,7 @@ const LoginPage = () => {
             // 네이버 개발자 센터에서 발급받은 클라이언트 아이디
             const naverClientId =  'UbIrUTt9yAJ42TARcJC5';
             // 네이버 개발자 센터에 등록한 콜백 URL (프론트엔드 라우트)
-            const naverRedirectUri = encodeURIComponent('http://localhost:5173/oauthcallback');
+            const naverRedirectUri = encodeURIComponent('http://localhost:5173/oauthcallback?provider=naver');
             // 네이버 인가 요청 URL (scope는 필요한 정보에 따라 추가)
             socialAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${Math.random().toString(36).substring(2)}`;
             // state 값은 CSRF 공격 방지를 위해 사용하며, 서버에서 검증해야 합니다. 여기서는 간단히 랜덤 값 사용.
@@ -49,7 +49,7 @@ const LoginPage = () => {
             // 카카오 개발자 센터에서 발급받은 클라이언트 아이디
             const kakaoClientId = 'YOUR_KAKAO_CLIENT_ID';
             // 카카오 개발자 센터에 등록한 콜백 URL (프론트엔드 라우트)
-            const kakaoRedirectUri = encodeURIComponent('http://localhost:5173/oauthcallback');
+            const kakaoRedirectUri = encodeURIComponent('http://localhost:5173/oauthcallback?provider=kakao');
             // 카카오 인가 요청 URL (scope는 필요한 정보에 따라 추가)
             socialAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&scope=profile_nickname,account_email,phone_number`;
         } else {
@@ -94,6 +94,16 @@ const LoginPage = () => {
                     {loading ? "로그인 중..." : "로그인"}
                 </button>
             </form>
+
+            {/* 회원가입 버튼  */}
+            <div className="d-grid gap-2 mb-4">
+                <button
+                    className="btn btn-outline-secondary w-100"
+                    onClick={() => nav("/register")}
+                >
+                    회원가입 하기
+                </button>
+            </div>
 
             {/* 소셜 로그인 */}
             <div style={{ maxWidth: 420 }}>
