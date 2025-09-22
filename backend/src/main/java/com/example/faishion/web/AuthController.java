@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -24,63 +25,83 @@ public class AuthController {
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtTokenProvider jwt;
+    private final AuthService authService;
 
     // 로컬 회원가입
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthDto.RegisterLocalReq req) {
-        if (userRepo.existsByUsername(req.username()))
-            return ResponseEntity.badRequest().body("이미 존재하는 아이디입니다.");
-        if (userRepo.existsByEmail(req.email()))
-            return ResponseEntity.badRequest().body("이미 존재하는 이메일입니다.");
-
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setProvider(AuthProvider.LOCAL);
-        u.setProviderUserId(null);
-        u.setUsername(req.username());
-        u.setEmail(req.email());
-        u.setPwHash(encoder.encode(req.password()));
-        u.setName(req.name());
-        u.setPhoneNumber(req.phoneNumber());
-
-        userRepo.save(u);
-        return ResponseEntity.ok().build();
+        try {
+            authService.registerLocal(req);
+            return ResponseEntity.ok("회원가입 성공");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // 로컬 로그인: username 또는 email 둘 다 허용
-    // HttpServletResponse를 주입하여 쿠키를 설정
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
-        var login = req.login();
-        var userOpt = (login.contains("@"))
-                ? userRepo.findByEmail(login)
-                : userRepo.findByUsername(login);
-        var u = userOpt.orElse(null);
+        try {
+            User u = authService.loginLocal(req.login(), req.password());
+            var tokens = authService.issueTokens(u);
 
-        if (u == null || u.getPwHash() == null || !encoder.matches(req.password(), u.getPwHash())) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));
+            accessCookie.setHttpOnly(true);
+            accessCookie.setPath("/");
+            accessCookie.setMaxAge(3600);
+            response.addCookie(accessCookie);
+
+            Cookie refreshCookie = new Cookie("refreshToken", tokens.get("refresh"));
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setPath("/");
+            refreshCookie.setMaxAge(1209600);
+            response.addCookie(refreshCookie);
+
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
         }
+    }
 
-        // JWT 생성
-        String access  = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));
-        String refresh = jwt.generateRefresh(u.getId());
+    // 네이버 로그인
+    @PostMapping("/login/naver")
+    public ResponseEntity<?> loginNaver(@RequestBody Map<String, String> body, HttpServletResponse response) {
+        User u = authService.loginNaver(body.get("code"), body.get("state"));
+        var tokens = authService.issueTokens(u);
 
-        // HttpOnly 쿠키에 토큰을 담아 응답
-        Cookie accessCookie = new Cookie("accessToken", access);
+        Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));
         accessCookie.setHttpOnly(true);
-        // accessCookie.setSecure(true); // HTTPS 환경에서는 활성화
         accessCookie.setPath("/");
-        accessCookie.setMaxAge(3600); // 1시간
+        accessCookie.setMaxAge(3600);
         response.addCookie(accessCookie);
 
-        Cookie refreshCookie = new Cookie("refreshToken", refresh);
+        Cookie refreshCookie = new Cookie("refreshToken", tokens.get("refresh"));
         refreshCookie.setHttpOnly(true);
-        // refreshCookie.setSecure(true); // HTTPS 환경에서는 활성화
         refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(86400); // 24시간
+        refreshCookie.setMaxAge(1209600);
         response.addCookie(refreshCookie);
 
-        // 응답 본문에는 토큰을 담지 않고, 성공 응답만 보냄
+        return ResponseEntity.ok().build();
+    }
+
+    // 카카오 로그인
+    @PostMapping("/login/kakao")
+    public ResponseEntity<?> loginKakao(@RequestBody Map<String, String> body, HttpServletResponse response) {
+        User u = authService.loginKakao(body.get("code"));
+        var tokens = authService.issueTokens(u);
+
+        Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));
+        accessCookie.setHttpOnly(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(3600);
+        response.addCookie(accessCookie);
+
+        Cookie refreshCookie = new Cookie("refreshToken", tokens.get("refresh"));
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(1209600);
+        response.addCookie(refreshCookie);
+
         return ResponseEntity.ok().build();
     }
 
