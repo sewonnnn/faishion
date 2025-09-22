@@ -1,5 +1,6 @@
 package com.example.faishion.product;
 
+import com.example.faishion.image.Image;
 import com.example.faishion.stock.Stock;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -132,6 +134,24 @@ public class ProductController {
                     (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
 
             return new ProductDetailDTO(findProduct, domain);
+        }
+        return null;
+    }
+    // ProductBody에 이미지 띄우기 ho
+    @GetMapping("/body/{productId}")
+    public Set<String> productBody(@PathVariable Long productId, HttpServletRequest request) {
+        Product product = productService.findById(productId);
+
+        if (product != null) {
+            String domain = request.getScheme() + "://" + request.getServerName() +
+                    (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
+
+            Set<String> imageUrls = product.getDetailImageList().stream()
+                    .map(image -> domain + "/image/" + image.getId()) // Image 객체를 URL 문자열로 변환
+                    .collect(Collectors.toSet());
+
+//            imageUrls.forEach(url -> System.out.println("Image URL: " + url)); // 백엔드 로그 확인
+            return imageUrls; // 이미지 URL 문자열의 Set을 반환
         }
         return null;
     }

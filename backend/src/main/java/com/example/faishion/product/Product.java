@@ -41,10 +41,10 @@ public class Product {
     private LocalDateTime discountEndDate;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Image> mainImageList = new HashSet<>();
+    private Set<Image> mainImageList = new HashSet<>(); // 썸네일
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Image> detailImageList = new HashSet<>();
+    private Set<Image> detailImageList = new HashSet<>(); // 상세에 나오는 바디 사진
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Stock> stockList = new HashSet<>(); //상품 옵션(재고)
