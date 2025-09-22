@@ -33,13 +33,12 @@ public class CartController {
     @PostMapping("/save")
     public boolean cartSave(@RequestBody StockDTO stockDTO) {
 
-        // DTO에서 받은 stockId로 Stock 객체 조회
-        // stockRepository.findById()를 사용하여 안전하게 조회
-        Stock stock = stockRepository.findById(Math.toIntExact(stockDTO.getStockId()))
-                .orElseThrow(() -> new EntityNotFoundException("Stock not found with id: " + stockDTO.getStockId()));
-
         // 임시 사용자 생성
         User user = userRepository.getReferenceById("sewon"); // 임시 아이디
+        Stock stock = stockRepository.findById(1).get();
+
+        Product product = productService.findById(stockDTO.getProductId());
+        stock.setProduct(product);
 
         // 장바구니 객체 생성 및 저장
         Cart cart = new Cart();
