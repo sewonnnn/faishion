@@ -1,7 +1,29 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import "./MyPage.css";
+import axios from "axios";
 
 const MyPage = () => {
+    const [cartList, setCartList] = useState([]); // 보여지는 장바구니 리스트
+
+    // 장바구니 데이터 불러오는 함수
+    const fetchCartData = async () => {
+        try {
+            const response = await axios.get(
+                'http://localhost:8080/cart/list'
+            );
+            console.log(response.data);
+            setCartList(response.data);
+        } catch (error) {
+            console.error("장바구니데이터를 가져오는 중 오류 발생:", error);
+            setCartList([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartData();
+    }, []);
+
+
     return (
         <div className="mypage-container">
             {/* 상단 프로필 영역(로그인한 회원 데이터 받아서 뿌리기) */}
@@ -26,7 +48,7 @@ const MyPage = () => {
             {/* 적립금, 등급, 쿠폰 */}
             <section className="status-section">
                 <div className="status-box">
-                    <p className="status-label">적립금</p>
+                    <p className="status-label">배송현황</p>
                     <p className="status-value">1,195원</p>
                 </div>
                 <div className="status-box">
@@ -46,19 +68,17 @@ const MyPage = () => {
                 <h2 className="section-title">주문 내역</h2>
                 <div className="order-list">
                     {/*추후 주문 내역 담겨있는 리스트로 사용*/}
-                    {[1, 2, 3, 4].map((p) => (
-                        <div key={p} className="order-item">
+                    {cartList.map((item) => (
+                        <div key={item} className="order-item">
                             <img
-                                src="https://image.msscdn.net/thumbnails/images/goods_img/20250528/5151434/5151434_17562621557732_big.jpg?w=1200" class="sc-uxvjgl-8 hlFFlu"
-                                alt="상품"
-                                className="order-thumb"
-                            />
+                                 alt="키코지러브 앤 재즈 캡_블루 상품 이미지"
+                                 src=""
+                                 className="order-thumb"/>
                             <div className="order-info">
-                                <p className="order-brand">컬럼비아</p>
+                                <p className="order-brand">(상품명)</p>
                                 <p className="order-desc">
-                                    여성 패스 디씨 포레스트 다운 자켓 C54YL3483010
-                                </p>
-                                <p className="order-meta">105 / 1개</p>
+                                    판매자 점포명</p>
+                                <p className="order-meta">105 / {item.quantity}개</p>
                                 <p className="order-price-original">559,000원</p>
                                 <p className="order-price-sale">335,000원</p>
                             </div>

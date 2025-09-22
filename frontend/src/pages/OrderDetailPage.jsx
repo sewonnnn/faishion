@@ -1,9 +1,10 @@
+import React from 'react';
+
 const OrderDetailPage = () => {
     return (
-        <>
-            <h1>OrderDetailPage</h1>
+        <>주문 상세페이지
         </>
     );
-}
+};
 
 export default OrderDetailPage;

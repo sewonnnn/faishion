@@ -2,7 +2,7 @@ import React from "react";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import "./QnaListPage.css";
-import { Link } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const QnaListPage = () => {
     const [qnaBoardList, setQnaBoardList] = useState([]); // 전체 게시글
@@ -11,6 +11,7 @@ const QnaListPage = () => {
     const [page, setPage] = useState(0); // 현재 페이지 번호 상태
     const [totalPages, setTotalPages] = useState(0); // 총 페이지 수 상태
     const pageSize = 10; // 한 페이지당 고정된 게시물 수
+    const navigate = useNavigate();
 
 
     // 게시글 함수
@@ -50,6 +51,11 @@ const QnaListPage = () => {
         fetchQnaData(searchText, 0);
     };
 
+    //상세페이지 이동을 위한 함수
+    const handleGoDetail = (id)=>{
+        navigate(`/qna/${id}`);
+    }
+
     return (
         <section className="qa">
             <div className="qa-inner">
@@ -75,12 +81,10 @@ const QnaListPage = () => {
                         // 페이지 번호와 배열 인덱스를 더해 전체 순번을 계산
                         const sequentialNumber = (page * pageSize) + (index + 1);
                         return (
-                            <tr key={index}>
+                            <tr key={index} onClick={()=>handleGoDetail(item.id)} style={{ cursor: 'pointer' }}>
                                 <td>{sequentialNumber}</td>
                                 <td className="subject">
-                                    <Link to={`/qna/${item.id}`}>
                                         {item.title}
-                                    </Link>
                                 </td>
                                 <td> {new Date(item.created_at).toLocaleDateString('ko-KR', {
                                     year: 'numeric',

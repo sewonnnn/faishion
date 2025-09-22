@@ -1,9 +1,97 @@
+import React, { useEffect, useState } from 'react';
+import './OrderFormPage.css';
+import axios from "axios";
+
 const OrderFormPage = () => {
+    const [cartList, setCartList] = useState([]);
+
+    // 장바구니 데이터 불러오는 함수
+    const fetchCartData = async () => {
+        try {
+            const response = await axios.get(
+                'http://localhost:8080/cart/list'
+            );
+            console.log(response.data);
+            setCartList(response.data);
+        } catch (error) {
+            console.error("장바구니 데이터를 가져오는 중 오류 발생:", error);
+            setCartList([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartData();
+    }, []);
+
+    // 결제 버튼 클릭 시 실행될 함수
+    const handlePayment = () => {
+        alert("결제 페이지로 이동합니다.");
+        // 실제 결제 로직 또는 페이지 이동을 여기에 구현
+    };
+
     return (
-        <>
-            <h1>OrderFormPage</h1>
-        </>
+        <div className="cart-page-layout">
+            <div className="order-details-container">
+                <h2 className="section-header">주문서</h2>
+                <div className="order-section">
+                    <div className="delivery-info-header">
+                        <h3>박세원</h3>
+                        <button className="change-address-btn">
+                            배송지 변경
+                        </button>
+                    </div>
+                    <p className="delivery-text">서울특별시 관악구</p>
+                    <p className="delivery-text">010-1234-5678</p>
+                    <select className="delivery-select">
+                        <option>직접 수령</option>
+                        <option>문 앞에 놔주세요</option>
+                        <option>문 앞에 두고 벨 눌러주세요</option>
+                        <option>경비실에 맡겨주세요</option>
+                    </select>
+                </div>
+
+                <hr className="divider" />
+                <h2 className="section-header">주문 상품 {cartList.length}개</h2>
+                {cartList.map((item) => (
+                    <div className="order-item" key={item.id}>
+                        <img
+                            src="https://image.msscdn.net/thumbnails/images/goods_img/20240913/4440635/4440635_17262086007629_big.jpg?w=1200"
+                            alt="벤힛(VENHIT) Astral 레글런 니트집업" className="product-image"/>
+                        <div className="product-details">
+                            <h4>(상품명)</h4>
+                            <p>(판매자 점포명)</p>
+                            <p>{item.quantity}개</p>
+                            <div className="price-info">
+                                <span className="original-price">(가격)원</span>
+                                <span className="sale-price">(할인 적용 가격)원</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            {/* 결제 정보 박스가 주문서 컨테이너 밖으로 이동 */}
+            <div className="price-summary-box">
+                <h3 className="section-header">결제 정보</h3>
+                <div className="price-item">
+                    <span>상품금액</span>
+                    <span>355,000원</span>
+                </div>
+                <div className="price-item">
+                    <span>배송비</span>
+                    <span>(무료배송)</span>
+                </div>
+                <div className="price-item">
+                    <span>상품할인</span>
+                    <span>0원</span>
+                </div>
+                <div className="total-price">
+                    <span>총 구매 금액</span>
+                    <span>(가격)원</span>
+                </div>
+                <button className="order-btn" onClick={handlePayment}>n건 결제하기</button>
+            </div>
+        </div>
     );
-}
+};
 
 export default OrderFormPage;
