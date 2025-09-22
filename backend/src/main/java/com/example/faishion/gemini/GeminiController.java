@@ -1,5 +1,9 @@
-/*package com.example.faishion.gemini;
+package com.example.faishion.gemini;
 
+import com.example.faishion.image.Image;
+import com.example.faishion.stock.Stock;
+import com.example.faishion.stock.StockRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,38 +27,38 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/gemini")
+@RequiredArgsConstructor
 public class GeminiController {
+
+    private final StockRepository stockRepository;
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
     private final Gson gson = new Gson();
 
-    @Value("${GOOGLE.API.KEY}")
+    @Value("${google.api.key}")
     private String apiKey;
 
     // 루트 URL ('/')로 들어오는 GET 요청을 처리하여 index.html을 반환합니다.
     @GetMapping("/")
     public String showHomePage() {
         System.out.println("GET / 요청 처리 - index.html 반환");
+        System.out.println("apikey : "+apiKey);
         return "index.html";
     }
 
     @GetMapping("/{productId}")
     @ResponseBody
-    public String getProductImage(@PathVariable String productId) {
-        System.out.println("GET /api/product/" + productId + " 요청 수신.");
-
-        Map<String, String> mockProductData = new HashMap<>();
-        mockProductData.put("1", "https://placehold.co/600x600/FFC0CB/000000?text=핑크+드레스");
-        mockProductData.put("2", "https://placehold.co/600x600/ADD8E6/000000?text=파란색+자켓");
-        mockProductData.put("3", "https://placehold.co/600x600/90EE90/000000?text=초록색+티셔츠");
-
-        String imageUrl = mockProductData.getOrDefault(productId, "https://placehold.co/600x600/E5E7EB/A1A1AA?text=상품+이미지+없음");
+    public String getProductImage(@PathVariable Long productId) {
+        System.out.println("GET /api/gemini/" + productId + " 요청 수신.");
+        System.out.println("apikey : "+apiKey);
+        Stock stock = stockRepository.findByProductId(productId); // 선택된 상품 정보 가지고오기
+        Image image = stock.getImage();
 
         JsonObject responseJson = new JsonObject();
-        responseJson.addProperty("imageUrl", imageUrl);
-        System.out.println("productId " + productId + "에 대한 이미지 URL: " + imageUrl);
+        responseJson.addProperty("imageUrl", "http://localhost:8080/image/"+image.getId());
+        System.out.println("productId " + productId + "에 대한 이미지 URL: " + image.getOriginName());
 
         return gson.toJson(responseJson);
     }
@@ -110,7 +114,7 @@ public class GeminiController {
 
             // --- Gemini API 요청 페이로드 구성 ---
             // 프런트엔드에서 프롬프트를 보내지 않으므로, 백엔드에서 고정 프롬프트를 설정합니다.
-            String prompt = "옷 사진들을 하나씩 사람 사진이 입고있는 걸로 만들어줘";
+            String prompt = "이 옷 사진을 사람 사진이 입고 있는 사진으로 합성해줘 키는 160cm이고 몸무게는 90kg야. 결과 이미지로만 응답해. 다른 텍스트는 포함하지마.";
 
             JsonObject inlineData1 = new JsonObject();
             inlineData1.addProperty("mimeType", "image/png");
@@ -142,6 +146,7 @@ public class GeminiController {
 
             JsonObject generationConfig = new JsonObject();
             JsonArray responseModalities = new JsonArray();
+            generationConfig.addProperty("temperature", 0);
             responseModalities.add("IMAGE");
             generationConfig.add("responseModalities", responseModalities);
 
@@ -228,4 +233,3 @@ public class GeminiController {
         }
     }
 }
-*/
