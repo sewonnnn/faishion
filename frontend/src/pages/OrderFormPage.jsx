@@ -15,6 +15,7 @@ const OrderFormPage = () => {
     const handlePayment = () => {
         alert("결제 페이지로 이동합니다.");
         // 실제 결제 로직 또는 페이지 이동을 여기에 구현
+
     };
 
     // 주문 상품 개수

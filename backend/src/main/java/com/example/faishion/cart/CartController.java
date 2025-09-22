@@ -51,7 +51,8 @@ public class CartController {
         User user = userRepository.getReferenceById("sewon");
 
         // stockDTO.getId()를 사용하여 Stock 객체를 찾기
-        Stock stock = stockRepository.getReferenceById(stockDTO.getId().intValue());
+      // Stock stock = stockRepository.getReferenceById(stockDTO.getId().intValue());
+        Stock stock = stockRepository.getReferenceById(1);
 
 
         // 장바구니 객체를 생성합니다.
