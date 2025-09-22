@@ -1,32 +1,27 @@
-import React, { useEffect, useState } from 'react';
 import './OrderFormPage.css';
-import axios from "axios";
+import useCart from '../hooks/useCart.js'; // 커스텀 훅 가져옴
 
 const OrderFormPage = () => {
-    const [cartList, setCartList] = useState([]);
+    // 커스텀 훅을 사용하여 장바구니 데이터와 함수를 가져옴.
+    const {
+        cartList,
+        totalOriginalPrice,
+        totalDiscountedPrice,
+        totalDiscount,
+    } = useCart();
 
-    // 장바구니 데이터 불러오는 함수
-    const fetchCartData = async () => {
-        try {
-            const response = await axios.get(
-                'http://localhost:8080/cart/list'
-            );
-            console.log(response.data);
-            setCartList(response.data);
-        } catch (error) {
-            console.error("장바구니 데이터를 가져오는 중 오류 발생:", error);
-            setCartList([]);
-        }
-    };
-
-    useEffect(() => {
-        fetchCartData();
-    }, []);
 
     // 결제 버튼 클릭 시 실행될 함수
     const handlePayment = () => {
         alert("결제 페이지로 이동합니다.");
         // 실제 결제 로직 또는 페이지 이동을 여기에 구현
+    };
+
+    // 주문 상품 개수
+    const getOrderSummary = () => {
+        if (cartList.length === 0) return "주문 상품 0개";
+        const totalItems = cartList.length;
+            return `${totalItems}건`;
     };
 
     return (
@@ -55,26 +50,29 @@ const OrderFormPage = () => {
                 {cartList.map((item) => (
                     <div className="order-item" key={item.id}>
                         <img
-                            src="https://image.msscdn.net/thumbnails/images/goods_img/20240913/4440635/4440635_17262086007629_big.jpg?w=1200"
-                            alt="벤힛(VENHIT) Astral 레글런 니트집업" className="product-image"/>
+                            src={`http://localhost:8080/image/${item.productImageId}`}
+                            alt={item.productName}
+                            className="product-image"
+                        />
                         <div className="product-details">
-                            <h4>(상품명)</h4>
-                            <p>(판매자 점포명)</p>
+                            <h4>{item.productName}</h4>
+                            <p>{item.sellerBusinessName}</p>
+                            <p>상세옵션:  {item.productSize}, {item.productColor}</p>
                             <p>{item.quantity}개</p>
                             <div className="price-info">
-                                <span className="original-price">(가격)원</span>
-                                <span className="sale-price">(할인 적용 가격)원</span>
+                                <span className="original-price">{item.productPrice}원</span>
+                                <span className="sale-price">{item.discountedProductPrice}원</span>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-            {/* 결제 정보 박스가 주문서 컨테이너 밖으로 이동 */}
+            {/* 결제 정보 */}
             <div className="price-summary-box">
                 <h3 className="section-header">결제 정보</h3>
                 <div className="price-item">
                     <span>상품금액</span>
-                    <span>355,000원</span>
+                    <span>{totalOriginalPrice}원</span>
                 </div>
                 <div className="price-item">
                     <span>배송비</span>
@@ -82,13 +80,13 @@ const OrderFormPage = () => {
                 </div>
                 <div className="price-item">
                     <span>상품할인</span>
-                    <span>0원</span>
+                    <span>{totalDiscount}원</span>
                 </div>
                 <div className="total-price">
                     <span>총 구매 금액</span>
-                    <span>(가격)원</span>
+                    <span>{totalDiscountedPrice}</span>
                 </div>
-                <button className="order-btn" onClick={handlePayment}>n건 결제하기</button>
+                <button className="order-btn" onClick={handlePayment}>{getOrderSummary()} 결제하기</button>
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RequestMapping("/cart")
@@ -33,7 +34,7 @@ public class CartController {
     @PostMapping("/save")
     public boolean cartSave(@RequestBody StockDTO stockDTO) {
 
-        // 임시 사용자 생성
+    /*    // 임시 사용자 생성
         User user = userRepository.getReferenceById("sewon"); // 임시 아이디
         Stock stock = stockRepository.findById(1).get();
 
@@ -45,8 +46,36 @@ public class CartController {
         cart.setUser(user);
         cart.setStock(stock);
         cart.setQuantity(stockDTO.getQuantity());
-        cartService.save(cart);
+        cartService.save(cart);*/
+
+        User user = userRepository.getReferenceById("sewon");
+
+        // stockDTO.getId()를 사용하여 Stock 객체를 찾기
+        Stock stock = stockRepository.getReferenceById(stockDTO.getId().intValue());
+
+
+        // 장바구니 객체를 생성합니다.
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setStock(stock);
+        cart.setQuantity(stockDTO.getQuantity());
+
+        cartService.addItemToCart(user, stock, stockDTO.getQuantity());
 
         return true;
     }
+
+    // 개별 상품 삭제
+    @DeleteMapping("/delete/{cartId}")
+    public void deleteCartItem(@PathVariable Long cartId) {
+        cartService.deleteCartItem(cartId);
+    }
+
+    // 선택된 상품 전체 삭제
+    @PostMapping("/deletePickAll")
+    public void deleteSelectedCartItems(@RequestBody Map<String, List<Long>> requestBody) {
+        List<Long> cartIds = requestBody.get("cartIds");
+        cartService.deleteSelectedCartItems(cartIds);
+    }
+
 }
