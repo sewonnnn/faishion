@@ -5,8 +5,6 @@ import com.example.faishion.image.ImageService;
 import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
