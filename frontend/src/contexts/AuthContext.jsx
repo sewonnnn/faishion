@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) throw new Error("useAuth must be used within an AuthProvider");
@@ -14,6 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // 👈 New loading state
 
     // Initial check for a token on component mount
     useEffect(() => {
@@ -27,6 +29,7 @@ export const AuthProvider = ({ children }) => {
                 sessionStorage.removeItem("accessToken");
             }
         }
+        setIsLoading(false); // 👈 Set loading to false after the check
     }, []);
 
     // 로그인 함수
@@ -34,7 +37,6 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem("accessToken", token);
         const decodedUser = jwtDecode(token);
         setUser(decodedUser);
-
     };
 
     // 로그아웃 함수
@@ -62,7 +64,6 @@ export const AuthProvider = ({ children }) => {
                 const newToken = response.headers.authorization;
                 if (newToken) {
                     sessionStorage.setItem("accessToken", newToken);
-                    // Update user state if a new token is received
                     const decodedUser = jwtDecode(newToken);
                     setUser(decodedUser);
                 }
@@ -75,8 +76,11 @@ export const AuthProvider = ({ children }) => {
         );
 
         return instance;
-    }, [logout]); // logout is added as a dependency to ensure the correct function is always used
+    }, [logout]);
 
+    if (isLoading) {
+        return <div>Loading...</div>; // 👈 Show a loading indicator
+    }
 
     return (
         <AuthContext.Provider value={{ user, login, logout, api }}>

@@ -1,6 +1,6 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Outlet, Navigate, useLocation} from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
@@ -66,50 +66,41 @@ function AdminLayout() {
 }
 
 function App() {
-
-    const ProtectedRoute = ({ requiredRoles }) => {
+    const ProtectedRoute = ({requiredRole})=>{
         const { user } = useAuth();
-        if(!user) return <Navigate to="/login" replace />;
-        const hasRequiredRole = user.roles.some(role => requiredRoles.includes(role));
-        if (!hasRequiredRole) {
-            //console.log(hasRequiredRole);
-            if (user.roles.includes("USER")) {
+        const userRole = user?.roles[0];
+        if (!userRole) {
+            if (requiredRole !== "") {
                 return <Navigate to="/" replace />;
             }
-            if (user.roles.includes("SELLER")) {
-                return <Navigate to="/seller" replace />;
-            }
-            if (user.roles.includes("ADMIN")) {
-                return <Navigate to="/admin" replace />;
-            }
-            return <Navigate to="/" replace />;
+        }else if(requiredRole !== userRole){
+            if(userRole === "ADMIN") return <Navigate to="/admin" replace/>;
+            if(userRole === "SELLER") return <Navigate to="/seller" replace/>;
+            if(userRole === "USER" && requiredRole !== "") return <Navigate to="/" replace/>;
         }
-
-        console.log(hasRequiredRole);
-
-        return <Outlet />;
-    };
+        return <Outlet/>;
+    }
 
   return (
     <>
      <BrowserRouter>
          <AuthProvider>
          <Routes>
-             <Route path="/oauthcallback" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
-
              <Route element={<Layout/>}>
-                 <Route path="/" element={<HomePage/>}/>   {/*홈페이지*/}
-                 <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}
+                 <Route element={<ProtectedRoute requiredRole={""} />}>
+                     <Route path="/" element={<HomePage/>}/>   {/*홈페이지*/}
+                     <Route path="/oauthcallback" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
+                     <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}
 
-                 <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
+                     <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
 
-               <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
-               <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
-                <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
-                <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
-               <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
-
-                 <Route element={<ProtectedRoute requiredRoles={['USER']} />}>
+                   <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
+                   <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
+                    <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
+                    <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
+                   <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
+                 </Route>
+                 <Route element={<ProtectedRoute requiredRole={"USER"} />}>
                    {/*로그인한 사용자만 접근 가능한 페이지들*/}
                    <Route path="/cart" element={<CartPage />} />   {/*장바구니 페이지*/}
                    <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
@@ -123,8 +114,7 @@ function App() {
                    <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
                  </Route>
              </Route>
-            {/*판매자 권한이 있는 사용자만 접근 가능한 페이지들*/}
-            <Route element={<ProtectedRoute requiredRoles={['SELLER']} />}>
+             <Route element={<ProtectedRoute requiredRole={"SELLER"} />}>
                 <Route element={<SellerLayout/>}>
                     <Route path="/seller/order/list" element={<SellerOrderListPage/>}/>
                     <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
@@ -135,8 +125,9 @@ function App() {
                     <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
                     <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
                 </Route>
-            </Route>
-            <Route element={<ProtectedRoute requiredRoles={['ADMIN']} />}>
+             </Route>
+
+             <Route element={<ProtectedRoute requiredRole={"ADMIN"} />}>
                 <Route element={<AdminLayout/>}>
                    {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
                      <Route path="/admin/notice/list" element={<AdminNoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}

@@ -1,5 +1,8 @@
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 const AdminHeader = () => {
+
+    const { logout } = useAuth();
 
     return (
         <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
@@ -29,7 +32,7 @@ const AdminHeader = () => {
                     </Nav>
 
                     <Nav>
-                        <a className="dropdown-item" href="#">
+                        <a className="nav-link" onClick={logout}>
                             로그아웃
                         </a>
                     </Nav>
