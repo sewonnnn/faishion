@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Row, Col, Image } from "react-bootstrap";
-import "./ProductLiftInfo.css";
+import "../../pages/ProductDetailPage.css"
 
 const ProductLiftInfo = ({ images }) => {
     // 메인 이미지 상태 관리
@@ -25,7 +25,7 @@ const ProductLiftInfo = ({ images }) => {
                 </Col>
                 {/* 메인 이미지 컬럼 */}
                 <Col xs={10}>
-                    <Image src={mainImage} fluid alt="Main product image" /> {/* alt 속성 추가 */}
+                    <Image  className="product-left-main-img" src={mainImage} fluid alt="Main product image" /> {/* alt 속성 추가 */}
                 </Col>
             </Row>
         </div>

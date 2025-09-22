@@ -7,14 +7,10 @@ import {
     InputGroup,
     ToggleButton,
     ToggleButtonGroup,
-    Stack,
-    Container,
-    Row,
     Col,
-    Card,
 } from "react-bootstrap";
 import { FaHeart } from 'react-icons/fa';
-import "./ProductRightInfo.css";
+import "../../pages/ProductDetailPage.css"
 
 const ProductRightInfo = ({ productId, product }) => {
     const navigate = useNavigate();

@@ -43,22 +43,20 @@ public class GeminiController {
     // 루트 URL ('/')로 들어오는 GET 요청을 처리하여 index.html을 반환합니다.
     @GetMapping("/")
     public String showHomePage() {
-        System.out.println("GET / 요청 처리 - index.html 반환");
-        System.out.println("apikey : "+apiKey);
+//        System.out.println("GET / 요청 처리 - index.html 반환");
         return "index.html";
     }
 
     @GetMapping("/{productId}")
     @ResponseBody
     public String getProductImage(@PathVariable Long productId) {
-        System.out.println("GET /api/gemini/" + productId + " 요청 수신.");
-        System.out.println("apikey : "+apiKey);
+//        System.out.println("GET /api/gemini/" + productId + " 요청 수신.");
         Stock stock = stockRepository.findByProductId(productId); // 선택된 상품 정보 가지고오기
         Image image = stock.getImage();
 
         JsonObject responseJson = new JsonObject();
-        responseJson.addProperty("imageUrl", "http://localhost:8080/image/"+image.getId());
-        System.out.println("productId " + productId + "에 대한 이미지 URL: " + image.getOriginName());
+        responseJson.addProperty("imageUrl", "/api/image/"+image.getId());
+//        System.out.println("productId " + productId + "에 대한 이미지 URL: " + image.getOriginName());
 
         return gson.toJson(responseJson);
     }
@@ -66,7 +64,7 @@ public class GeminiController {
     @GetMapping("/cart")
     @ResponseBody
     public String getCartImages() {
-        System.out.println("GET /api/cart 요청 수신.");
+//        System.out.println("GET /api/cart 요청 수신.");
 
         JsonArray cartItems = new JsonArray();
         String[] productIds = {"1", "2", "3"};
@@ -85,7 +83,7 @@ public class GeminiController {
             cartItems.add(itemJson);
         }
 
-        System.out.println("장바구니 이미지 목록 반환.");
+//        System.out.println("장바구니 이미지 목록 반환.");
         return gson.toJson(cartItems);
     }
 
@@ -110,7 +108,7 @@ public class GeminiController {
             String base64Image1 = requestJson.get("image1").getAsString(); // 상품 이미지
             String base64Image2 = requestJson.get("image2").getAsString(); // 모델 이미지
 
-            System.out.println("요청 파싱 완료: image1 길이=" + base64Image1.length() + ", image2 길이=" + base64Image2.length());
+//            System.out.println("요청 파싱 완료: image1 길이=" + base64Image1.length() + ", image2 길이=" + base64Image2.length());
 
             // --- Gemini API 요청 페이로드 구성 ---
             // 프런트엔드에서 프롬프트를 보내지 않으므로, 백엔드에서 고정 프롬프트를 설정합니다.
@@ -155,7 +153,7 @@ public class GeminiController {
             mainPayload.add("generationConfig", generationConfig);
 
             String payloadString = mainPayload.toString();
-            System.out.println("Gemini API 요청 페이로드 (일부): " + payloadString.substring(0, Math.min(payloadString.length(), 200)) + "...");
+//            System.out.println("Gemini API 요청 페이로드 (일부): " + payloadString.substring(0, Math.min(payloadString.length(), 200)) + "...");
 
             // --- Gemini API 요청 전송 ---
             Request request = new Request.Builder()
@@ -163,15 +161,15 @@ public class GeminiController {
                     .post(okhttp3.RequestBody.create(payloadString, MediaType.get("application/json; charset=utf-8")))
                     .build();
 
-            System.out.println("Gemini API로 요청 전송 중...");
+//            System.out.println("Gemini API로 요청 전송 중...");
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-                System.out.println("Gemini API 응답 수신. 상태 코드: " + response.code());
-                System.out.println("Gemini API 응답 본문 (일부): " + responseBody.substring(0, Math.min(responseBody.length(), 200)) + "...");
+//                System.out.println("Gemini API 응답 수신. 상태 코드: " + response.code());
+//                System.out.println("Gemini API 응답 본문 (일부): " + responseBody.substring(0, Math.min(responseBody.length(), 200)) + "...");
 
                 // 응답이 성공적인지 확인합니다.
                 if (!response.isSuccessful()) {
-                    System.err.println("Gemini API 요청 실패: " + response.code() + " - " + response.message());
+//                    System.err.println("Gemini API 요청 실패: " + response.code() + " - " + response.message());
                     return "{\"error\": \"" + response.code() + " - " + response.message() + "\"}";
                 }
 
@@ -181,7 +179,7 @@ public class GeminiController {
                     JsonArray candidates = jsonObject.getAsJsonArray("candidates");
 
                     if (candidates == null || candidates.size() == 0) {
-                        System.err.println("API 응답에서 candidates를 찾을 수 없습니다.");
+//                        System.err.println("API 응답에서 candidates를 찾을 수 없습니다.");
                         return "{\"error\": \"No candidates found in API response.\"}";
                     }
 
@@ -199,36 +197,36 @@ public class GeminiController {
                         JsonObject partObject = part.getAsJsonObject();
                         if (partObject.has("inlineData")) {
                             imagePart = partObject;
-                            System.out.println("이미지 part (inlineData) 발견.");
+//                            System.out.println("이미지 part (inlineData) 발견.");
                             break;
                         }
                     }
 
                     if (imagePart != null && imagePart.has("inlineData")) {
                         String base64Data = imagePart.getAsJsonObject("inlineData").get("data").getAsString();
-                        System.out.println("추출된 Base64 데이터 (앞 50자): " + base64Data.substring(0, Math.min(base64Data.length(), 50)) + "...");
+//                        System.out.println("추출된 Base64 데이터 (앞 50자): " + base64Data.substring(0, Math.min(base64Data.length(), 50)) + "...");
                         return "{\"base64Data\": \"" + base64Data + "\"}";
                     } else {
-                        System.err.println("API 응답 형식 오류: 이미지 데이터 (inlineData)를 찾을 수 없음.");
+//                        System.err.println("API 응답 형식 오류: 이미지 데이터 (inlineData)를 찾을 수 없음.");
                         return "{\"error\": \"Unexpected API response format. No image data found.\"}";
                     }
 
                 } catch (JsonSyntaxException | NullPointerException e) {
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));
-                    System.err.println("API 응답 JSON 파싱 오류: " + sw.toString());
+//                    System.err.println("API 응답 JSON 파싱 오류: " + sw.toString());
                     return "{\"error\": \"Failed to parse API response: Invalid JSON structure.\"}";
                 }
             }
         } catch (IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            System.err.println("네트워크 오류 또는 타임아웃 발생: " + sw.toString());
+//            System.err.println("네트워크 오류 또는 타임아웃 발생: " + sw.toString());
             return "{\"error\": \"Image generation failed due to a network error or timeout.\"}";
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            System.err.println("예상치 못한 오류 발생: " + sw.toString());
+//            System.err.println("예상치 못한 오류 발생: " + sw.toString());
             return "{\"error\": \"An unexpected error occurred.\"}";
         }
     }

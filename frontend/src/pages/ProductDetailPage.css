@@ -1,7 +1,17 @@
-.ProductDetailPage{
-
-}
-
 .productInfo{
     display: flex;
+}
+
+.product-detail-body-image {
+    width: 100%;
+    max-width: 800px; /* 원하는 최대 너비 설정 */
+    height: auto;
+    object-fit: contain; /* 이미지가 잘리지 않고 전체가 보이도록 설정 */
+}
+
+.product-left-main-img {
+    width: 100%; /* 부모 컬럼에 맞춰 너비 100% */
+    height: auto; /* 이미지 비율 유지 */
+    max-height: 500px; /* 최대 높이 설정 (선택 사항) */
+    object-fit: contain; /* 이미지가 잘리지 않고 전체 보이도록 */
 }
