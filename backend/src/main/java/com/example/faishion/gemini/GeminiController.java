@@ -1,3 +1,4 @@
+/*
 package com.example.faishion.gemini;
 
 import com.example.faishion.image.Image;
@@ -231,3 +232,4 @@ public class GeminiController {
         }
     }
 }
+*/
