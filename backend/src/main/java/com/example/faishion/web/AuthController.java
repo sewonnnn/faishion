@@ -49,21 +49,26 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
         try {
             User u = authService.loginLocal(req.login(), req.password());
+            // 토큰 발급
             var tokens = authService.issueTokens(u);
 
-            Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));
-            accessCookie.setHttpOnly(true);
-            accessCookie.setPath("/");
-            accessCookie.setMaxAge(3600);
-            response.addCookie(accessCookie);
+            // 로컬스토리지로 저장 변경
+//            Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));
+//            accessCookie.setHttpOnly(true);
+//            accessCookie.setPath("/");
+//            accessCookie.setMaxAge(3600);
+//            response.addCookie(accessCookie);
 
+            // 1. 쿠키 저장
             Cookie refreshCookie = new Cookie("refreshToken", tokens.get("refresh"));
             refreshCookie.setHttpOnly(true);
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(1209600);
             response.addCookie(refreshCookie);
 
-            return ResponseEntity.ok().build();
+            // 2. body JSON 으로 accessToken 내려줌
+            //            → 프론트(localStorage)에 저장해서 API 호출 시 Authorization 헤더에 직접 사용
+            return ResponseEntity.ok(new AuthDto.TokenRes(tokens.get("access"), tokens.get("refresh")));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }

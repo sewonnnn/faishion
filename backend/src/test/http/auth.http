@@ -3,10 +3,11 @@ POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "email": "test1@x.com",
-  "password": "1234",
+  "username": "testuser4",
+  "email": "test4@naver.com",
+  "password": "test1234",
   "name": "테스터",
-  "phoneNumber": "010-0000-0000"
+  "phoneNumber": "010-2222-1111"
 }
 
 ### 로그인 (토큰 받기)
@@ -14,8 +15,8 @@ POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-  "email": "test1@x.com",
-  "password": "1234"
+  "login": "testuser4",
+  "password": "test1234"
 }
 
 > {%

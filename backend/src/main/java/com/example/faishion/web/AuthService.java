@@ -5,10 +5,12 @@ import com.example.faishion.user.AuthProvider;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import com.example.faishion.web.dto.AuthDto;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -28,6 +30,7 @@ public class AuthService {
 
 
     // 로컬 회원가입
+    @Transactional
     public void registerLocal(AuthDto.RegisterLocalReq req) {
         if (userRepo.existsByUsername(req.username())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
@@ -164,5 +167,14 @@ public class AuthService {
         String access = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));
         String refresh = jwt.generateRefresh(u.getId());
         return Map.of("access", access, "refresh", refresh);
+    }
+
+    // 테스트 로그 출력용
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @PostConstruct
+    public void logDbUrl() {
+        System.out.println(">>> [AuthService] DB URL = " + dbUrl);
     }
 }

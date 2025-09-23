@@ -50,7 +50,7 @@ const ProductDetailPage = () => {
             </Row>
             <Row>
                 <Col>
-                    <ProductBody />
+                    <ProductBody productId={productId} />
                 </Col>
             </Row>
             <Row>
