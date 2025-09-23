@@ -1,10 +1,8 @@
 import Banner from "../components/productlist/Banner.jsx";
-import { useAuth } from "../contexts/AuthContext.jsx";
-import { useEffect } from "react";
 
 const HomePage = () => {
+    /*
     const { api } = useAuth();
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -17,7 +15,7 @@ const HomePage = () => {
         };
         fetchCategories();
     }, [api]);
-
+    */
     return (
         <>
             <h1>HomePage</h1>

@@ -11,7 +11,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { useAuth } from '../../contexts/AuthContext';
 
 
@@ -29,16 +28,15 @@ const Header = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('/api/category/groups');
+                const response = await api.get('/category/groups');
                 setCategories(response.data);
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
                 // 에러 발생 시 초기 데이터를 사용하거나 다른 처리를 할 수 있습니다.
             }
         };
-
         fetchCategories();
-    }, []);
+    }, [api]);
 
     const renderSubCategories = (subCategories) => {
         return (

@@ -15,12 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -50,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void handleRefreshToken(HttpServletRequest req, HttpServletResponse res) {
-        System.out.println("리프레시 토큰 재발급 시도");
         String refreshToken = extractRefreshTokenFromCookie(req);
         if (refreshToken != null) {
             try {
@@ -60,13 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String subject = claims.getSubject();
                 @SuppressWarnings("unchecked")
                 List<String> roles = (List<String>)claims.get("roles");
-
-                System.out.println(roles);
-
                 // 사용자 ID(subject)와 role을 사용해서 실제로 DB에 존재하는지 조회
                 if(roles != null && !roles.isEmpty()){
                     String role = roles.get(0);
-                    System.out.println(role);
                     if("USER".equals(role)){
                         userRepository.findById(subject).orElseThrow();
                     }else if("SELLER".equals(role)){
@@ -75,24 +70,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         adminRepository.findById(subject).orElseThrow();
                     }
                 }
-
-                System.out.println("dd2");
-
                 // 새 액세스 토큰 발급 및 응답 헤더에 추가
                 String newAccessToken = jwt.generateAccess(subject, roles);
-                res.setHeader("Authorization", "Bearer " + newAccessToken);
-
+                res.setHeader("Authorization", newAccessToken);
                 // 새 액세스 토큰으로 인증 설정
                 authenticateUser(jwt.parse(newAccessToken));
             } catch (Exception refreshException) {
                 // 리프레시 토큰 유효성 검증 실패 시 401 에러 반환
-                System.out.println("리프레시 토큰 유효성 검증 실패");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 SecurityContextHolder.clearContext();
             }
         } else {
             // 리프레시 토큰이 없는 경우 401 에러 반환
-            System.out.println("리프레시 토큰 없음");
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             SecurityContextHolder.clearContext();
         }
@@ -106,7 +95,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         List<SimpleGrantedAuthority> authorities = ((List<String>)claims.get("roles")).stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .toList();
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(subject, null, authorities);
+        UserDetails userDetails = new User(subject, "", authorities);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 

@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useMemo } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -13,9 +12,10 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    let isTokenExpired = false;
+    let isTokenRefreshed = false;
 
     // Initial check for a token on component mount
     useEffect(() => {
@@ -61,16 +61,21 @@ export const AuthProvider = ({ children }) => {
         instance.interceptors.response.use(
             (response) => {
                 const newToken = response.headers.authorization;
-                console.log(newToken);
-                if (newToken) {
+                if (newToken && !isTokenRefreshed) {
+                    isTokenRefreshed = true;
                     sessionStorage.setItem("accessToken", newToken);
+                    console.log("새로운 토큰 발급 : " + newToken);
                     const decodedUser = jwtDecode(newToken);
                     setUser(decodedUser);
                 }
                 return response;
             },
             (error) => {
-                if (error.response?.status === 401) logout();
+                if (error.response?.status === 401 && !isTokenExpired){
+                    isTokenExpired = true;
+                    alert("토큰이 만료되었습니다. 다시 로그인해주세요.");
+                    logout();
+                }
                 return Promise.reject(error);
             }
         );
