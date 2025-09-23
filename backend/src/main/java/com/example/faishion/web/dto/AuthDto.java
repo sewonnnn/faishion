@@ -16,6 +16,7 @@ public class AuthDto {
     @AllArgsConstructor
     public static class RegisterLocalReq {
         @NotBlank
+        @Size(min = 6, max = 20, message = "아이디는 최소 6자 이상 20자 이하로 입력해야 합니다.")
         private String id;   // 사용자가 직접 입력할 아이디 (PK)
 
         @Email
@@ -23,7 +24,7 @@ public class AuthDto {
         private String email;
 
         @NotBlank
-        @Size(min = 8, max = 64)
+        @Size(min = 8, max = 64, message = "비밀번호는 최소 8자 이상 64자 이하로 입력해야 합니다.")
         private String password;
 
         @NotBlank
