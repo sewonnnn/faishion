@@ -87,7 +87,7 @@ function App() {
                <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
                <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
                <Route path="/order/new/:productId" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
-               <Route path="/order/new/:productId" element={<TossPaymentPage />} />   {/*토스 결제 페이지*/}
+               {/*<Route path="/order/new/:productId" element={<TossPaymentPage />} />   /!*토스 결제 페이지*!/*/}
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
                <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
