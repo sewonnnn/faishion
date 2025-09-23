@@ -60,7 +60,7 @@ const ProductCard = ({ product }) => {
                     {hasCoupon && <div className="coupon-badge me-2">쿠폰</div>}
                     <span className="rating-info text-muted">
                         <BsStarFill className="star-icon me-1" />
-                        {reviewRating}점 ({reviewCount})
+                        {reviewRating ? reviewRating.toFixed(1) : '0.0'}점 ({reviewCount})
                     </span>
                 </div>
             </Card.Body>
