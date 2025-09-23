@@ -37,7 +37,7 @@ import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
-import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
+
 
 
 function Layout() {
@@ -91,7 +91,7 @@ function App() {
                <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
                <Route path="/order/new/:productId" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
 
-               <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
+               {/*<Route path="/order/toss" element={<PaymentCheckoutPage/>} />   /!*토스 결제창 페이지*!/*/}
 
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}

@@ -1,7 +1,7 @@
 import './OrderFormPage.css';
 import {useEffect, useState} from "react";
 import {useLocation} from "react-router-dom";
-import useTosspay from '../hooks/useTosspay.js';
+
 import axios from 'axios'; // 1. Axios를 임포트
 
 const OrderFormPage = () => {
