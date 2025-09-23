@@ -25,14 +25,14 @@ public class ProductDetailDTO {
     private Set<String> imageUrls;
     private LocalDateTime discountStartDate;
     private LocalDateTime discountEndDate;
-
+    private String username;
     private Map<String, Map<String, Integer>> stockByColorAndSize;
 
-    public ProductDetailDTO(Product product, String domain) {
+    public ProductDetailDTO(Product product, String domain,  String username) {
         this.id = product.getId();
         this.name = product.getName();
         this.brand = product.getSeller().getBusinessName();
-
+        this.username = username;
         // 가격 정보 설정
         boolean isDiscounting = product.getDiscountStartDate() != null && product.getDiscountEndDate() != null &&
                 LocalDateTime.now().isAfter(product.getDiscountStartDate()) && LocalDateTime.now().isBefore(product.getDiscountEndDate());

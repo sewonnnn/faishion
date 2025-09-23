@@ -137,7 +137,12 @@ public class GeminiController {
             JsonArray base64Images = requestJson.getAsJsonArray("image1");
             String base64ModelImage = requestJson.get("image2").getAsString();
 
-            String prompt = "이 옷 사진을 사람 사진이 입고 있는 사진으로 합성해줘 키는 160cm이고 몸무게는 90kg야. 결과 이미지로만 응답해. 다른 텍스트는 포함하지마.";
+            String prompt = "image1 is a full-body image of a person. All subsequent images (from image2 to imageX, up to six images)" +
+                    " are fashion items, which can include clothing, accessories, footwear, or headwear. Create a single photorealistic " +
+                    "full-body image of the person from image1 wearing and styled with all the fashion items from the other images. " +
+                    "The person should have a height of 180cm and a weight of 73kg, ensuring their body shape and " +
+                    "proportions are consistent with these measurements. Focus on seamless integration of all items, maintaining a realistic fit, " +
+                    "natural proportions, high-quality textures, and appropriate lighting.";
 
             JsonArray partsArray = new JsonArray();
 

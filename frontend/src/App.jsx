@@ -39,6 +39,7 @@ import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
+import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
 
 function Layout() {
     return (
@@ -97,7 +98,7 @@ function App() {
 
                      <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
 
-<Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
+                    <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
                    <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
                     <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
                     <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
@@ -123,7 +124,8 @@ function App() {
              <Route element={<ProtectedRoute requiredRole={"SELLER"} />}>
                 <Route element={<SellerLayout/>}>
                     <Route path="/seller/order/list" element={<SellerOrderListPage/>}/>
-                    <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
+                    <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/> {/* 판매자 문의사항 리스트 */}
+                    {/* 새로 추가(머지하면 삭제) */}<Route path="/seller/qna/:id" element={<SellerQnaDetail/>}/> {/* 판매자 문의 상세보기 */}
                     <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
                     <Route path="/seller/category" element={<SellerCategoryPage/>}/> {/*판매자 카테고리 페이지*/}
                     <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}

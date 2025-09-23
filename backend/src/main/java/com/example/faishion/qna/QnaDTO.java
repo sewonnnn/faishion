@@ -1,5 +1,6 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class QnaDTO {
     private String answered_by; //답변한 판매자
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
+    private String productName;
 
     public QnaDTO(Qna qna) {
         this.id = qna.getId();
@@ -27,6 +29,7 @@ public class QnaDTO {
         this.answer = qna.getAnswer();
         this.created_at = qna.getCreatedAt();
         this.updated_at = qna.getUpdatedAt();
+        this.productName = qna.getProduct().getName();
 
         if (qna.getUser() != null) {
             this.user_id = qna.getUser().getId();
