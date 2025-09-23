@@ -31,6 +31,8 @@ import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
 import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
 import SellerOrderListPage from "./pages/seller/SellerOrderListPage.jsx";
+import SellerRegisterPage from "./pages/seller/SellerRegisterPage.jsx";
+import SellerLoginPage from "./pages/seller/SellerLoginPage.jsx";
 import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
@@ -88,7 +90,9 @@ function App() {
                <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
                <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
                <Route path="/order/new/:productId" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
+
                <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
+
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
                <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
@@ -105,6 +109,8 @@ function App() {
                      <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
                      <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
                      <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
+                     <Route path="/seller/register" element={<SellerRegisterPage />} /> {/*판매자 회원가입 페이지*/}
+                     <Route path="/seller/login" element={<SellerLoginPage />} /> {/*판매자 로그인 페이지*/}
                 </Route>
                 <Route element={<AdminLayout/>}>
                    {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
