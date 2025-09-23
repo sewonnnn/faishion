@@ -16,7 +16,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +26,14 @@ import java.util.List;
         uniqueConstraints = {
                 @UniqueConstraint(name="uk_users_email", columnNames="email"),
                 @UniqueConstraint(name="uk_users_phone", columnNames="phone_number"),
-                @UniqueConstraint(name="uk_users_username", columnNames="username"),
                 @UniqueConstraint(name="uk_users_provider_uid", columnNames={"provider","provider_user_id"})
         })
 public class User {
 
+    // 수정
     @Id
-    @Column(length = 36)
-    private String id; // 항상 UUID (LOCAL/소셜 모두)
+    @Column(length = 100)
+    private String id; // 로컬 : 사용자 입력 아이디 , 소셜: provider userId
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
@@ -42,10 +41,6 @@ public class User {
 
     @Column(name="provider_user_id", length=100)
     private String providerUserId; // LOCAL일 땐 null
-
-    // 로컬 로그인용 사용자 아이디 // 소셜은 null 가능
-    @Column(length = 30)
-    private String username;
 
     @Column(nullable = false, length = 60)
     private String name;

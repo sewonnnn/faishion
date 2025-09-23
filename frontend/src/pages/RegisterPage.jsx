@@ -5,7 +5,7 @@ import axios from "axios";
 export default function RegisterPage() {
     const nav = useNavigate();
     const [form, setForm] = useState({
-        username: "",
+        id: "",
         email: "",
         password: "",
         name: "",
@@ -33,12 +33,20 @@ export default function RegisterPage() {
     return (
         <form onSubmit={onSubmit} style={{ maxWidth: 420, margin: "0 auto" }}>
             <h2>회원가입</h2>
-            <input name="username" value={form.username} onChange={onChange} placeholder="아이디" required/>
-            <input name="email" value={form.email} onChange={onChange} placeholder="이메일"  />
+            <input name="id" value={form.id} onChange={onChange} placeholder="아이디" required/>
+            <input name="email" value={form.email} onChange={onChange} placeholder="이메일" />
             <input name="password" type="password" value={form.password} onChange={onChange} placeholder="비밀번호" required />
             <input name="name" value={form.name} onChange={onChange} placeholder="이름" required />
-            <input name="phoneNumber" value={form.phoneNumber} onChange={onChange} placeholder="010-0000-0000"
-                   type="tel" pattern="^010-\d{4}-\d{4}$" className="form-control" required/>
+            <input
+                name="phoneNumber"
+                value={form.phoneNumber}
+                onChange={onChange}
+                placeholder="010-0000-0000"
+                type="tel"
+                pattern="^010-\\d{4}-\\d{4}$"
+                className="form-control"
+                required
+            />
             <button type="submit">가입하기</button>
         </form>
     );

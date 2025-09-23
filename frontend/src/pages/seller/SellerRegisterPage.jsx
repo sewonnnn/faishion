@@ -3,9 +3,10 @@ import axios from "axios";
 
 const SellerRegisterPage = () => {
     const [form, setForm] = useState({
+        id:"",
+        password: "",
         email: "",
         phoneNumber: "",
-        password: "",
         businessName: "",
         businessNumber: "",
         ownerName: ""
@@ -32,11 +33,12 @@ const SellerRegisterPage = () => {
         <div>
             <h2>판매자 회원가입</h2>
             <form onSubmit={handleSubmit}>
+                <input name="id" placeholder="아이디" onChange={handleChange} />   {/* 수정 */}
+                <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} />
                 <input name="email" placeholder="이메일" onChange={handleChange} />
                 <input name="phoneNumber" placeholder="휴대폰 번호" onChange={handleChange} />
-                <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} />
-                <input name="businessName" placeholder="상호명" onChange={handleChange} />
                 <input name="businessNumber" placeholder="사업자 등록번호" onChange={handleChange} />
+                <input name="businessName" placeholder="상호명" onChange={handleChange} />
                 <input name="ownerName" placeholder="대표자 이름" onChange={handleChange} />
                 <button type="submit">회원가입</button>
             </form>

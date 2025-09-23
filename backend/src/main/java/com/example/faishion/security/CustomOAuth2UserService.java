@@ -90,7 +90,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     u.setId(UUID.randomUUID().toString());
                     u.setProvider(userInfo.provider());
                     u.setProviderUserId(userInfo.providerUserId());
-                    u.setUsername(null);
                     u.setName(userInfo.name() != null && !userInfo.name().isBlank() ? userInfo.name() : userInfo.provider().name() + "_" + userInfo.providerUserId());
                     u.setEmail(userInfo.email() != null ? userInfo.email() : userInfo.provider().name().toLowerCase() + "_" + userInfo.providerUserId() + "@social.local");
                     u.setPhoneNumber(userInfo.phone() != null ? userInfo.phone() : "SOCIAL-" + userInfo.providerUserId());

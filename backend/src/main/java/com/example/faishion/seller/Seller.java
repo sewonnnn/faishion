@@ -29,7 +29,7 @@ public class Seller {
     @Column(nullable = false)
     private String phoneNumber; //판매자 휴대폰번호
 
-    private String pwHash; //Spring Security 암호화
+    private String password; //Spring Security  pwHash 암호화
 
     private String businessName; //상호명
 
