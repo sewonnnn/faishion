@@ -49,9 +49,9 @@ public class CartService {
 
     // 장바구니에 상품을 추가하는 메서드
     public void addItemToCart(User user, Stock stock, int quantity) {
-        // 해당 유저와 Stock ID로 장바구니에 이미 담긴 상품이 있는지 확인
-        Optional<Cart> existCartItem = cartRepository.findByUserIdAndProductId(user.getId(), stock.getProduct().getId());
-
+        // ✨ 유저와 Stock ID로 장바구니에 이미 담긴 상품이 있는지 확인
+        Optional<Cart> existCartItem = cartRepository.findByUserIdAndStockId(user.getId(), stock.getId());
+        System.out.println("existCartItem = " + existCartItem);
         if (existCartItem.isPresent()) {
             // 이미 있다면 기존 항목의 수량 증가
             Cart cartUpdate = existCartItem.get();

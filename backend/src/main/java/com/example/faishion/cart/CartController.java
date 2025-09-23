@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RequestMapping("/cart")
@@ -32,36 +33,24 @@ public class CartController {
     }
 
     @PostMapping("/save")
-    public boolean cartSave(@RequestBody StockDTO stockDTO) {
+    public boolean cartSave(@RequestBody List<StockDTO> stockList) {
 
-    /*    // 임시 사용자 생성
-        User user = userRepository.getReferenceById("sewon"); // 임시 아이디
-        Stock stock = stockRepository.findById(1).get();
+        User user = userRepository.getReferenceById("sewon"); // 임시 사용자 ID 사용
 
-        Product product = productService.findById(stockDTO.getProductId());
-        stock.setProduct(product);
+        for (StockDTO stockDTO : stockList) {
+            Optional<Stock> stockOptional = stockRepository.findByProductIdAndColorAndSize( // 상품번호, 컬러, 사이즈로 찾기
+                    stockDTO.getProductId(), stockDTO.getColor(), stockDTO.getSize());
 
-        // 장바구니 객체 생성 및 저장
-        Cart cart = new Cart();
-        cart.setUser(user);
-        cart.setStock(stock);
-        cart.setQuantity(stockDTO.getQuantity());
-        cartService.save(cart);*/
-
-        User user = userRepository.getReferenceById("sewon");
-
-        // stockDTO.getId()를 사용하여 Stock 객체를 찾기
-      // Stock stock = stockRepository.getReferenceById(stockDTO.getId().intValue());
-        Stock stock = stockRepository.getReferenceById(1);
-
-        // 장바구니 객체를 생성합니다.
-        Cart cart = new Cart();
-        cart.setUser(user);
-        cart.setStock(stock);
-        cart.setQuantity(stockDTO.getQuantity());
-
-        cartService.addItemToCart(user, stock, stockDTO.getQuantity());
-
+            if (stockOptional.isPresent()) {
+                Stock stock = stockOptional.get(); // 찾은상품 있으면 불러오기
+                cartService.addItemToCart(user, stock, stockDTO.getQuantity()); // 카트에 담기
+            } else {
+                throw new EntityNotFoundException("재고 정보를 찾을 수 없습니다: " +
+                        "ProductId=" + stockDTO.getProductId() +
+                        ", Color=" + stockDTO.getColor() +
+                        ", Size=" + stockDTO.getSize());
+            }
+        }
         return true;
     }
 

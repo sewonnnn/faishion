@@ -7,6 +7,10 @@ import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,30 +73,31 @@ public class ReviewController {
 
     // 화면에 보여주기용
     @GetMapping("/{productId}")
-    public List<ReviewResponseDTO> getReviewsByProductId(@PathVariable Long productId, HttpServletRequest request) {
-
-        List<Review> reviews = reviewService.findByProduct_Id(productId);
+    public Page<ReviewResponseDTO> getReviewsByProductId(
+            @PathVariable Long productId,
+            HttpServletRequest request,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<Review> reviewsPage = reviewService.findByProduct_Id(productId, pageable);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        if (reviews == null || reviews.isEmpty()) {
-            return List.of();
-        }
-
         String domain = request.getScheme() + "://" + request.getServerName() +
                 (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
 
-        return reviews.stream()
-                .map(review -> new ReviewResponseDTO(
-                        review.getId(),
-                        review.getUser().getId(),
-                        review.getContent(),
-                        review.getRating(),
-                        review.getCreatedAt().format(formatter),
-                        review.getImageList().stream()
-                                .map(image -> domain + "/image/" + image.getId()) // Image 객체를 ID로 변환
-                                .collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
+        return reviewsPage.map(review -> {
+            // NullPointerException 방지: review.getUser()가 null일 수 있음을 고려
+            String userName = (review.getUser() != null) ? review.getUser().getName() : "익명 사용자";
+
+            return new ReviewResponseDTO(
+                    review.getId(),
+                    userName, // 올바르게 수정됨
+                    review.getContent(),
+                    review.getRating(),
+                    review.getCreatedAt().format(formatter),
+                    review.getImageList().stream()
+                            .map(image -> domain + "/image/" + image.getId())
+                            .collect(Collectors.toList())
+            );
+        });
     }
 
     // 신고 메서드

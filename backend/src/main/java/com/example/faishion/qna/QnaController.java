@@ -9,9 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -69,6 +73,53 @@ public class QnaController {
     // JSON에 있는 필드만 DTO에 매핑하고, 나머지는 그냥 비워두는 방식으로 처리
     public void saveAnswer(@PathVariable long id, @RequestBody QnaDTO qnaDto) {
         qnaService.updateAnswer(id, qnaDto.getAnswer(), qnaDto.getAnswered_by());
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<QnaResponseDTO>> getQuestionsByProductId(@PathVariable Long productId) {
+        // qnaService에 상품 ID를 전달하여 해당 상품의 문의만 가져옵니다.
+        List<Qna> questions = qnaService.findByProduct_Id(productId);
+
+        // Qna 엔티티 리스트를 QnaResponseDTO 리스트로 변환
+        List<QnaResponseDTO> responseDTOs = questions.stream()
+                .map(qna -> {
+                    String userName = (qna.getUser() != null) ? qna.getUser().getName() : "익명";
+                    return new QnaResponseDTO(
+                            qna.getId(),
+                            userName,
+                            qna.getTitle(),
+                            qna.getContent(),
+                            qna.isSecret(),
+                            qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<String> addQuestion(@RequestBody QnaSaveDTO qnaSaveDTO) {
+        try {
+            Product product = productRepository.findById(qnaSaveDTO.getProductId())
+                    .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+            // 임시 사용자
+            User user = userRepository.getReferenceById("sewon");
+
+            Qna qna = new Qna();
+            qna.setTitle(qnaSaveDTO.getTitle());
+            qna.setContent(qnaSaveDTO.getContent());
+            qna.setSecret(qnaSaveDTO.isSecret()); // DTO에서 받은 isSecret 값을 엔티티에 설정
+            qna.setUser(user);
+            qna.setProduct(product);
+
+            qnaService.addQna(qna);
+            return ResponseEntity.status(HttpStatus.CREATED).body("문의가 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            System.err.println("문의 등록 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("문의 등록 중 오류가 발생했습니다.");
+        }
     }
 }
 

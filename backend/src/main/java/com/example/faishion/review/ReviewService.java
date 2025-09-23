@@ -4,6 +4,8 @@ import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,8 +50,8 @@ public class ReviewService {
 
 
     // 리뷰목록 불러오기
-    List<Review> findByProduct_Id(Long productId){
-        return reviewRepository.findByProduct_Id(productId);
+    public Page<Review> findByProduct_Id(Long productId, Pageable pageable) {
+        return reviewRepository.findByProduct_Id(productId, pageable);
     }
 
     // 리뷰 신고하기
