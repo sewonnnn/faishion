@@ -46,7 +46,7 @@ public class ProductController {
                        @RequestPart("detailImages") List<MultipartFile> detailImages,
                        @RequestPart("stockList") List<Stock> stockList,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
-        if(sellerId == null) sellerId = "tj";
+        if(sellerId == null) sellerId = "temp";
         productService.createProduct(sellerId, product, mainImages, detailImages, stockList, stockImages);
     }
 

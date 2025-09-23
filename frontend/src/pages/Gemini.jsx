@@ -7,7 +7,8 @@ const Gemini = () => {
     const { productId } = useParams();
     const [searchParams] = useSearchParams();
     const [productImages, setProductImages] = useState([]);
-    const [selectedImage, setSelectedImage] = useState(null);
+    // 상태를 단일 선택에서 여러 선택으로 변경 (배열)
+    const [selectedImages, setSelectedImages] = useState([]);
     const [modelFile, setModelFile] = useState(null);
     const [resultImageUrl, setResultImageUrl] = useState("https://placehold.co/600x600/E5E7EB/A1A1AA?text=결과+이미지");
     const [isLoading, setIsLoading] = useState(false);
@@ -17,11 +18,9 @@ const Gemini = () => {
         const fetchImages = async () => {
             try {
                 let imageUrls = [];
-                // stockIds를 URL 쿼리 파라미터에서 직접 가져옵니다.
                 const stockIds = searchParams.get("stockIds");
                 const BASE_URL = "http://localhost:8080";
 
-                // stockIds가 존재하는지 먼저 확인하고, 있다면 장바구니 이미지 API를 호출합니다.
                 if (stockIds) {
                     const apiUrl = `${BASE_URL}/gemini/cart-images?ids=${stockIds}`;
                     const response = await axios.get(apiUrl);
@@ -32,9 +31,7 @@ const Gemini = () => {
                             return fullUrl;
                         });
                     }
-                }
-                // stockIds가 없고, productId가 존재할 경우 단일 상품 이미지 API를 호출합니다.
-                else if (productId) {
+                } else if (productId) {
                     const apiUrl = `${BASE_URL}/gemini/${productId}`;
                     const response = await axios.get(apiUrl);
 
@@ -46,9 +43,11 @@ const Gemini = () => {
 
                 setProductImages(imageUrls);
 
-                if (imageUrls.length > 0) {
-                    setSelectedImage(imageUrls[0]);
-                } else {
+                // 여러 이미지 선택을 위해 초기 선택 이미지를 설정하지 않음
+                // if (imageUrls.length > 0) {
+                //     setSelectedImages([imageUrls[0]]);
+                // }
+                if (imageUrls.length === 0) {
                     setMessage("이미지 목록을 불러오는 데 실패했거나 이미지가 없습니다.");
                 }
             } catch (error) {
@@ -60,7 +59,19 @@ const Gemini = () => {
         fetchImages();
     }, [productId, searchParams]);
 
-    // ... (나머지 코드 동일)
+    // 이미지 클릭 시 선택/선택 해제하는 함수
+    const handleImageToggle = (image) => {
+        setSelectedImages(prevImages => {
+            if (prevImages.includes(image)) {
+                // 이미 선택된 이미지면 배열에서 제거
+                return prevImages.filter(item => item !== image);
+            } else {
+                // 선택되지 않은 이미지면 배열에 추가
+                return [...prevImages, image];
+            }
+        });
+    };
+
     const getBase64 = (fileOrBlob) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -71,36 +82,41 @@ const Gemini = () => {
     };
 
     const handleGenerateClick = async () => {
-        if (!selectedImage || !modelFile) {
+        // 선택된 상품 이미지가 없거나 모델 파일이 없을 경우
+        if (selectedImages.length === 0 || !modelFile) {
             setMessage("상품 이미지와 모델 이미지를 모두 선택해주세요.");
-            console.warn("[프런트엔드] 경고: 상품 이미지 또는 모델 이미지가 선택되지 않았습니다.");
             return;
         }
+
         setIsLoading(true);
         setMessage("");
         setResultImageUrl("https://placehold.co/600x600/E5E7EB/A1A1AA?text=결과+이미지");
 
         try {
-            const dressBlob = await fetch(selectedImage).then((res) => res.blob());
-            const base64Image1 = await getBase64(dressBlob);
-            const base64Image2 = await getBase64(modelFile);
+            // 선택된 모든 상품 이미지들을 Base64로 변환
+            const base64ImagePromises = selectedImages.map(async (image) => {
+                const dressBlob = await fetch(image).then((res) => res.blob());
+                return getBase64(dressBlob);
+            });
+            const base64Images = await Promise.all(base64ImagePromises);
+
+            const base64ModelImage = await getBase64(modelFile);
 
             const response = await axios.post("http://localhost:8080/gemini/generate-image", {
-                image1: base64Image1,
-                image2: base64Image2,
+                // 배열 형태로 전송
+                image1: base64Images,
+                image2: base64ModelImage,
             });
 
             const responseData = response.data;
 
             if (responseData.error) {
                 setMessage(`오류: ${responseData.error}`);
-                console.error("[프런트엔드] 이미지 생성 오류:", responseData.error);
             } else if (responseData.base64Data) {
                 setResultImageUrl(`data:image/png;base64,${responseData.base64Data}`);
                 setMessage("이미지 생성 완료!");
             } else {
                 setMessage("알 수 없는 응답 형식입니다.");
-                console.error("[프런트엔드] 알 수 없는 응답 형식:", responseData);
             }
         } catch (error) {
             console.error("[프런트엔드] 이미지 생성 요청 실패:", error.message);
@@ -131,9 +147,10 @@ const Gemini = () => {
                                             fluid
                                             rounded
                                             className={`shadow-sm transition-all duration-200 cursor-pointer hover-shadow-lg ${
-                                                selectedImage === image ? "border border-primary border-4" : "border border-transparent hover-border-blue-300"
+                                                // 배열에 포함되어 있는지 확인하여 선택된 이미지에만 테두리를 표시
+                                                selectedImages.includes(image) ? "border border-primary border-4" : "border border-transparent hover-border-blue-300"
                                             }`}
-                                            onClick={() => setSelectedImage(image)}
+                                            onClick={() => handleImageToggle(image)}
                                             style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                                         />
                                     ))
@@ -153,7 +170,7 @@ const Gemini = () => {
                                 <Form.Control type="file" accept="image/*" className="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" onChange={(e) => setModelFile(e.target.files[0])} />
                             </Form.Group>
                         </div>
-                        <Button variant="primary" className="w-100 py-3 rounded-pill fw-bold" onClick={handleGenerateClick} disabled={isLoading}>
+                        <Button variant="primary" className="w-100 py-3 rounded-pill fw-bold" onClick={handleGenerateClick} disabled={isLoading || selectedImages.length === 0 || !modelFile}>
                             {isLoading ? (
                                 <>
                                     <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />

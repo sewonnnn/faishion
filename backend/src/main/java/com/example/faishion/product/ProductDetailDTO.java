@@ -26,8 +26,6 @@ public class ProductDetailDTO {
     private LocalDateTime discountStartDate;
     private LocalDateTime discountEndDate;
 
-    // ✨ 추가된 필드: 색상과 사이즈별 재고를 저장하는 맵
-    // Map<String, Map<String, Integer>> -> Map<색상, Map<사이즈, 수량>>
     private Map<String, Map<String, Integer>> stockByColorAndSize;
 
     public ProductDetailDTO(Product product, String domain) {

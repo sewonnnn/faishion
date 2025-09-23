@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.io.PrintWriter;
@@ -51,12 +50,10 @@ public class GeminiController {
     @ResponseBody
     public String getProductImage(@PathVariable Long productId) {
         List<Stock> stocks = stockRepository.findByProductId(productId);
-
         JsonObject responseJson = new JsonObject();
         if (!stocks.isEmpty()) {
             Stock stock = stocks.get(0);
             Image image = stock.getImage();
-
             if (image != null) {
                 String imageUrl = "/image/" + image.getId();
                 responseJson.addProperty("imageUrl", imageUrl);
@@ -132,43 +129,58 @@ public class GeminiController {
     @ResponseBody
     public String generateImage(@org.springframework.web.bind.annotation.RequestBody String requestBody) {
         if (apiKey == null || apiKey.isEmpty()) {
-            System.err.println("[백엔드] API 키가 설정되지 않았거나 유효하지 않습니다.");
             return "{\"error\": \"API key is not configured or is invalid\"}";
         }
         try {
             JsonObject requestJson = gson.fromJson(requestBody, JsonObject.class);
-            String base64Image1 = requestJson.get("image1").getAsString();
-            String base64Image2 = requestJson.get("image2").getAsString();
+            // 프런트엔드에서 배열로 전송된 Base64 데이터를 가져옴
+            JsonArray base64Images = requestJson.getAsJsonArray("image1");
+            String base64ModelImage = requestJson.get("image2").getAsString();
 
             String prompt = "이 옷 사진을 사람 사진이 입고 있는 사진으로 합성해줘 키는 160cm이고 몸무게는 90kg야. 결과 이미지로만 응답해. 다른 텍스트는 포함하지마.";
-            JsonObject inlineData1 = new JsonObject();
-            inlineData1.addProperty("mimeType", "image/png");
-            inlineData1.addProperty("data", base64Image1);
-            JsonObject part1 = new JsonObject();
-            part1.add("inlineData", inlineData1);
-            JsonObject inlineData2 = new JsonObject();
-            inlineData2.addProperty("mimeType", "image/png");
-            inlineData2.addProperty("data", base64Image2);
-            JsonObject part2 = new JsonObject();
-            part2.add("inlineData", inlineData2);
-            JsonObject part3 = new JsonObject();
-            part3.addProperty("text", prompt);
+
             JsonArray partsArray = new JsonArray();
-            partsArray.add(part1);
-            partsArray.add(part2);
-            partsArray.add(part3);
+
+            // 선택된 모든 상품 이미지들을 partsArray에 추가
+            for (JsonElement base64ImageElement : base64Images) {
+                String base64Data = base64ImageElement.getAsString();
+                JsonObject inlineData = new JsonObject();
+                inlineData.addProperty("mimeType", "image/png");
+                inlineData.addProperty("data", base64Data);
+                JsonObject part = new JsonObject();
+                part.add("inlineData", inlineData);
+                partsArray.add(part);
+            }
+
+            // 모델 이미지 추가
+            JsonObject inlineModelData = new JsonObject();
+            inlineModelData.addProperty("mimeType", "image/png");
+            inlineModelData.addProperty("data", base64ModelImage);
+            JsonObject modelPart = new JsonObject();
+            modelPart.add("inlineData", inlineModelData);
+            partsArray.add(modelPart);
+
+            // 프롬프트 텍스트 추가
+            JsonObject promptPart = new JsonObject();
+            promptPart.addProperty("text", prompt);
+            partsArray.add(promptPart);
+
             JsonObject contentObject = new JsonObject();
             contentObject.add("parts", partsArray);
+
             JsonArray contentsArray = new JsonArray();
             contentsArray.add(contentObject);
+
             JsonObject generationConfig = new JsonObject();
             JsonArray responseModalities = new JsonArray();
             generationConfig.addProperty("temperature", 0);
             responseModalities.add("IMAGE");
             generationConfig.add("responseModalities", responseModalities);
+
             JsonObject mainPayload = new JsonObject();
             mainPayload.add("contents", contentsArray);
             mainPayload.add("generationConfig", generationConfig);
+
             String payloadString = mainPayload.toString();
 
             Request request = new Request.Builder()
@@ -178,9 +190,7 @@ public class GeminiController {
 
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-
                 if (!response.isSuccessful()) {
-                    System.err.println("[백엔드] Gemini API 요청 실패: " + response.code() + " - " + response.message());
                     return "{\"error\": \"" + response.code() + " - " + response.message() + "\"}";
                 }
 
@@ -188,13 +198,11 @@ public class GeminiController {
                     JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
                     JsonArray candidates = jsonObject.getAsJsonArray("candidates");
                     if (candidates == null || candidates.size() == 0) {
-                        System.err.println("[백엔드] API 응답에서 candidates를 찾을 수 없습니다.");
                         return "{\"error\": \"No candidates found in API response.\"}";
                     }
                     JsonObject candidate = candidates.get(0).getAsJsonObject();
                     JsonArray parts = candidate.getAsJsonObject("content").getAsJsonArray("parts");
                     if (parts == null || parts.size() == 0) {
-                        System.err.println("[백엔드] API 응답의 content에서 parts를 찾을 수 없습니다.");
                         return "{\"error\": \"No parts found in API response.\"}";
                     }
                     JsonObject imagePart = null;
@@ -209,25 +217,21 @@ public class GeminiController {
                         String base64Data = imagePart.getAsJsonObject("inlineData").get("data").getAsString();
                         return "{\"base64Data\": \"" + base64Data + "\"}";
                     } else {
-                        System.err.println("[백엔드] API 응답 형식 오류: 이미지 데이터 (inlineData)를 찾을 수 없음.");
                         return "{\"error\": \"Unexpected API response format. No image data found.\"}";
                     }
                 } catch (JsonSyntaxException | NullPointerException e) {
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));
-                    System.err.println("[백엔드] API 응답 JSON 파싱 오류: " + sw.toString());
                     return "{\"error\": \"Failed to parse API response: Invalid JSON structure.\"}";
                 }
             }
         } catch (IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            System.err.println("[백엔드] 네트워크 오류 또는 타임아웃 발생: " + sw.toString());
             return "{\"error\": \"Image generation failed due to a network error or timeout.\"}";
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            System.err.println("[백엔드] 예상치 못한 오류 발생: " + sw.toString());
             return "{\"error\": \"An unexpected error occurred.\"}";
         }
     }
