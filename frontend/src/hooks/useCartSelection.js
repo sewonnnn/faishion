@@ -49,7 +49,7 @@ const useCartSelection = (cartList, fetchCartData) => {
         }
 
         try {
-            await axios.post('http://localhost:8080/cart/delete-multiple', { cartIds: selectedItems });
+            await axios.post('http://localhost:8080/cart/deletePickAll', { cartIds: selectedItems });
             alert('선택된 상품들이 삭제되었습니다.');
             setSelectedItems([]); // 선택 상태 초기화
             setIsAllSelected(false);

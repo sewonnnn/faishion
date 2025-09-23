@@ -61,6 +61,12 @@ const CartPage = () => {
         return `${totalItems}건`;
     };
 
+    // 상품 상세로 이동
+    const goProduct = (productId) => {
+        console.log("상품 상세 이동 상품 id:" + productId)
+        navigate(`/product/${productId}`);
+    };
+
     return (
         <>
             <div className="cart-container">
@@ -94,11 +100,11 @@ const CartPage = () => {
                                         className="product-image"
                                     />
                                 </div>
-                                <div className="item-info">
+                                <div className="item-info" onClick={() => goProduct(item.productId)} style={{ cursor: "pointer" }} >
                                     <h4>{item.productName}</h4>
                                     <p>{item.sellerBusinessName}</p>
                                     <p>상세옵션:  {item.productSize}, {item.productColor}</p>
-                                    <p className="item-options">{item.quantity}개 </p>
+                                    <p className="item-options">수량: {item.quantity}개 </p>
                                     <p className="item-price">{item.discountedProductPrice}원</p>
                                 </div>
                             </div>
