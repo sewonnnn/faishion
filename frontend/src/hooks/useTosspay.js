@@ -1,3 +1,4 @@
+/*
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import {useCallback, useEffect, useState} from "react";
 
@@ -83,3 +84,4 @@ const useTosspay = () => {
 };
 
 export default useTosspay;
+*/

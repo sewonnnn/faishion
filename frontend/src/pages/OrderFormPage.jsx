@@ -1,16 +1,15 @@
 import './OrderFormPage.css';
 import {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom"
+import {useLocation, useNavigate} from "react-router-dom"
 import axios from 'axios';
-import {PaymentCheckoutPage} from "./tossPay/PaymentCheckoutPage.jsx";
 
 const OrderFormPage = () => {
     const [orderItems, setOrderItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const location = useLocation();
+    const navigate = useNavigate();
 
-    // ... (기존 useEffect, calculateTotals, getOrderSummary 함수는 동일)
 
     useEffect(() => {
         const {ids} = location.state;
@@ -40,7 +39,25 @@ const OrderFormPage = () => {
                 }
                 setIsLoading(false);
             });
-    }, [location.state]); // `location.search` 대신 `location.state` 사용
+    }, [location.state]);
+
+    // 토스페이 결제로 이동
+    const goTossPay = async () => {
+
+        // 임시 주문번호 생성 (실제 DB에 저장되는 주문번호는 아님)
+        const orderId = `order-${new Date().getTime()}`;
+        const userName = "박세원";
+
+        // 계산된 총 금액과 주문 요약 정보를 state 객체에 담아 전달
+        navigate('/order/toss', {
+                state: {
+                totalAmount: totals.totalDiscountedPrice,
+                orderName: getOrderSummary(),
+                orderId: orderId, // 임시 주문번호를 전달
+                customerName: userName,
+                }
+        });
+    };
 
     // 총 가격 계산
     const calculateTotals = () => {
@@ -102,8 +119,7 @@ const OrderFormPage = () => {
                         <img
                             src={`http://localhost:8080/image/${item.productImageId}`}
                             alt={item.productName}
-                            className="product-image"
-                        />
+                            className="product-image"/>
                         <div className="product-details">
                             <h4>{item.productName}</h4>
                             <p>{item.sellerBusinessName}</p>
@@ -135,10 +151,16 @@ const OrderFormPage = () => {
                     <span>총 구매 금액</span>
                     <span>{totals.totalDiscountedPrice.toLocaleString()}원</span>
                 </div>
-                <PaymentCheckoutPage
+                <button
+                    onClick={goTossPay}
+                    className="button"
+                >
+                    {getOrderSummary()} 결제하기
+                </button>
+                {/*<PaymentCheckoutPage
                     totalAmount={totals.totalDiscountedPrice}
                     orderName={getOrderSummary()}
-                />
+                />*/}
             </div>
         </div>
     );
