@@ -1,6 +1,10 @@
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const SellerHeader = () => {
+
+    const { logout } = useAuth();
+
     return (
         <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
             <Container>
@@ -33,15 +37,9 @@ const SellerHeader = () => {
                     </Nav>
 
                     <Nav>
-                        <NavDropdown title="내 계정" id="account-dropdown" align="end">
-                            <a className="dropdown-item" href="#">
-                                프로필
-                            </a>
-                            <NavDropdown.Divider />
-                            <a className="dropdown-item" href="#">
-                                로그아웃
-                            </a>
-                        </NavDropdown>
+                        <a className="nav-link" onClick={logout}>
+                            로그아웃
+                        </a>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

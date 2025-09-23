@@ -11,7 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useAuth } from '../../contexts/AuthContext';
 
 
 const Header = () => {
@@ -23,19 +23,20 @@ const Header = () => {
     // URL 변경을 위한 navigate 훅 사용
     const navigate = useNavigate();
 
+    const { user, login, logout, api } = useAuth();
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('/api/category/groups');
+                const response = await api.get('/category/groups');
                 setCategories(response.data);
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
                 // 에러 발생 시 초기 데이터를 사용하거나 다른 처리를 할 수 있습니다.
             }
         };
-
         fetchCategories();
-    }, []);
+    }, [api]);
 
     const renderSubCategories = (subCategories) => {
         return (
@@ -83,6 +84,24 @@ const Header = () => {
         }
     };
 
+
+    const [selectedRole, setSelectedRole] = useState('USER');
+    const createTempToken = async () => {
+            try {
+                const response = await api.post('/auth/temp/token',
+                    {
+                        id : "asdf",
+                        role : selectedRole
+                    }
+                );
+                login(response.data);
+                alert('토큰이 성공적으로 발급되었습니다!');
+            } catch (error) {
+                console.error('토큰 발급 실패:', error);
+                alert('토큰 발급에 실패했습니다.');
+            }
+        };
+
     return (
         <>
             <Navbar expand="lg" className="top-nav">
@@ -91,11 +110,29 @@ const Header = () => {
                         <h1 className="logo">fAIshion</h1>
                     </Navbar.Brand>
                     <Nav className="ms-auto">
-                        <Nav.Link href="/login">login</Nav.Link>
-                        <Nav.Link href="/cart">logout</Nav.Link>
-                        <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link>
-                        <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link>
-                        <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link>
+                        {user ? (
+                            <>
+                                <Nav.Link onClick={logout} style={{ cursor: 'pointer' }}>logout</Nav.Link>
+                                <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link>
+                                <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link>
+                                <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link>
+                            </>
+                        ) : (
+                            <>
+                                <Form.Select
+                                    aria-label="Select Role"
+                                    value={selectedRole}
+                                    onChange={(e) => setSelectedRole(e.target.value)}
+                                    style={{ width: '120px', marginRight: '10px' }}
+                                >
+                                    <option value="USER">구매자</option>
+                                    <option value="SELLER">판매자</option>
+                                    <option value="ADMIN">운영자</option>
+                                </Form.Select>
+                                <Nav.Link onClick={createTempToken} style={{ cursor: 'pointer' }}>임시 토큰 발급</Nav.Link>
+                                <Nav.Link href="/login">login</Nav.Link>
+                            </>
+                        )}
                     </Nav>
                 </Container>
             </Navbar>
