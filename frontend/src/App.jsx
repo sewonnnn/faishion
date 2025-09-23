@@ -39,6 +39,7 @@ import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
+import SellerProductEditFormPage from "./pages/seller/SellerProductEditFormPage.jsx";
 
 function Layout() {
     return (
@@ -97,7 +98,7 @@ function App() {
 
                      <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
 
-<Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
+                    <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
                    <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
                     <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
                     <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
@@ -129,8 +130,7 @@ function App() {
                     <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
                     <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
                     <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
-                    <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
-                    
+                    <Route path="/seller/product/edit" element={<SellerProductEditFormPage />}/>  {/*판매자 상품 편집 폼 페이지*/}
                 </Route>
              </Route>
 

@@ -5,6 +5,8 @@ import com.example.faishion.stock.Stock;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,9 +53,8 @@ public class ProductController {
     }
 
     @GetMapping("/seller/list")
-    public Page<Map<String, Object>> sellerProducts(String sellerId, Pageable pageable){
-        if(sellerId == null) sellerId = "tj";
-        Page<Product> products = productService.sellerProducts(sellerId, pageable);
+    public Page<Map<String, Object>> sellerProducts(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable){
+        Page<Product> products = productService.sellerProducts(userDetails.getUsername(), pageable);
         List<Map<String, Object>> content = products.stream()
                 .map(p -> {
                     Map<String, Object> map = new LinkedHashMap<>(); // Use LinkedHashMap for predictable order
@@ -67,7 +68,8 @@ public class ProductController {
                     map.put("discountEndDate", p.getDiscountEndDate());
                     map.put("categoryName", p.getCategory().getName());
                     map.put("categoryGroupName", p.getCategory().getCategoryGroup().getName());
-                    map.put("mainImageId", p.getMainImageList().stream().findFirst().get().getId());
+                    map.put("mainImageList", p.getMainImageList().stream().map(Image::getId).toList());
+                    map.put("detailImageList", p.getDetailImageList().stream().map(Image::getId).toList());
                     List<Map<String, Object>> stockData = p.getStockList().stream()
                             .map(s -> {
                                 Map<String, Object> stockMap = new LinkedHashMap<>(); // Use LinkedHashMap here as well
@@ -75,6 +77,7 @@ public class ProductController {
                                 stockMap.put("size", s.getSize());
                                 stockMap.put("color", s.getColor());
                                 stockMap.put("quantity", s.getQuantity());
+                                stockMap.put("image", s.getImage().getId());
                                 return stockMap;
                             })
                             .collect(Collectors.toList());

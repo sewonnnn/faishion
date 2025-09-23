@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Container, Table, Button, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
+import {useAuth} from "../../contexts/AuthContext.jsx";
+import {useNavigate} from "react-router-dom";
 
 const SellerProductListPage = () => {
     const [products, setProducts] = useState([]);
@@ -10,11 +11,12 @@ const SellerProductListPage = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageSize] = useState(5);
+    const { api } = useAuth();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/product/seller/list?page=${page}&size=${pageSize}`);
-                console.log(response.data.content);
+                const response = await api.get(`/product/seller/list?page=${page}&size=${pageSize}`);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setTotalElements(response.data.totalElements);
@@ -23,7 +25,7 @@ const SellerProductListPage = () => {
             }
         };
         fetchProducts();
-    }, [page, pageSize]);
+    }, [page, pageSize, api]);
 
     const handlePageChange = (pageNumber) => {
         setPage(pageNumber);
@@ -71,7 +73,7 @@ const SellerProductListPage = () => {
                                     <td className="text-center">{product.id}</td>
                                     <td className="d-flex align-items-center">
                                         <img
-                                            src={`http://localhost:8080/image/${product.mainImageId}`}
+                                            src={`http://localhost:8080/image/${product.mainImageList[0]}`}
                                             style={{
                                                 width: "50px",
                                                 height: "50px",
@@ -110,7 +112,7 @@ const SellerProductListPage = () => {
                                         </ul>
                                     </td>
                                     <td>
-                                        <Button variant="light">수정</Button>
+                                        <Button variant="light" onClick={() => navigate(`/seller/product/edit`, {state : {product}})}>수정</Button>
                                     </td>
                                 </tr>
                             ))}
