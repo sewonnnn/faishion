@@ -61,7 +61,7 @@ const useCartSelection = (cartList, fetchCartData) => {
     };
 
     // cartList가 변경될 때마다 전체 선택 체크박스 상태 업데이트
-    useEffect(() => {
+    /*useEffect(() => {
         if (cartList.length === 0) {
             setIsAllSelected(false);
             setSelectedItems([]);
@@ -71,6 +71,28 @@ const useCartSelection = (cartList, fetchCartData) => {
             setIsAllSelected(allChecked);
         }
     }, [cartList, selectedItems]);
+*/
+    // cartList가 변경될 때마다 전체 선택 체크박스 상태 업데이트
+    useEffect(() => {
+        if (cartList.length === 0) {
+            // 상태가 이미 false라면 setState를 호출하지 않음
+            if (isAllSelected !== false) {
+                setIsAllSelected(false);
+            }
+            if (selectedItems.length !== 0) {
+                setSelectedItems([]);
+            }
+        } else {
+            // 모든 상품이 선택되었는지 확인
+            const allChecked = cartList.length > 0 && selectedItems.length === cartList.length;
+
+            // 현재 상태와 다를 때만 업데이트
+            if (isAllSelected !== allChecked) {
+                setIsAllSelected(allChecked);
+            }
+        }
+    }, [cartList, selectedItems, isAllSelected]); // isAllSelected도 의존성 배열에 추가
+
 
     return {
         selectedItems,

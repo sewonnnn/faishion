@@ -54,7 +54,6 @@ public class CartController {
       // Stock stock = stockRepository.getReferenceById(stockDTO.getId().intValue());
         Stock stock = stockRepository.getReferenceById(1);
 
-
         // 장바구니 객체를 생성합니다.
         Cart cart = new Cart();
         cart.setUser(user);
