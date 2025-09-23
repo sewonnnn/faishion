@@ -8,7 +8,7 @@ import ProductListPage from "./pages/ProductListPage.jsx";
 import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
-import OrderFormPage from "./pages/OrderFormPage.jsx";
+//import OrderFormPage from "./pages/OrderFormPage.jsx";
 import OrderCompletePage from "./pages/OrderCompletePage.jsx";
 import OrderDetailPage from "./pages/OrderDetailPage.jsx";
 import MyPage from "./pages/MyPage.jsx";
@@ -35,6 +35,7 @@ import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
+import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
 
 
 function Layout() {
@@ -86,8 +87,8 @@ function App() {
                <Route path="/cart" element={<CartPage />} />   {/*장바구니 페이지*/}
                <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
                <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
-               <Route path="/order/new/:productId" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
-               <Route path="/order/new/:productId" element={<TossPaymentPage />} />   {/*토스 결제 페이지*/}
+               {/*<Route path="/order/new/:productId" element={<OrderFormPage />} />   /!*주문 상세 페이지*!/*/}
+               <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
                <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
                <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
