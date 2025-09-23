@@ -1,58 +1,78 @@
-package com.example.faishion.product;// ProductDetailDTO.java (수정된 코드)
+package com.example.faishion.product;
 
-import com.example.faishion.product.Product;
+import com.example.faishion.image.Image;
+import com.example.faishion.stock.Stock;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ProductDetailDTO {
     private Long id;
     private String name;
     private String brand;
-    private Integer price; // 최종 가격
-    private Integer originalPrice; // 원가 (취소선)
-    private Integer discountRate; // 할인율
-    private List<String> imageUrls;
-    private List<String> sizes;
+    private int price;
+    private int originalPrice;
+    private int discountRate;
+    private Set<String> imageUrls;
+    private LocalDateTime discountStartDate;
+    private LocalDateTime discountEndDate;
 
-    // ... 다른 필드
+    // ✨ 추가된 필드: 색상과 사이즈별 재고를 저장하는 맵
+    // Map<String, Map<String, Integer>> -> Map<색상, Map<사이즈, 수량>>
+    private Map<String, Map<String, Integer>> stockByColorAndSize;
 
     public ProductDetailDTO(Product product, String domain) {
         this.id = product.getId();
         this.name = product.getName();
-        this.brand = "BEAKER ORIGINAL"; // 임시값
+        this.brand = product.getSeller().getBusinessName();
 
-        // 할인이 적용 중인지 확인
+        // 가격 정보 설정
         boolean isDiscounting = product.getDiscountStartDate() != null && product.getDiscountEndDate() != null &&
-                LocalDateTime.now().isAfter(product.getDiscountStartDate()) &&
-                LocalDateTime.now().isBefore(product.getDiscountEndDate());
+                LocalDateTime.now().isAfter(product.getDiscountStartDate()) && LocalDateTime.now().isBefore(product.getDiscountEndDate());
 
-        if (isDiscounting && product.getDiscountPrice() != null) {
-            // 할인이 적용 중인 경우
-            this.price = product.getDiscountPrice(); // 최종 가격은 할인가
-            this.originalPrice = product.getPrice(); // 원가는 정가
-            this.discountRate = (int)(((double)(product.getPrice() - product.getDiscountPrice()) / product.getPrice()) * 100);
+        if (isDiscounting) {
+            this.price = product.getDiscountPrice();
+            this.originalPrice = product.getPrice();
+            this.discountRate = (int) ((double)(product.getPrice() - product.getDiscountPrice()) / product.getPrice() * 100);
         } else {
-            // 할인이 없는 경우
-            this.price = product.getPrice(); // 최종 가격은 정가
-            this.originalPrice = null; // 원가는 null로 설정하여 프론트에서 표시하지 않음
-            this.discountRate = null; // 할인율은 null로 설정하여 표시하지 않음
+            this.price = product.getPrice();
+            this.originalPrice = product.getPrice();
+            this.discountRate = 0;
         }
 
-        // 이미지 URL 목록 생성
+        this.discountStartDate = product.getDiscountStartDate();
+        this.discountEndDate = product.getDiscountEndDate();
+
+        // 이미지 URL 설정
         this.imageUrls = product.getMainImageList().stream()
                 .map(image -> domain + "/image/" + image.getId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        // 사이즈 정보 추출 (기존 로직 유지)
-        this.sizes = product.getStockList().stream()
-                .map(stock -> stock.getSize())
-                .distinct()
-                .collect(Collectors.toList());
+        // ✨ 추가된 재고 정보 매핑 로직
+        // stockList가 null이 아닐 때만 스트림을 처리하도록 방어 코드 추가
+        if (product.getStockList() != null) {
+            this.stockByColorAndSize = product.getStockList().stream()
+                    .collect(Collectors.groupingBy(
+                            stock -> stock.getColor(),
+                            LinkedHashMap::new,
+                            Collectors.toMap(
+                                    stock -> stock.getSize(),
+                                    stock -> stock.getQuantity(),
+                                    (existing, replacement) -> existing,
+                                    LinkedHashMap::new
+                            )
+                    ));
+        } else {
+            this.stockByColorAndSize = new LinkedHashMap<>();
+        }
     }
 }

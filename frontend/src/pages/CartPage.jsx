@@ -2,6 +2,7 @@ import "./CartPage.css";
 import {useNavigate} from "react-router-dom";
 import useCart from '../hooks/useCart.js'; // 커스텀 훅 가져옴
 import useCartSelection from "../hooks/useCartSelection.js";
+import axios from "axios";
 
 const CartPage = () => {
 
@@ -26,23 +27,32 @@ const CartPage = () => {
         handleDeleteSelected,
     } = useCartSelection(cartList, fetchCartData);
 
-    // 선택된 상품들만 주문정보 페이지로 이동
-    const goSelectedItemsOrder = () => {
-        if (selectedItems.length === 0) {
-            alert("주문할 상품을 선택해주세요.");
-            return;
+    const goSelectedItemsOrder = async () => {
+        console.log("함수 시작됨");
+
+        try {
+            if (selectedItems.length === 0) {
+                alert("주문할 상품을 선택해주세요.");
+                return;
+            }
+
+            const cartIds = selectedItems.join(",");
+            console.log("선택된 상품들의 id들: " + cartIds);
+
+            const res = await axios.get("http://localhost:8080/order/new", {
+                params: { ids: cartIds },
+            });
+
+            // 받은 데이터와 함께 페이지 이동
+            navigate("/order/new", {
+                state: { orderItems: res.data, ids: cartIds },
+                replace: false,
+            });
+        } catch (e) {
+            console.error("함수 실행 중 오류 발생:", e);
+            alert("주문서 불러오기에 실패했습니다.");
         }
-
-        // 선택된 상품들의 cartId를 쉼표로 구분하여 URL 파라미터로 전달
-        const cartIds = selectedItems.join(',');
-        navigate(`/order/new?ids=${cartIds}`);
     };
-
-    //
-    // // 주문정보 페이지 이동
-    // const goOrder= (cartId)=>{
-    //      navigate(`/order/new/${cartId}`);
-    // }
 
     // 주문 상품 개수
     const getOrderSummary = () => {
