@@ -38,11 +38,17 @@ public class OrderController {
         // 2. 모든 상품 관련 정보를 한 번에 조회
         List<Cart> carts = cartService.findCartsWithDetailsByIds(cartIds);
 
+
         // 3. 조회된 Carts 리스트를 DTO 리스트로 변환하여 반환
         List<CartProductDTO> orderItems = carts.stream()
                 .map(CartProductDTO::new)
                 .collect(Collectors.toList());
 
+        for(CartProductDTO cart : orderItems) {
+            System.out.println(cart.getId());
+            System.out.println(cart.getQuantity());
+            System.out.println(cart.getProductPrice());
+        }
         return orderItems;
     }
 }

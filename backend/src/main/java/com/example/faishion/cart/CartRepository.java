@@ -27,8 +27,8 @@ public interface CartRepository extends JpaRepository<Cart,Long> {
     List<Cart> findAllWithDetails();
 
     // 특정 유저와 상품 ID로 장바구니 항목 찾기 (항목 중복 체크를 위함)
-    @Query("SELECT c FROM Cart c WHERE c.user.id = :userId AND c.stock.product.id = :productId")
-    Optional<Cart> findByUserIdAndProductId(String userId, Long productId);
+//    @Query("SELECT c FROM Cart c WHERE c.user.id = :userId AND c.stock.product.id = :productId")
+//    Optional<Cart> findByUserIdAndProductId(String userId, Long productId);
 
     @Query("SELECT c FROM Cart c WHERE c.user.id = :userId AND c.stock.id = :stockId")
     Optional<Cart> findByUserIdAndStockId(String userId, Long stockId);

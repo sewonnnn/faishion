@@ -33,7 +33,7 @@ const OrderFormPage = () => {
                 // Axios는 응답 데이터를 자동으로 .data에 넣어줌
                 setOrderItems(response.data);
                 setIsLoading(false);
-                console.log('선택된 상품들:', orderItems);
+                console.log('선택된 상품들:', response.data);
             })
             .catch(err => {
                 if (err.response) {
@@ -69,7 +69,6 @@ const OrderFormPage = () => {
     };
 
     const totals = calculateTotals();
-
 
     const getOrderSummary = () => {
         if (orderItems.length === 0) return "주문 상품 0개";
