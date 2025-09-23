@@ -4,28 +4,42 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
 import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
 import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";
-import { useAuth } from "../../contexts/AuthContext.jsx"
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const SellerProductFormPage = () => {
+const SellerProductEditFormPage = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { product: initialProduct } = location.state || {};
+
+    // Redirect if no product data is passed
+    useEffect(() => {
+        if (!initialProduct) {
+            alert('상품 정보가 없습니다. 메인 페이지로 돌아갑니다.');
+            navigate('/seller/dashboard');
+        }
+    }, [initialProduct, navigate]);
+
     const [product, setProduct] = useState({
-        name: '',
-        status: 1, // '판매 게시'를 의미하는 정수 1로 초기화
-        description: '',
-        price: '',
-        category: null,
-        discountPrice: '',
-        discountStartDate: '',
-        discountEndDate: '',
-        mainImages: [],
-        detailImages: [],
-        stocks: [],
+        name: initialProduct?.name || '',
+        status: initialProduct?.status || 1,
+        description: initialProduct?.description || '',
+        price: initialProduct?.price || '',
+        category: initialProduct?.category || null,
+        discountPrice: initialProduct?.discountPrice || '',
+        discountStartDate: initialProduct?.discountStartDate || '',
+        discountEndDate: initialProduct?.discountEndDate || '',
+        mainImages: initialProduct?.mainImageList || [],
+        detailImages: initialProduct?.detailImageList || [],
+        stocks: initialProduct?.stockList || [],
     });
 
     const [categoryGroups, setCategoryGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState(initialProduct?.category?.categoryGroup.id || '');
+    const [selectedCategory, setSelectedCategory] = useState(initialProduct?.category?.id || '');
     const { api } = useAuth();
 
+    // Fetch categories on component mount
     useEffect(() => {
         const fetchCategoryGroups = async () => {
             try {
@@ -36,27 +50,25 @@ const SellerProductFormPage = () => {
             }
         };
         fetchCategoryGroups();
-    }, []);
+    }, [api]);
+
+    // This useEffect is crucial for CategorySelector to work with initial data
+    useEffect(() => {
+        if (initialProduct?.category) {
+            setSelectedGroup(initialProduct.category.categoryGroup.id);
+            setSelectedCategory(initialProduct.category.id);
+        }
+    }, [initialProduct]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         if (name === 'price' || name === 'discountPrice') {
             const numericValue = value.replace(/[^0-9]/g, '');
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                [name]: numericValue,
-            }));
+            setProduct((prevProduct) => ({ ...prevProduct, [name]: numericValue }));
         } else if (name === 'status') {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                status: parseInt(value, 10),
-            }));
+            setProduct((prevProduct) => ({ ...prevProduct, status: parseInt(value, 10) }));
         } else {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                [name]: value,
-            }));
+            setProduct((prevProduct) => ({ ...prevProduct, [name]: value }));
         }
     };
 
@@ -64,12 +76,8 @@ const SellerProductFormPage = () => {
         const { name } = e.target;
         const price = Number(product.price);
         const discountPrice = Number(product.discountPrice);
-
         if (name === 'price' && discountPrice > price) {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                discountPrice: '',
-            }));
+            setProduct((prevProduct) => ({ ...prevProduct, discountPrice: '' }));
             alert('할인 금액은 상품 가격보다 클 수 없습니다. 할인 금액이 초기화됩니다.');
         }
     };
@@ -77,12 +85,8 @@ const SellerProductFormPage = () => {
     const handleDiscountPriceBlur = (e) => {
         const price = Number(product.price);
         const discountPrice = Number(e.target.value);
-
         if (discountPrice > price) {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                discountPrice: '',
-            }));
+            setProduct((prevProduct) => ({ ...prevProduct, discountPrice: '' }));
             alert('할인 금액은 상품 가격보다 클 수 없습니다.');
         }
     };
@@ -91,76 +95,47 @@ const SellerProductFormPage = () => {
         const groupId = e.target.value;
         setSelectedGroup(groupId);
         setSelectedCategory('');
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            category: null,
-        }));
+        setProduct((prevProduct) => ({ ...prevProduct, category: null }));
     };
 
     const handleSubCategoryChange = (e) => {
         const categoryId = e.target.value;
         setSelectedCategory(categoryId);
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            category: { id: categoryId },
-        }));
+        setProduct((prevProduct) => ({ ...prevProduct, category: { id: categoryId } }));
     };
 
     const handleMainImageChange = (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                mainImages: [...prevProduct.mainImages, ...Array.from(files)],
-            }));
-        }
+        const files = Array.from(e.target.files);
+        setProduct((prevProduct) => ({ ...prevProduct, mainImages: [...prevProduct.mainImages, ...files] }));
     };
 
     const handleRemoveMainImage = (index) => {
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            mainImages: prevProduct.mainImages.filter((_, i) => i !== index),
-        }));
+        setProduct((prevProduct) => ({ ...prevProduct, mainImages: prevProduct.mainImages.filter((_, i) => i !== index) }));
     };
 
     const handleDetailImageChange = (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                detailImages: [...prevProduct.detailImages, ...Array.from(files)],
-            }));
-        }
+        const files = Array.from(e.target.files);
+        setProduct((prevProduct) => ({ ...prevProduct, detailImages: [...prevProduct.detailImages, ...files] }));
     };
 
     const handleRemoveDetailImage = (index) => {
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            detailImages: prevProduct.detailImages.filter((_, i) => i !== index),
-        }));
+        setProduct((prevProduct) => ({ ...prevProduct, detailImages: prevProduct.detailImages.filter((_, i) => i !== index) }));
     };
 
     const handleAddStockImage = (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            const newStock = Array.from(files).map(file => ({
-                image: file,
-                count: 0,
-                color: '',
-                size: '',
-            }));
-            setProduct((prevProduct) => ({
-                ...prevProduct,
-                stocks: [...prevProduct.stocks, ...newStock],
-            }));
-        }
+        const files = Array.from(e.target.files);
+        const newStocks = files.map(file => ({
+            image: file,
+            quantity: 0,
+            color: '',
+            size: '',
+            isNew: true
+        }));
+        setProduct((prevProduct) => ({ ...prevProduct, stocks: [...prevProduct.stocks, ...newStocks] }));
     };
 
     const handleRemoveStockImage = (index) => {
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            stocks: prevProduct.stocks.filter((_, i) => i !== index),
-        }));
+        setProduct((prevProduct) => ({ ...prevProduct, stocks: prevProduct.stocks.filter((_, i) => i !== index) }));
     };
 
     const handleUpdateStockItem = (index, key, value) => {
@@ -174,17 +149,17 @@ const SellerProductFormPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // ... (validation and FormData creation logic as described in Step 2)
         const price = Number(product.price);
         const discountPrice = Number(product.discountPrice);
         const { discountStartDate, discountEndDate, stocks, category } = product;
 
-        // 카테고리 유효성 검사
         if (!category) {
             alert('상품 카테고리를 선택해야 합니다.');
             return;
         }
 
-        // 이미지 유효성 검사
         if (product.mainImages.length === 0) {
             alert('상품 대표 이미지를 1개 이상 등록해야 합니다.');
             return;
@@ -200,7 +175,6 @@ const SellerProductFormPage = () => {
             return;
         }
 
-        // 할인 기간 유효성 검사
         if (discountPrice > 0) {
             if (!discountStartDate || !discountEndDate) {
                 alert('할인 금액이 있을 경우 할인 기간을 모두 입력해야 합니다.');
@@ -214,13 +188,11 @@ const SellerProductFormPage = () => {
             }
         }
 
-        // 할인 금액 유효성 검사
         if (discountPrice > price) {
             alert('할인 금액은 상품 가격보다 클 수 없습니다. 상품 정보를 다시 확인해주세요.');
             return;
         }
 
-        // 재고 색상 및 사이즈 유효성 검사
         for (const stock of stocks) {
             if (stock.color.trim() === '' || stock.size.trim() === '') {
                 alert('모든 재고에 대한 색상과 사이즈를 입력해야 합니다.');
@@ -228,58 +200,74 @@ const SellerProductFormPage = () => {
             }
         }
 
-        // 2. Create FormData object
         const formData = new FormData();
 
-        // 3. Append JSON data for the product (excluding image files)
-        const productData = {
+        const newMainImages = product.mainImages.filter(file => file instanceof File);
+        const existingMainImageUrls = product.mainImages.filter(file => typeof file === 'string');
+
+        const newDetailImages = product.detailImages.filter(file => file instanceof File);
+        const existingDetailImageUrls = product.detailImages.filter(file => typeof file === 'string');
+
+        const newStocks = product.stocks.filter(stock => stock.isNew);
+        const existingStocks = product.stocks.filter(stock => !stock.isNew);
+
+        const newStockImages = newStocks.map(stock => stock.image);
+
+        const updatedProductData = {
+            id: initialProduct.id,
             name: product.name,
             status: product.status,
-            description: product.description, // 상품 설명 추가
+            description: product.description,
             price: product.price,
             category: product.category,
             discountPrice: product.discountPrice,
             discountStartDate: product.discountStartDate,
             discountEndDate: product.discountEndDate,
+            mainImageUrls: existingMainImageUrls,
+            detailImageUrls: existingDetailImageUrls,
         };
-        // Append the product data as a JSON Blob
-        formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
-        // 4. Append image files
-        product.mainImages.forEach((image) => {
-            formData.append('mainImages', image);
-        });
+        const updatedStockData = existingStocks.map(stock => ({
+            id: stock.id,
+            quantity: stock.quantity,
+            color: stock.color,
+            size: stock.size,
+        }));
 
-        product.detailImages.forEach((image) => {
-            formData.append('detailImages', image);
-        });
-
-        // 5. Append stock information and images
-        const stockData = product.stocks.map(stock => ({
+        const newStockData = newStocks.map(stock => ({
             quantity: stock.count,
             color: stock.color,
             size: stock.size,
         }));
 
-        formData.append('stockList', new Blob([JSON.stringify(stockData)], { type: 'application/json' }));
+        formData.append('product', new Blob([JSON.stringify(updatedProductData)], { type: 'application/json' }));
+        formData.append('stockList', new Blob([JSON.stringify(updatedStockData)], { type: 'application/json' }));
+        formData.append('newStockList', new Blob([JSON.stringify(newStockData)], { type: 'application/json' }));
 
-        // Append stock image files
-        product.stocks.forEach((stock) => {
-            formData.append('stockImages', stock.image);
+        newMainImages.forEach((image) => {
+            formData.append('newMainImages', image);
         });
 
-        // 6. Send the request
+        newDetailImages.forEach((image) => {
+            formData.append('newDetailImages', image);
+        });
+
+        newStockImages.forEach((image) => {
+            formData.append('newStockImages', image);
+        });
+
         try {
-            const response = await api.post('/product', formData, {
+            const response = await api.put(`/product/${initialProduct.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('Product registered successfully:', response.data);
-            alert('상품이 성공적으로 등록되었습니다.');
+            console.log('Product updated successfully:', response.data);
+            alert('상품이 성공적으로 수정되었습니다.');
+            navigate('/seller/dashboard');
         } catch (error) {
-            console.error('Error registering product:', error.response ? error.response.data : error.message);
-            alert('상품 등록 중 오류가 발생했습니다.');
+            console.error('Error updating product:', error.response ? error.response.data : error.message);
+            alert('상품 수정 중 오류가 발생했습니다.');
         }
     };
 
@@ -287,7 +275,7 @@ const SellerProductFormPage = () => {
 
     return (
         <Container className="my-5">
-            <h2 className="text-center mb-4">상품 등록</h2>
+            <h2 className="text-center mb-4">상품 수정</h2>
             <Form onSubmit={handleSubmit}>
                 <Form.Group as={Row} className="mb-3" controlId="formProductName">
                     <Form.Label column sm="2">상품명 :</Form.Label>
@@ -422,11 +410,11 @@ const SellerProductFormPage = () => {
 
                 <Row className="mt-4">
                     <Col className="text-center">
-                        <Button variant="secondary" className="me-3">
-                            메인으로 가기
+                        <Button variant="secondary" onClick={() => navigate('/seller/dashboard')} className="me-3">
+                            취소
                         </Button>
                         <Button variant="success" type="submit">
-                            등록하기
+                            수정하기
                         </Button>
                     </Col>
                 </Row>
@@ -435,4 +423,4 @@ const SellerProductFormPage = () => {
     );
 };
 
-export default SellerProductFormPage;
+export default SellerProductEditFormPage;

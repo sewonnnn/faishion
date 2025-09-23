@@ -21,6 +21,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "ORDER BY p.createdAt DESC")
     Page<Product> sellerProducts(Pageable pageable);
 
+    @Query("SELECT p FROM Product p " +
+            "JOIN FETCH p.category c " +
+            "JOIN FETCH c.categoryGroup " +
+            "JOIN p.stockList " +
+            "JOIN p.mainImageList " +
+            "JOIN p.detailImageList "
+    )
+    Product sellerProduct();
+
     // id 일치 하는 상품 가져오기 ho
     Product findById(long id);
 
