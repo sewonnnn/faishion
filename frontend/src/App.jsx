@@ -112,7 +112,7 @@ function App() {
                    <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
                    <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
                    <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
-                    <Route path="/order/new/:productId" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
+                    <Route path="/order/new" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
                    <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
                    <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
                    <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}

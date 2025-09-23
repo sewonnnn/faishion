@@ -42,7 +42,7 @@ const CartPage = () => {
             const res = await axios.get("http://localhost:8080/order/new", {
                 params: { ids: cartIds },
             });
-
+            res.data.map((item) => {console.log(item)});
             // 받은 데이터와 함께 페이지 이동
             navigate("/order/new", {
                 state: { orderItems: res.data, ids: cartIds },

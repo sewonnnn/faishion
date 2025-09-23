@@ -43,12 +43,6 @@ public class OrderController {
         List<CartProductDTO> orderItems = carts.stream()
                 .map(CartProductDTO::new)
                 .collect(Collectors.toList());
-
-        for(CartProductDTO cart : orderItems) {
-            System.out.println(cart.getId());
-            System.out.println(cart.getQuantity());
-            System.out.println(cart.getProductPrice());
-        }
         return orderItems;
     }
 }

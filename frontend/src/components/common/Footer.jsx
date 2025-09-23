@@ -25,7 +25,7 @@ const Footer = () => {
                     <Col lg={6} md={6} className="mb-4 mb-md-0">
                         <h5 className="text-uppercase">(주) fAIshion</h5>
                         <div className="text-muted">
-                            <p>대표자 명 : # | 주소 : # | 사업자등록번호 : #</p>
+                            <p>대표자 명 : # | 주소 : # | 사업자등록번호 : 211-88-79575</p>
                             <p>통신판매업신고 : 제20241010</p>
                             <p>고객센터 : # | 이메일 : #</p>
                         </div>
