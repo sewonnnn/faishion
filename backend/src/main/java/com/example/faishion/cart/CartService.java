@@ -24,15 +24,22 @@ public class CartService {
 //                .collect(Collectors.toList());
 //    }
 
+    // 장바구니 모든 리스트
     public List<CartProductDTO> findAllCartList() {
-        // Fetch Join을 사용하여 모든 상세 정보를 한 번에 가져옵니다.
+        // Fetch Join을 사용하여 모든 상세 정보를 한 번에 가져옴
         List<Cart> cartList = cartRepository.findAllWithDetails();
 
-        // 스트림을 이용해 각 Cart 객체를 CartProductDTO로 변환합니다.
-        // DTO 생성자에서 필요한 정보를 모두 추출합니다.
+        // 스트림을 이용해 각 Cart 객체를 CartProductDTO로 변환
+        // DTO 생성자에서 필요한 정보를 모두 추출
         return cartList.stream()
                 .map(CartProductDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    // 장바구니에서 선택한 상품 리스트
+    public List<Cart> findCartsWithDetailsByIds(List<Long> ids) {
+        // 리포지토리의 JOIN FETCH 메서드를 호출하여 데이터 조회
+        return cartRepository.findCartsWithDetailsByIds(ids);
     }
 
 
