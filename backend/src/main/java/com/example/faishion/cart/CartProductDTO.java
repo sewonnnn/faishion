@@ -46,6 +46,7 @@ public class CartProductDTO {
         if (cart.getStock() != null) {
             // Stock에서 Product 정보 추출
             if (cart.getStock().getProduct() != null) {
+                this.productId = cart.getStock().getProduct().getId();
                 this.productName = cart.getStock().getProduct().getName();
                 this.productPrice = cart.getStock().getProduct().getPrice();
                 this.productSize = cart.getStock().getSize();

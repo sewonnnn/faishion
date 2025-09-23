@@ -62,7 +62,7 @@ public class CartController {
         cartService.deleteCartItem(cartId);
     }
 
-    // 선택된 상품 전체 삭제
+    // 선택된 상품들 삭제
     @PostMapping("/deletePickAll")
     public void deleteSelectedCartItems(@RequestBody Map<String, List<Long>> requestBody) {
         List<Long> cartIds = requestBody.get("cartIds");
