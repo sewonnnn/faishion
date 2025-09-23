@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { FaHeart, FaTimes } from 'react-icons/fa';
 import "../../pages/ProductDetailPage.css"
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const ProductRightInfo = ({ productId, product }) => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const ProductRightInfo = ({ productId, product }) => {
     const [selectedSize, setSelectedSize] = useState("");
     const [availableSizes, setAvailableSizes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
-
+    const {api} = useAuth();
     useEffect(() => {
         if (product && product.stockByColorAndSize) {
             const colors = Object.keys(product.stockByColorAndSize);
@@ -125,7 +126,7 @@ const ProductRightInfo = ({ productId, product }) => {
                 productId: productId
             }));
 
-            const response = await axios.post('/api/cart/save', stockList);
+            const response = await api.post('/cart/save', stockList);
             if (response) {
                 alert("카트 상품이 담겼습니다.");
                 setSelectedOptions([]);

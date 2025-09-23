@@ -10,6 +10,8 @@ import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,9 +35,9 @@ public class CartController {
     }
 
     @PostMapping("/save")
-    public boolean cartSave(@RequestBody List<StockDTO> stockList) {
-
-        User user = userRepository.getReferenceById("sewon"); // 임시 사용자 ID 사용
+    public boolean cartSave(@AuthenticationPrincipal UserDetails userDetails, @RequestBody List<StockDTO> stockList) {
+        if(userDetails == null) throw new RuntimeException("");
+        User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException(""));
 
         for (StockDTO stockDTO : stockList) {
             Optional<Stock> stockOptional = stockRepository.findByProductIdAndColorAndSize( // 상품번호, 컬러, 사이즈로 찾기

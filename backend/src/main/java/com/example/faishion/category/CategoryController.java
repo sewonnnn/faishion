@@ -15,7 +15,11 @@ public class CategoryController {
 
     // 전체 중분류 + 소분류 조회
     @GetMapping("/groups")
-    public List<CategoryGroupDTO> getAllGroups() {
+    public List<CategoryGroupDTO> getAllGroups(@AuthenticationPrincipal UserDetails userDetails) {
+        if(userDetails != null) {
+            System.out.println(userDetails.getUsername()); // 아이디
+            System.out.println(userDetails.getAuthorities()); // 권한
+        }
         return categoryService.getAllGroupsWithCategories();
     }
 
