@@ -88,11 +88,12 @@ public class SellerService {
         List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         if (data.isEmpty()) return false;
 
-        // valid 값 안전하게 변환
-        Object validObj = data.get(0).get("valid");
-        String valid = String.valueOf(validObj); // 숫자든 문자열이든 변환됨
-        System.out.println("검증 결과 valid = " + valid);
+        // b_stt_cd 사용 (01 = 계속사업자, 정상)
+        Object statusCode = data.get(0).get("b_stt_cd");
+        String code = String.valueOf(statusCode);
+        System.out.println("검증 결과 b_stt_cd = " + code);
 
-        return "01".equals(valid); // 01: 정상 사업자
+
+        return "01".equals(code); // 01: 정상 사업자
     }
 }
