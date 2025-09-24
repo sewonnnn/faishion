@@ -9,7 +9,6 @@ import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import OrderFormPage from "./pages/OrderFormPage.jsx";
-import OrderCompletePage from "./pages/OrderCompletePage.jsx";
 import OrderDetailPage from "./pages/OrderDetailPage.jsx";
 import MyPage from "./pages/MyPage.jsx";
 import SellerPage from "./pages/seller/SellerPage.jsx";
@@ -38,8 +37,9 @@ import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 import {AuthProvider, useAuth} from './contexts/AuthContext';
-import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
+import {FailPage} from "./pages/tossPay/Fail.jsx";
 import {SuccessPage} from "./pages/tossPay/Success.jsx";
+import {CheckoutPage} from "./pages/tossPay/Checkout.jsx";
 
 function Layout() {
     return (
@@ -111,11 +111,11 @@ function App() {
                                 <Route path="/cart" element={<CartPage/>}/> {/*장바구니 페이지*/}
                                 <Route path="/gemini/:productId" element={<Gemini/>}/> {/*옷 피팅 페이지*/}
                                 <Route path="/wishlist" element={<WishlistPage/>}/> {/*찜 목록 페이지*/}
-                                <Route path="/order/complete" element={<OrderCompletePage/>}/> {/*주문 완료 페이지*/}
                                 <Route path="/order/:orderId" element={<OrderDetailPage/>}/> {/*주문 상세 조회 페이지*/}
                                 <Route path="/order/new" element={<OrderFormPage/>}/> {/*주문 상세 페이지*/}
-                                <Route path="/order/toss" element={<PaymentCheckoutPage/>}/> {/*토스 결제창 페이지*/}
-                                <Route path="/success" element={<SuccessPage/>}/> {/*토스 결제창 페이지*/}
+                                <Route path="/order/check" element={<CheckoutPage/>}/> {/*토스 결제창 페이지*/}
+                                <Route path="/success" element={<SuccessPage/>}/> {/*주문성공 페이지*/}
+                                <Route path="/fail" element={<FailPage/>}/> {/*토스 실패 페이지*/}
                                 <Route path="/mypage" element={<MyPage/>}/> {/*마이 페이지*/}
                                 <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
                                 <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}

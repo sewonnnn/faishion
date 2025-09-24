@@ -1,5 +1,5 @@
-import {useEffect} from "react";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function SuccessPage() {
     const navigate = useNavigate();
@@ -9,13 +9,15 @@ export function SuccessPage() {
         // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
         // 클라이언트에서 결제 금액을 조작하는 행위를 방지할 수 있습니다.
         const requestData = {
+            // 전달 받을 데이터 넣기
             orderId: searchParams.get("orderId"),
             amount: searchParams.get("amount"),
             paymentKey: searchParams.get("paymentKey"),
+
         };
 
         async function confirm() {
-            const response = await fetch("payments/confirm", {
+            const response = await fetch("/confirm", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -32,8 +34,20 @@ export function SuccessPage() {
             }
 
             // 결제 성공 비즈니스 로직을 구현하세요.
-        }
+            if (response.ok) {
+                await fetch("/confirm", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        // 전달 데이터 넣기
+                    }),
+                });
+                return;
+            }
 
+        }
         confirm();
     }, []);
 

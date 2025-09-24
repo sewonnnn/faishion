@@ -30,6 +30,10 @@ const CartPage = () => {
     const goSelectedItemsOrder = async () => {
         console.log("함수 시작됨");
 
+        console.log("selectedItems:", selectedItems);
+        console.log("타입:", typeof selectedItems);
+        console.log("배열인지?", Array.isArray(selectedItems));
+
         try {
             if (selectedItems.length === 0) {
                 alert("주문할 상품을 선택해주세요.");

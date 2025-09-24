@@ -1,44 +1,33 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
+
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-const customerKey = "jD3D0fmD4Lu41F70aKXAR";
+const customerKey =  generateRandomString();
 
-export function PaymentCheckoutPage() {
-
-    // 1. useLocation을 사용하여 이전 페이지의 state 데이터 가져오기
+export function CheckoutPage() {
     const location = useLocation();
-    const navigate = useNavigate(); // 잘못된 접근 시 리다이렉트를 위해 추가
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    // 가져온 데이터를 구조 분해 할당. 데이터가 없을 경우를 대비해 기본값 설정
-    const { totalAmount, orderName, orderId } = location.state || {
-        totalAmount: 0,
-        orderName: "상품",
-        orderId: ""
-    };
+    // URL 파라미터에서 데이터 추출
+    const totalAmount = Number(searchParams.get('totalAmount'));
+    const orderName = searchParams.get('orderName');
+    const customerName = searchParams.get('customerName');
 
-    // 2. amount 상태의 초기값을 동적으로 받아온 totalAmount로 설정
+    // location.state에서 데이터 추출
+    const { items } = location.state || { items: [] };
     const [amount, setAmount] = useState({
         currency: "KRW",
-        value: totalAmount,
+        value: totalAmount, //서치파람으로 받기
     });
-
-
     const [ready, setReady] = useState(false);
     const [widgets, setWidgets] = useState(null);
 
-    // 잘못된 접근(state 없이 URL로 직접 접근) 방지
-    useEffect(() => {
-        if (totalAmount <= 0 || !orderId) {
-            alert("잘못된 접근입니다. 다시 주문을 시도해주세요.");
-            navigate('/');
-        }
-    }, [totalAmount, orderId, navigate]);
-
-
 
     useEffect(() => {
+
         async function fetchPaymentWidgets() {
             // ------  결제위젯 초기화 ------
             const tossPayments = await loadTossPayments(clientKey);
@@ -80,7 +69,7 @@ export function PaymentCheckoutPage() {
         }
 
         renderPaymentWidgets();
-    }, [widgets,amount]);
+    }, [widgets]);
 
     useEffect(() => {
         if (widgets == null) {
@@ -108,12 +97,12 @@ export function PaymentCheckoutPage() {
                             // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
                             // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
                             await widgets.requestPayment({
-                                orderId: orderId,
+                                orderId: "O3T-yz4BJ5S1nYiy54TPp",
                                 orderName: orderName,
-                                successUrl: window.location.origin + "/success",
+                                successUrl: window.location.origin + "/success", // get 방식으로
                                 failUrl: window.location.origin + "/fail",
                                 customerEmail: "customer123@gmail.com",
-                                customerName: "박세원",
+                                customerName: customerName,
                                 customerMobilePhone: "01012341234",
                             });
                         } catch (error) {
@@ -127,4 +116,8 @@ export function PaymentCheckoutPage() {
             </div>
         </div>
     );
+}
+
+function generateRandomString() {
+    return window.btoa(Math.random().toString()).slice(0, 20);
 }
