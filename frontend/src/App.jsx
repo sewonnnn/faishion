@@ -9,7 +9,6 @@ import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import OrderFormPage from "./pages/OrderFormPage.jsx";
-import OrderCompletePage from "./pages/OrderCompletePage.jsx";
 import OrderDetailPage from "./pages/OrderDetailPage.jsx";
 import MyPage from "./pages/MyPage.jsx";
 import SellerPage from "./pages/seller/SellerPage.jsx";
@@ -37,7 +36,10 @@ import QnaListPage from "./pages/QnaListPage.jsx";
 import QnaDetailPage from "./pages/QnaDetailPage.jsx";
 import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import {AuthProvider, useAuth} from './contexts/AuthContext';
+import {FailPage} from "./pages/tossPay/Fail.jsx";
+import {SuccessPage} from "./pages/tossPay/Success.jsx";
+import {CheckoutPage} from "./pages/tossPay/Checkout.jsx";
 import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
 import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
 import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
@@ -45,9 +47,9 @@ import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
 function Layout() {
     return (
         <>
-            <Header />
-            <Outlet />
-            <Footer />
+            <Header/>
+            <Outlet/>
+            <Footer/>
         </>
     );
 }
@@ -55,8 +57,8 @@ function Layout() {
 function SellerLayout() {
     return (
         <>
-            <SellerHeader />
-            <Outlet />
+            <SellerHeader/>
+            <Outlet/>
         </>
     );
 }
@@ -64,8 +66,8 @@ function SellerLayout() {
 function AdminLayout() {
     return (
         <>
-            <AdminHeader />
-            <Outlet />
+            <AdminHeader/>
+            <Outlet/>
         </>
     );
 }
@@ -99,44 +101,47 @@ function App() {
 
                      <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
 
-                    <Route path="/product/list" element={<ProductListPage />} />  {/* 전체 상품 목록 페이지*/}
-                   <Route path="/product/:productId" element={<ProductDetailPage />} />   {/*상품 상세 페이지*/}
-                    <Route path="/notice/list" element={<NoticeListPage/>} /> {/* 공지사항 페이지 */ }
-                    <Route path="/notice/:noticeId" element={<NoticeDetailPage/>} /> {/* 공지사항 상세,수정 페이지 */ }
-                   <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
-                    <Route path="/seller/register" element={<SellerRegisterPage />} /> {/*판매자 회원가입 페이지*/}
-                     <Route path="/seller/login" element={<SellerLoginPage />} /> {/*판매자 로그인 페이지*/}
-                 </Route>
-                 <Route element={<ProtectedRoute requiredRole={"USER"} />}>
-                   {/*로그인한 사용자만 접근 가능한 페이지들*/}
-                   <Route path="/cart" element={<CartPage />} />   {/*장바구니 페이지*/}
-                   <Route path="/gemini/:productId" element={<Gemini />} />   {/*옷 피팅 페이지*/}
-                   <Route path="/wishlist" element={<WishlistPage />} />   {/*찜 목록 페이지*/}
-                   <Route path="/order/complete" element={<OrderCompletePage />} />   {/*주문 완료 페이지*/}
-                   <Route path="/order/:orderId" element={<OrderDetailPage />} />   {/*주문 상세 조회 페이지*/}
-                    <Route path="/order/new" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
-                   <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
-                   <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
-                     {/* 새로 추가(머지하면 삭제) */}<Route path="/mypage/detail" element={<MyPageDetail/>}/> {/* 마이페이지 정보 수정 */}
-                   <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
-                   <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
-                   <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
-                 </Route>
-             </Route>
-             <Route element={<ProtectedRoute requiredRole={"SELLER"} />}>
-                <Route element={<SellerLayout/>}>
-                    <Route path="/seller/order/list" element={<SellerOrderListPage/>}/>
-                    <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/> {/* 판매자 문의사항 리스트 */}
-                    {/* 새로 추가(머지하면 삭제) */}<Route path="/seller/qna/:id" element={<SellerQnaDetail/>}/> {/* 판매자 문의 상세보기 */}
-                    <Route path="/seller" element={<SellerPage />} />   {/*판매자 대시보드*/}
-                    <Route path="/seller/category" element={<SellerCategoryPage/>}/> {/*판매자 카테고리 페이지*/}
-                    <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
-                    <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
-                    <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
-                    <Route path="/seller/product/edit/:productId" element={<SellerProductFormPage />} />   {/*판매자 상품 편집 폼 페이지*/}
+                                <Route path="/product/list" element={<ProductListPage/>}/> {/* 전체 상품 목록 페이지*/}
+                                <Route path="/product/:productId" element={<ProductDetailPage/>}/> {/*상품 상세 페이지*/}
+                                <Route path="/notice/list" element={<NoticeListPage/>}/> {/* 공지사항 페이지 */}
+                                <Route path="/notice/:noticeId" element={<NoticeDetailPage/>}/> {/* 공지사항 상세,수정 페이지 */}
+                                <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
+                                <Route path="/seller/register" element={<SellerRegisterPage/>}/> {/*판매자 회원가입 페이지*/}
+                                <Route path="/seller/login" element={<SellerLoginPage/>}/> {/*판매자 로그인 페이지*/}
+                            </Route>
+                            <Route element={<ProtectedRoute requiredRole={"USER"}/>}>
+                                {/*로그인한 사용자만 접근 가능한 페이지들*/}
+                                <Route path="/cart" element={<CartPage/>}/> {/*장바구니 페이지*/}
+                                <Route path="/gemini/:productId" element={<Gemini/>}/> {/*옷 피팅 페이지*/}
+                                <Route path="/wishlist" element={<WishlistPage/>}/> {/*찜 목록 페이지*/}
+                                <Route path="/order/:orderId" element={<OrderDetailPage/>}/> {/*주문 상세 조회 페이지*/}
+                                <Route path="/order/new" element={<OrderFormPage/>}/> {/*주문 상세 페이지*/}
+                                <Route path="/order/check" element={<CheckoutPage/>}/> {/*토스 결제창 페이지*/}
+                                <Route path="/success" element={<SuccessPage/>}/> {/*주문성공 페이지*/}
+                                <Route path="/fail" element={<FailPage/>}/> {/*토스 실패 페이지*/}
+                                <Route path="/mypage" element={<MyPage/>}/> {/*마이 페이지*/}
+                                <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
+                                <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
+                                <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
+                            </Route>
+                        </Route>
+                        <Route element={<ProtectedRoute requiredRole={"SELLER"}/>}>
+                            <Route element={<SellerLayout/>}>
+                                <Route path="/seller/order/list" element={<SellerOrderListPage/>}/>
+                                <Route path="/seller/qna/list" element={<SellerQnaListPage/>}/>
+                                <Route path="/seller" element={<SellerPage/>}/> {/*판매자 대시보드*/}
+                                <Route path="/seller/category" element={<SellerCategoryPage/>}/> {/*판매자 카테고리 페이지*/}
+                                <Route path="/seller/product/list"
+                                       element={<SellerProductListPage/>}/> {/*판매자 상품 목록 페이지*/}
+                                <Route path="/seller/product/:productId"
+                                       element={<SellerProductDetailPage/>}/> {/*판매자 상품 상세 조회 페이지*/}
+                                <Route path="/seller/product/new"
+                                       element={<SellerProductFormPage/>}/> {/*판매자 상품 등록 폼 페이지*/}
+                                <Route path="/seller/product/edit/:productId"
+                                       element={<SellerProductFormPage/>}/> {/*판매자 상품 편집 폼 페이지*/}
 
-                </Route>
-             </Route>
+                            </Route>
+                        </Route>
 
              <Route element={<ProtectedRoute requiredRole={"ADMIN"} />}>
                 <Route element={<AdminLayout/>}>

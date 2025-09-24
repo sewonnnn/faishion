@@ -22,46 +22,41 @@ public class CartProductDTO {
 
     private String sellerBusinessName; // 판매자 상호명
 
-//    public CartProductDTO(Cart cart) {
-//        this.id = cart.getId();
-//        this.userId = cart.getUser().getId();
-//        this.stockId = cart.getStock().getId();
-//        this.quantity = cart.getQuantity();
-//    }
-
-    //    public CartProductDTO(Long id, int quantity, Long productId, String productName, double productPrice, String productImageUrl) {
-//        this.id = id;
-//        this.quantity = quantity;
-//        this.productId = productId;
-//        this.productName = productName;
-//        this.productPrice = productPrice;
-//        this.productImageUrl = productImageUrl;
-//    }
     public CartProductDTO(Cart cart) {
         this.id = cart.getId();
         this.quantity =  cart.getQuantity();
         this.sellerBusinessName = cart.getStock().getProduct().getSeller().getBusinessName();
 
-        // Cart -> Stock -> Product 순으로 접근하여 데이터 추출
+        //객체 접근 전에 null 체크
         if (cart.getStock() != null) {
-            // Stock에서 Product 정보 추출
-            if (cart.getStock().getProduct() != null) {
-                this.productId = cart.getStock().getProduct().getId();
-                this.productName = cart.getStock().getProduct().getName();
-                if(cart.getStock().getProduct().getPrice() != null){
-                    this.productPrice = cart.getStock().getProduct().getPrice();
-                }
-                this.productSize = cart.getStock().getSize();
-                this.productColor = cart.getStock().getColor();
-                if(cart.getStock().getProduct().getDiscountPrice() != null){
-                    this.discountedProductPrice = cart.getStock().getProduct().getDiscountPrice();
-                }
-            }
+            this.stockId = cart.getStock().getId();
+            this.productColor = cart.getStock().getColor();
+            this.productSize = cart.getStock().getSize();
 
-            // Stock에서 Image 정보 추출
             if (cart.getStock().getImage() != null) {
                 this.productImageId = cart.getStock().getImage().getId();
             }
+
+            if (cart.getUser() != null) {
+                this.userId = cart.getUser().getId();
+            }
+
+            if (cart.getStock().getProduct() != null) {
+                this.sellerBusinessName = cart.getStock().getProduct().getSeller().getBusinessName();
+                this.productId = cart.getStock().getProduct().getId();
+                this.productName = cart.getStock().getProduct().getName();
+                this.productPrice = cart.getStock().getProduct().getPrice();
+
+                Integer discountPrice = cart.getStock().getProduct().getDiscountPrice();
+
+                if (discountPrice != null) {
+                    // Integer 값을 double
+                    this.discountedProductPrice = discountPrice.doubleValue();
+                } else {
+                    this.discountedProductPrice = this.productPrice;
+                }
+            }
+        }
+
           }
         }
-    }

@@ -61,18 +61,6 @@ const useCartSelection = (cartList, fetchCartData) => {
     };
 
     // cartList가 변경될 때마다 전체 선택 체크박스 상태 업데이트
-    /*useEffect(() => {
-        if (cartList.length === 0) {
-            setIsAllSelected(false);
-            setSelectedItems([]);
-        } else {
-            // 모든 상품이 선택되었는지 확인
-            const allChecked = cartList.length > 0 && selectedItems.length === cartList.length;
-            setIsAllSelected(allChecked);
-        }
-    }, [cartList, selectedItems]);
-*/
-    // cartList가 변경될 때마다 전체 선택 체크박스 상태 업데이트
     useEffect(() => {
         if (cartList.length === 0) {
             // 상태가 이미 false라면 setState를 호출하지 않음
