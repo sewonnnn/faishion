@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -63,19 +64,23 @@ public class AuthController {
         }
     }
 
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String clientId;
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String clientSecret;
 
     // 네이버 로그인
     @PostMapping("/login/naver")
     public ResponseEntity<?> loginNaver(@RequestBody Map<String, String> body, HttpServletResponse response) {
         RestTemplate restTemplate = new RestTemplate();
-        String clientId = "UbIrUTt9yAJ42TARcJC5";//위에 @Value 어노테이션으로 받아오도록 수정
-        String clientSecret = "WbnCi4gU7B";//시크릿 키니까 위에 @Value 어노테이션으로 받아오도록 수정
+//        String clientId = "UbIrUTt9yAJ42TARcJC5";//위에 @Value 어노테이션으로 받아오도록 수정
+//        String clientSecret = "WbnCi4gU7B";//시크릿 키니까 위에 @Value 어노테이션으로 받아오도록 수정
         try {
             // 1. 액세스 토큰(Access Token) 요청
             String tokenUrl = UriComponentsBuilder.fromHttpUrl("https://nid.naver.com/oauth2.0/token")
                     .queryParam("grant_type", "authorization_code")
-                    .queryParam("client_id", clientId)
-                    .queryParam("client_secret", clientSecret)
+                    .queryParam("client_id", clientId) // @Value 주입
+                    .queryParam("client_secret", clientSecret) // @Value 주입
                     .queryParam("code", body.get("code"))
                     .queryParam("state", body.get("state"))
                     .toUriString();
@@ -85,12 +90,10 @@ public class AuthController {
             Map<String, Object> tokenBody = tokenResponse.getBody();
             String accessToken = (String) tokenBody.get("access_token");
 
-            // 2. 받은 액세스 토큰으로 프로필 정보 요청
+            // 2. 받은 액세스 토큰으로 네이버 프로필 정보 조회 요청
             String profileUrl = "https://openapi.naver.com/v1/nid/me";
-
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
-
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
             ResponseEntity<Map> profileResponse = restTemplate.exchange(
@@ -103,29 +106,46 @@ public class AuthController {
             Map<String, Object> profileBody = profileResponse.getBody();
             Map<String, Object> profileData = (Map<String, Object>) profileBody.get("response");
 
-            System.out.println("데이터 " +  profileData);
+            System.out.println("네이버 프로필 데이터 " +  profileData);
             String naverUserId = (String) profileData.get("id");
             // 네이버 프로필에서 여기서 꺼내져서 user에 넣으면 됨
+            String naverUserEmail = (String) profileData.get("email");
+            String naverUserName = (String) profileData.get("name");
+            String naverUserMobile = (String) profileData.get("mobile");
 
-            //String naverUserId = (String) profileData.get("id");
-            //String naverUserEmail = (String) profileData.get("email");
 
-            // 3. 로그인 처리
-            // naverUserId를 사용하여 서비스의 DB에서 사용자를 조회하거나, 새로 생성하는 로직을 추가합니다.
-            // 세션에 사용자 정보를 저장하거나 JWT 토큰을 발급하여 클라이언트에 전달합니다.
+            // 3. User 저장 or 기존 유저 조회
+            User u = authService.saveOrUpdateNaverUser(naverUserId, naverUserEmail, naverUserName, naverUserMobile);
 
-            return ResponseEntity.ok().build();
+            // 4. JWT 발급
+            var tokens = authService.issueTokens(u);
+
+            // 5. RefreshToken → ResponseCookie로 만들어 헤더에 담음
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.get("refresh"))
+                    .httpOnly(true)
+                    //.secure(true)   // HTTPS 환경에서만 사용, dev 환경이면 주석 처리
+                    .path("/")
+                    .maxAge(1209600) // 14일
+                    .build();
+
+            // 6. AccessToken은 JSON body로 내려줌
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(Map.of(
+                            "accessToken", tokens.get("access"),
+                            "userId", u.getId(),
+                            "email", u.getEmail(),
+                            "name", u.getName()
+                    ));
 
         } catch (Exception e) {
             System.err.println("네이버 로그인 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("네이버 로그인 실패");
         }
-        //User u = authService.loginNaver(body.get("code"), body.get("state"));
-        //var tokens = authService.issueTokens(u);
 
-        //setCookies(response, tokens);
-        //return ResponseEntity.ok(new AuthDto.TokenRes(tokens.get("access"), tokens.get("refresh")));
     }
+
 
     // 카카오 로그인
     @PostMapping("/login/kakao")
