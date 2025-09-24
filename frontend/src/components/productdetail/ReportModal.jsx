@@ -2,13 +2,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import React from "react";
-import axios from "axios";
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 function ReportModal({show, setShow, reviewId}) {
     const [reason, setReason] = React.useState(null);
     const [description, setDescription] = React.useState(null);
     const handleClose = () => setShow(false);
-
+    const {api} = useAuth();
     // 신고 저장 버튼 핸들러
     const handleReport = async (reviewId) => {
 
@@ -19,7 +19,7 @@ function ReportModal({show, setShow, reviewId}) {
                 description : description
             }
             // 비동기 요청을 기다림
-            const response = await axios.post("/api/report/isReported",result);
+            const response = await api.post("/report/isReported",result);
             alert(response.data);
             handleClose();
         } catch (error) {

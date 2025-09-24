@@ -2,12 +2,19 @@ package com.example.faishion.wish;
 
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductService;
+import com.example.faishion.product.ProductWishDTO;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
+import com.example.faishion.user.UserUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,15 +27,16 @@ public class WishController {
 
     // 찜한상품 저장 메서드
     @PostMapping("/save/{productId}")
-    public ResponseEntity<String> wishSave(@PathVariable Long productId) {
-        Optional<Wish> wish = wishService.findByProductId(productId); // 추후에 유저 생기면 유저의 상품으로 복합검색 해야함
+    public ResponseEntity<String> wishSave(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        Optional<Wish> wish = wishService.findByProductId(productId,user);
         String msg = "";
         if (wish.isPresent()) {
             msg = "이미 찜한 상품입니다.";
             return ResponseEntity.ok(msg);
         } else {
             Product product = productService.findById(productId);
-            User user = userRepository.getReferenceById("sewon"); //임시 아이디
             Wish newWish = new Wish();
             newWish.setProduct(product);
             newWish.setUser(user);
@@ -42,5 +50,24 @@ public class WishController {
                 return ResponseEntity.ok(msg);
             }
         }
+    }
+
+    // 찜한상품 보여주기
+    @GetMapping("list")
+    public ResponseEntity<List<ProductWishDTO>> getAllWishes(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        List<Wish> wishs = wishService.findByUser(user); // 해당 유저의 위시리스트 가져오기
+        List<ProductWishDTO> products = new ArrayList<>();
+        for (Wish wish : wishs) {
+            products.add(new ProductWishDTO(
+                    wish.getProduct().getId(),
+                    wish.getProduct().getName(),
+                    wish.getProduct().getPrice(),
+                    wish.getProduct().getDiscountPrice(),
+                    wish.getProduct().getMainImageList().iterator().next().getId()
+            ));
+        }
+        return ResponseEntity.ok(products);
     }
 }
