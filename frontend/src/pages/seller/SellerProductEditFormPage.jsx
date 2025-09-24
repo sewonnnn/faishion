@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
-import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
-import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";
+import MultipleImageEditor from "../../components/seller/producteditform/MultipleImageEditor.jsx";
+import MultipleStockImageEditor from "../../components/seller/producteditform/MultipleStockImageEditor.jsx";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -20,6 +20,7 @@ const SellerProductEditFormPage = () => {
         }
     }, [initialProduct, navigate]);
 
+
     const [product, setProduct] = useState({
         name: initialProduct?.name || '',
         status: initialProduct?.status || 1,
@@ -35,9 +36,13 @@ const SellerProductEditFormPage = () => {
     });
 
     const [categoryGroups, setCategoryGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState(initialProduct?.category?.categoryGroup.id || '');
+    const [selectedGroup, setSelectedGroup] = useState(initialProduct?.category.categoryGroup.id || '');
     const [selectedCategory, setSelectedCategory] = useState(initialProduct?.category?.id || '');
     const { api } = useAuth();
+
+    // State to track removed image URLs
+    const [removedMainImageUrls, setRemovedMainImageUrls] = useState([]);
+    const [removedDetailImageUrls, setRemovedDetailImageUrls] = useState([]);
 
     // Fetch categories on component mount
     useEffect(() => {
@@ -51,14 +56,6 @@ const SellerProductEditFormPage = () => {
         };
         fetchCategoryGroups();
     }, [api]);
-
-    // This useEffect is crucial for CategorySelector to work with initial data
-    useEffect(() => {
-        if (initialProduct?.category) {
-            setSelectedGroup(initialProduct.category.categoryGroup.id);
-            setSelectedCategory(initialProduct.category.id);
-        }
-    }, [initialProduct]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -110,7 +107,24 @@ const SellerProductEditFormPage = () => {
     };
 
     const handleRemoveMainImage = (index) => {
+        const imageToRemove = product.mainImages[index];
+        if (typeof imageToRemove === 'string') {
+            setRemovedMainImageUrls((prev) => [...prev, imageToRemove]);
+        }
         setProduct((prevProduct) => ({ ...prevProduct, mainImages: prevProduct.mainImages.filter((_, i) => i !== index) }));
+    };
+
+    // New handler for editing/replacing a main image
+    const handleEditMainImage = (index, file) => {
+        const oldImage = product.mainImages[index];
+        if (typeof oldImage === 'string') {
+            setRemovedMainImageUrls((prev) => [...prev, oldImage]);
+        }
+        setProduct((prevProduct) => {
+            const newImages = [...prevProduct.mainImages];
+            newImages[index] = file;
+            return { ...prevProduct, mainImages: newImages };
+        });
     };
 
     const handleDetailImageChange = (e) => {
@@ -119,7 +133,24 @@ const SellerProductEditFormPage = () => {
     };
 
     const handleRemoveDetailImage = (index) => {
+        const imageToRemove = product.detailImages[index];
+        if (typeof imageToRemove === 'string') {
+            setRemovedDetailImageUrls((prev) => [...prev, imageToRemove]);
+        }
         setProduct((prevProduct) => ({ ...prevProduct, detailImages: prevProduct.detailImages.filter((_, i) => i !== index) }));
+    };
+
+    // New handler for editing/replacing a detail image
+    const handleEditDetailImage = (index, file) => {
+        const oldImage = product.detailImages[index];
+        if (typeof oldImage === 'string') {
+            setRemovedDetailImageUrls((prev) => [...prev, oldImage]);
+        }
+        setProduct((prevProduct) => {
+            const newImages = [...prevProduct.detailImages];
+            newImages[index] = file;
+            return { ...prevProduct, detailImages: newImages };
+        });
     };
 
     const handleAddStockImage = (e) => {
@@ -147,10 +178,24 @@ const SellerProductEditFormPage = () => {
         }));
     };
 
+    // New handler for editing/replacing a stock image
+    const handleEditStockImage = (index, file) => {
+        setProduct((prevProduct) => {
+            const newStocks = [...prevProduct.stocks];
+            newStocks[index] = {
+                ...newStocks[index],
+                image: file,
+                // Mark as new to ensure it's sent as a new file, even if it was originally an existing image
+                isNew: true
+            };
+            return { ...prevProduct, stocks: newStocks };
+        });
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // ... (validation and FormData creation logic as described in Step 2)
         const price = Number(product.price);
         const discountPrice = Number(product.discountPrice);
         const { discountStartDate, discountEndDate, stocks, category } = product;
@@ -223,8 +268,11 @@ const SellerProductEditFormPage = () => {
             discountPrice: product.discountPrice,
             discountStartDate: product.discountStartDate,
             discountEndDate: product.discountEndDate,
+            // Pass the existing URLs and the ones to be removed
             mainImageUrls: existingMainImageUrls,
             detailImageUrls: existingDetailImageUrls,
+            removedMainImageUrls: removedMainImageUrls,
+            removedDetailImageUrls: removedDetailImageUrls,
         };
 
         const updatedStockData = existingStocks.map(stock => ({
@@ -235,7 +283,7 @@ const SellerProductEditFormPage = () => {
         }));
 
         const newStockData = newStocks.map(stock => ({
-            quantity: stock.count,
+            quantity: stock.quantity, // Note: changed from stock.count
             color: stock.color,
             size: stock.size,
         }));
@@ -386,26 +434,29 @@ const SellerProductEditFormPage = () => {
                     </Form.Group>
                 )}
 
-                <MultipleImageUploader
+                <MultipleImageEditor
                     label="상품 대표 이미지"
                     images={product.mainImages}
                     onAddImage={handleMainImageChange}
                     onRemoveImage={handleRemoveMainImage}
+                    onEditImage={handleEditMainImage}
                 />
 
-                <MultipleImageUploader
+                <MultipleImageEditor
                     label="상품 상세 이미지"
                     images={product.detailImages}
                     onAddImage={handleDetailImageChange}
                     onRemoveImage={handleRemoveDetailImage}
+                    onEditImage={handleEditDetailImage}
                 />
 
-                <MultipleStockImageUploader
+                <MultipleStockImageEditor
                     label="상품 재고 이미지"
                     stocks={product.stocks}
                     onAddStockImage={handleAddStockImage}
                     onRemoveStockImage={handleRemoveStockImage}
                     onUpdateStockItem={handleUpdateStockItem}
+                    onEditStockImage={handleEditStockImage}
                 />
 
                 <Row className="mt-4">

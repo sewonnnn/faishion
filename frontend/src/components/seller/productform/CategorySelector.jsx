@@ -12,7 +12,7 @@ const CategorySelector = ({
                           }) => {
     // 선택된 그룹에 해당하는 소분류 목록을 계산합니다.
     const categoriesForSelectedGroup = selectedGroup
-        ? categoryGroups.find(group => group.id.toString() === selectedGroup)?.categories || []
+        ? categoryGroups.find(group => group.id == selectedGroup)?.categories || []
         : [];
 
     return (

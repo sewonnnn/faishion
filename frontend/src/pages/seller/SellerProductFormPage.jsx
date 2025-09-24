@@ -4,12 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
 import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
 import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";
-import { useAuth } from "../../contexts/AuthContext.jsx"
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
 const SellerProductFormPage = () => {
     const [product, setProduct] = useState({
         name: '',
-        status: 1, // '판매 게시'를 의미하는 정수 1로 초기화
+        status: 1,
         description: '',
         price: '',
         category: null,
@@ -20,6 +20,10 @@ const SellerProductFormPage = () => {
         detailImages: [],
         stocks: [],
     });
+
+    useEffect(()=>{
+        console.log(product);
+    }, [product]);
 
     const [categoryGroups, setCategoryGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState('');
@@ -106,6 +110,31 @@ const SellerProductFormPage = () => {
         }));
     };
 
+    // New handler for updating main images
+    const handleUpdateMainImage = (index, newFile) => {
+        setProduct((prevProduct) => {
+            const newMainImages = [...prevProduct.mainImages];
+            newMainImages[index] = newFile;
+            return {
+                ...prevProduct,
+                mainImages: newMainImages,
+            };
+        });
+    };
+
+    // New handler for updating detail images
+    const handleUpdateDetailImage = (index, newFile) => {
+        setProduct((prevProduct) => {
+            const newDetailImages = [...prevProduct.detailImages];
+            newDetailImages[index] = newFile;
+            return {
+                ...prevProduct,
+                detailImages: newDetailImages,
+            };
+        });
+    };
+
+    // Existing handlers remain the same
     const handleMainImageChange = (e) => {
         const files = e.target.files;
         if (files.length > 0) {
@@ -178,13 +207,12 @@ const SellerProductFormPage = () => {
         const discountPrice = Number(product.discountPrice);
         const { discountStartDate, discountEndDate, stocks, category } = product;
 
-        // 카테고리 유효성 검사
+        // Validation remains the same
         if (!category) {
             alert('상품 카테고리를 선택해야 합니다.');
             return;
         }
 
-        // 이미지 유효성 검사
         if (product.mainImages.length === 0) {
             alert('상품 대표 이미지를 1개 이상 등록해야 합니다.');
             return;
@@ -200,7 +228,6 @@ const SellerProductFormPage = () => {
             return;
         }
 
-        // 할인 기간 유효성 검사
         if (discountPrice > 0) {
             if (!discountStartDate || !discountEndDate) {
                 alert('할인 금액이 있을 경우 할인 기간을 모두 입력해야 합니다.');
@@ -214,13 +241,11 @@ const SellerProductFormPage = () => {
             }
         }
 
-        // 할인 금액 유효성 검사
         if (discountPrice > price) {
             alert('할인 금액은 상품 가격보다 클 수 없습니다. 상품 정보를 다시 확인해주세요.');
             return;
         }
 
-        // 재고 색상 및 사이즈 유효성 검사
         for (const stock of stocks) {
             if (stock.color.trim() === '' || stock.size.trim() === '') {
                 alert('모든 재고에 대한 색상과 사이즈를 입력해야 합니다.');
@@ -228,24 +253,20 @@ const SellerProductFormPage = () => {
             }
         }
 
-        // 2. Create FormData object
         const formData = new FormData();
 
-        // 3. Append JSON data for the product (excluding image files)
         const productData = {
             name: product.name,
             status: product.status,
-            description: product.description, // 상품 설명 추가
+            description: product.description,
             price: product.price,
             category: product.category,
             discountPrice: product.discountPrice,
             discountStartDate: product.discountStartDate,
             discountEndDate: product.discountEndDate,
         };
-        // Append the product data as a JSON Blob
         formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
-        // 4. Append image files
         product.mainImages.forEach((image) => {
             formData.append('mainImages', image);
         });
@@ -254,21 +275,17 @@ const SellerProductFormPage = () => {
             formData.append('detailImages', image);
         });
 
-        // 5. Append stock information and images
         const stockData = product.stocks.map(stock => ({
             quantity: stock.count,
             color: stock.color,
             size: stock.size,
         }));
-
         formData.append('stockList', new Blob([JSON.stringify(stockData)], { type: 'application/json' }));
 
-        // Append stock image files
         product.stocks.forEach((stock) => {
             formData.append('stockImages', stock.image);
         });
 
-        // 6. Send the request
         try {
             const response = await api.post('/product', formData, {
                 headers: {
@@ -403,6 +420,7 @@ const SellerProductFormPage = () => {
                     images={product.mainImages}
                     onAddImage={handleMainImageChange}
                     onRemoveImage={handleRemoveMainImage}
+                    onUpdateImage={handleUpdateMainImage} // New prop for updating
                 />
 
                 <MultipleImageUploader
@@ -410,6 +428,7 @@ const SellerProductFormPage = () => {
                     images={product.detailImages}
                     onAddImage={handleDetailImageChange}
                     onRemoveImage={handleRemoveDetailImage}
+                    onUpdateImage={handleUpdateDetailImage} // New prop for updating
                 />
 
                 <MultipleStockImageUploader
