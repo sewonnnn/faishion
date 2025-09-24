@@ -11,10 +11,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -37,9 +40,13 @@ public class QnaController {
 
     // 게시물 추가
     @PostMapping
-    public void addQna(@RequestBody Qna qna) {
+    public void addQna(@RequestBody Qna qna, @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.getReferenceById("sewon"); //임시 아이디
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (!userOptional.isPresent()) {
+            return;
+        }
+        User user = userOptional.get();
         Product product = productRepository.getReferenceById(1L); //임시 상품
 
         qna.setUser(user); //임시 아이디 qna에 설정
@@ -101,13 +108,18 @@ public class QnaController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> addQuestion(@RequestBody QnaSaveDTO qnaSaveDTO) {
+    public ResponseEntity<String> addQuestion(@RequestBody QnaSaveDTO qnaSaveDTO, @AuthenticationPrincipal UserDetails userDetails) {
         try {
             Product product = productRepository.findById(qnaSaveDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
             // 임시 사용자
-            User user = userRepository.getReferenceById("sewon");
+            Optional<User> userOptional =  userRepository.findById(userDetails.getUsername());
+            if (!userOptional.isPresent()) {
+                return ResponseEntity.ok("로그인된 유저가 없습니다.");
+            }
+
+            User user = userOptional.get();
 
             Qna qna = new Qna();
             qna.setTitle(qnaSaveDTO.getTitle());
