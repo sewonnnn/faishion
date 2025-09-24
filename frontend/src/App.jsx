@@ -40,6 +40,7 @@ import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
 import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
+import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
 
 function Layout() {
     return (
@@ -116,6 +117,7 @@ function App() {
                     <Route path="/order/new" element={<OrderFormPage />} />   {/*주문 상세 페이지*/}
                    <Route path="/order/toss" element={<PaymentCheckoutPage/>} />   {/*토스 결제창 페이지*/}
                    <Route path="/mypage" element={<MyPage />} />   {/*마이 페이지*/}
+                     {/* 새로 추가(머지하면 삭제) */}<Route path="/mypage/detail" element={<MyPageDetail/>}/> {/* 마이페이지 정보 수정 */}
                    <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
                    <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
                    <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}

@@ -178,7 +178,7 @@ public class GeminiController {
 
             JsonObject generationConfig = new JsonObject();
             JsonArray responseModalities = new JsonArray();
-            generationConfig.addProperty("temperature", 0);
+            generationConfig.addProperty("temperature", 0); // Ai 창의성 레벨 0~1
             responseModalities.add("IMAGE");
             generationConfig.add("responseModalities", responseModalities);
 
