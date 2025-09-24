@@ -83,11 +83,13 @@ public class AuthController {
                     .queryParam("client_secret", clientSecret) // @Value 주입
                     .queryParam("code", body.get("code"))
                     .queryParam("state", body.get("state"))
+                    .queryParam("redirect_uri", "http://localhost:5173/oauthcallback/naver") //  추가
                     .toUriString();
 
             // JSON 응답을 Map으로 바로 받습니다.
             ResponseEntity<Map> tokenResponse = restTemplate.getForEntity(tokenUrl, Map.class);
             Map<String, Object> tokenBody = tokenResponse.getBody();
+            System.out.println("네이버 토큰 응답: " + tokenBody);
             String accessToken = (String) tokenBody.get("access_token");
 
             // 2. 받은 액세스 토큰으로 네이버 프로필 정보 조회 요청
