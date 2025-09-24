@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import useCart from '../hooks/useCart.js'; // 커스텀 훅 가져옴
 import useCartSelection from "../hooks/useCartSelection.js";
 import axios from "axios";
+import {Button} from "react-bootstrap";
+import React from "react";
 
 const CartPage = () => {
 
@@ -51,6 +53,29 @@ const CartPage = () => {
         } catch (e) {
             console.error("함수 실행 중 오류 발생:", e);
             alert("주문서 불러오기에 실패했습니다.");
+        }
+    };
+    const onAIForm = async () => {
+        // 선택된 상품이 없으면 경고창 띄우기
+        if (selectedItems.length === 0) {
+            alert("AI로 옷 입어보기를 할 상품을 선택해주세요.");
+            return;
+        }
+        // 선택된 cartId들을 콤마로 연결
+        const cartIds = selectedItems.join(",");
+        try {
+            // 백엔드 API 호출하여 선택된 상품들의 stockId 리스트를 가져옴
+            const res = await axios.get("api/gemini/cart-stocks", {
+                params: { ids: cartIds }
+            });
+
+            const stockIds = res.data.stockIds;
+
+            // stockId 리스트를 URL 파라미터로 넘겨 AI 페이지로 이동
+            navigate(`/gemini/try-on?stockIds=${stockIds}`);
+        } catch (e) {
+            console.error("AI로 옷 입어보기 실패:", e);
+            alert("AI로 옷 입어보기에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -135,6 +160,9 @@ const CartPage = () => {
                         <span>{totalDiscountedPrice}원</span>
                     </div>
                     <button className="order-btn" onClick={goSelectedItemsOrder}>{getOrderSummary()} 주문하기</button>
+                    <Button variant="outline-dark" onClick={onAIForm}>
+                        AI로 옷 입어보기
+                    </Button>
                 </div>
             </div>
         </>

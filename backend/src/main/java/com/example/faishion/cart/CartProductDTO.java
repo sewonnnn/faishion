@@ -48,10 +48,14 @@ public class CartProductDTO {
             if (cart.getStock().getProduct() != null) {
                 this.productId = cart.getStock().getProduct().getId();
                 this.productName = cart.getStock().getProduct().getName();
-                this.productPrice = cart.getStock().getProduct().getPrice();
+                if(cart.getStock().getProduct().getPrice() != null){
+                    this.productPrice = cart.getStock().getProduct().getPrice();
+                }
                 this.productSize = cart.getStock().getSize();
                 this.productColor = cart.getStock().getColor();
-                this.discountedProductPrice = cart.getStock().getProduct().getDiscountPrice();
+                if(cart.getStock().getProduct().getDiscountPrice() != null){
+                    this.discountedProductPrice = cart.getStock().getProduct().getDiscountPrice();
+                }
             }
 
             // Stock에서 Image 정보 추출

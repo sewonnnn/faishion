@@ -51,6 +51,8 @@ public class QnaController {
     // 게시물 상세보기
     @GetMapping("/{id}")
     public QnaDTO findQnaById(@PathVariable long id) {
+        System.out.println(id);
+        System.out.println(qnaService.findQnaById(id));
         return qnaService.findQnaById(id);
     }
     

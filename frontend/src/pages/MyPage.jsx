@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import "./MyPage.css";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const MyPage = () => {
     const [cartList, setCartList] = useState([]); // 보여지는 장바구니 리스트
-
+    const nav = useNavigate();
     // 장바구니 데이터 불러오는 함수
     const fetchCartData = async () => {
         try {
@@ -23,7 +24,9 @@ const MyPage = () => {
         fetchCartData();
     }, []);
 
-
+    const onDetailPage = () =>{
+        nav("/mypage/detail");
+    }
     return (
         <div className="mypage-container">
             {/* 상단 프로필 영역(로그인한 회원 데이터 받아서 뿌리기) */}
@@ -42,7 +45,7 @@ const MyPage = () => {
                         </p>
                     </div>
                 </div>
-                <button className="settings-btn">⚙️</button>
+                <button className="settings-btn" onClick={onDetailPage}>⚙️</button>
             </section>
 
             {/* 적립금, 등급, 쿠폰 */}

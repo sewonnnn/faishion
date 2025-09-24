@@ -5,6 +5,8 @@ import com.example.faishion.stock.Stock;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,13 +48,13 @@ public class ProductController {
                        @RequestPart("detailImages") List<MultipartFile> detailImages,
                        @RequestPart("stockList") List<Stock> stockList,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
-        if(sellerId == null) sellerId = "tj";
+        if(sellerId == null) sellerId = "temp";
         productService.createProduct(sellerId, product, mainImages, detailImages, stockList, stockImages);
     }
 
     @GetMapping("/seller/list")
     public Page<Map<String, Object>> sellerProducts(String sellerId, Pageable pageable){
-        if(sellerId == null) sellerId = "tj";
+        if(sellerId == null) sellerId = "temp";
         Page<Product> products = productService.sellerProducts(sellerId, pageable);
         List<Map<String, Object>> content = products.stream()
                 .map(p -> {
@@ -124,16 +126,18 @@ public class ProductController {
 
     // ProductDetailPage에서 id에 일치하는 상품 가져오기 ho
     @GetMapping("/{productId}")
-    public ProductDetailDTO productDetail(@PathVariable Long productId, HttpServletRequest request) {
+    public ProductDetailDTO productDetail(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
         // findById 메서드가 Optional을 반환한다고 가정
         Product findProduct = productService.findById(productId);
-
+        String username = userDetails.getUsername();
+        System.out.println("username: " + username);
+        System.out.println("findProduct: " + findProduct.getName());
         if (findProduct != null) {
             // 도메인 정보를 동적으로 가져옵니다.
             String domain = request.getScheme() + "://" + request.getServerName() +
                     (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
 
-            return new ProductDetailDTO(findProduct, domain);
+            return new ProductDetailDTO(findProduct, domain, username);
         }
         return null;
     }
