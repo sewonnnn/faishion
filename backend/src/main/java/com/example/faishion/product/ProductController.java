@@ -12,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -68,6 +65,13 @@ public class ProductController {
                     map.put("discountEndDate", p.getDiscountEndDate());
                     map.put("categoryName", p.getCategory().getName());
                     map.put("categoryGroupName", p.getCategory().getCategoryGroup().getName());
+                    Map<String, Object> categoryMap =Map.of(
+                        "categoryGroup", Map.of(
+                                "id", p.getCategory().getCategoryGroup().getId()
+                        ),
+                        "id", p.getCategory().getId()
+                    );
+                    map.put("category", categoryMap);
                     map.put("mainImageList", p.getMainImageList().stream().map(Image::getId).toList());
                     map.put("detailImageList", p.getDetailImageList().stream().map(Image::getId).toList());
                     List<Map<String, Object>> stockData = p.getStockList().stream()
