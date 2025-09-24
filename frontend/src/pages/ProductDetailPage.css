@@ -15,3 +15,14 @@
     max-height: 500px; /* 최대 높이 설정 (선택 사항) */
     object-fit: contain; /* 이미지가 잘리지 않고 전체 보이도록 */
 }
+
+/* 스크롤바를 숨기면서 스크롤 기능은 유지 */
+.hide-scrollbar {
+    -ms-overflow-style: none; /* IE 및 Edge */
+    scrollbar-width: none;    /* Firefox */
+}
+
+/* 웹킷 기반 브라우저용 (Chrome, Safari) */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
