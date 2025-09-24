@@ -95,7 +95,7 @@ function App() {
              <Route element={<Layout/>}>
                  <Route element={<ProtectedRoute requiredRole={""} />}>
                      <Route path="/" element={<HomePage/>}/>   {/*홈페이지*/}
-                     <Route path="/oauthcallback" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
+                     <Route path="/oauthcallback/naver" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
                      <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}
 
                      <Route path="/register" element={<RegisterPage />} />   {/*회원가입 페이지*/}
