@@ -81,7 +81,7 @@ const OrderFormPage = () => {
                 addressId: 1, // ⭐ 실제 배송지 ID로 변경
                 orderName: getOrderSummary(), // 주문명
                 totalAmount: totals.totalDiscountedPrice, // ⭐ 할인이 적용된 최종 결제 금액
-                // ⭐ items 배열을 백엔드 OrderItemDTO 구조에 맞춰 변환
+                // ⭐ items 배열을 백엔드 OrderItemDTO 구조에 맞춰 변환 (잘들어옴)
                 items: orderItems.map(item => ({
                     stockId: item.stockId,
                     quantity: item.quantity,
@@ -93,16 +93,15 @@ const OrderFormPage = () => {
 
             console.log("백엔드로 보낼 주문 생성 요청 데이터:", requestData);
 
-            // const response = await api.post("/orders/create", requestData);
-            // const { orderId: clientOrderId } = response.data;
+            const response = await api.post("/order/create", requestData);
+            const { clientOrderId: clientOrderId } = response.data;
 
-            // 2. 받은 orderId를 가지고 다음 페이지로 이동
-            navigate('/order/toss', {
+            // 2. 받은 orderId를 가지고 다음 페이지(check.page)로 이동
+            navigate('/order/check', {
                 state: {
                     totalAmount: totals.totalDiscountedPrice,
                     orderName: requestData.orderName,
-                    customerName: "박세원", // ⭐ 실제 사용자 이름 (예: useAuth에서 가져옴)
-                   // clientOrderId: clientOrderId,
+                    clientOrderId: clientOrderId,
                 },
             });
 
@@ -110,12 +109,10 @@ const OrderFormPage = () => {
             console.error("주문 생성 중 오류 발생:", error.response?.data || error.message);
             alert("주문을 처리하는 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
-
-
 /*
         const queryString = new URLSearchParams({
-            totalAmount: totals.totalDiscountedPrice,
             orderName: getOrderSummary(),
+            totalAmount: totals.totalDiscountedPrice,
             // user 정보를 가져와서 추가합니다.
             customerName: "박세원", // 예시 유저 이름
         }).toString();
