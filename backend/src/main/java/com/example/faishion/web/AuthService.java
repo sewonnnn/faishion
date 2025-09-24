@@ -18,52 +18,42 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-  //  @Value("${spring.security.oauth2.client.registration.naver.client-id}")
-  //  private String naverClientId;
-   // @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-  //  private String naverClientSecret;
-
 
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtTokenProvider jwt;
 
-
     // 로컬 회원가입
     @Transactional
     public void registerLocal(AuthDto.RegisterLocalReq req) {
-        if (userRepo.existsByUsername(req.username())) {
+        if (userRepo.existsById(req.getId())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
-        if (userRepo.existsByEmail(req.email())) {
+        if (userRepo.existsByEmail(req.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
         User u = new User();
-        u.setId(UUID.randomUUID().toString());
+        u.setId(req.getId()); // 사용자가 입력한 아이디 = PK
         u.setProvider(AuthProvider.LOCAL);
-        u.setUsername(req.username());
-        u.setEmail(req.email());
-        u.setPwHash(encoder.encode(req.password())); // 비밀번호 암호화
-        u.setName(req.name());
-        u.setPhoneNumber(req.phoneNumber());
+        u.setEmail(req.getEmail());
+        u.setPwHash(encoder.encode(req.getPassword()));
+        u.setName(req.getName());
+        u.setPhoneNumber(req.getPhoneNumber());
 
         userRepo.save(u);
     }
 
     // 로컬 로그인
-    public User loginLocal(String login, String password) {
-        var userOpt = (login.contains("@"))
-                ? userRepo.findByEmail(login)
-                : userRepo.findByUsername(login);
-        var u = userOpt.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public User loginLocal(String id, String password) {
+        var u = userRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
 
         if (u.getPwHash() == null || !encoder.matches(password, u.getPwHash())) {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
         }
         return u;
     }
-
 
     // 네이버 로그인
     public User loginNaver(String code, String state) {
@@ -94,24 +84,23 @@ public class AuthService {
 
         Map resp = (Map) profileRes.getBody().get("response");
         String email = (String) resp.get("email");
-        String id = (String) resp.get("id");
+        String providerUserId = (String) resp.get("id"); // 네이버 고유 ID
         String name = (String) resp.get("name");
         String mobile = (String) resp.get("mobile");
 
         // 3. DB에 사용자 존재 여부 확인
-        return userRepo.findByProviderAndProviderUserId(AuthProvider.NAVER, id)
+        return userRepo.findByProviderAndProviderUserId(AuthProvider.NAVER, providerUserId)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setId(UUID.randomUUID().toString());
+                    u.setId(providerUserId); // ✅ 네이버 ID를 PK로 사용
                     u.setProvider(AuthProvider.NAVER);
-                    u.setProviderUserId(id);
+                    u.setProviderUserId(providerUserId);
                     u.setEmail(email);
                     u.setName(name);
                     u.setPhoneNumber(mobile);
                     return userRepo.save(u);
                 });
     }
-
 
     // 카카오 로그인
     public User loginKakao(String code) {
@@ -140,7 +129,7 @@ public class AuthService {
         );
 
         Map resp = profileRes.getBody();
-        String id = String.valueOf(resp.get("id"));
+        String providerUserId = String.valueOf(resp.get("id"));
 
         Map kakaoAccount = (Map) resp.get("kakao_account");
         String email = (String) kakaoAccount.get("email");
@@ -148,12 +137,12 @@ public class AuthService {
         String nickname = (String) profile.get("nickname");
 
         // 3. DB에 사용자 존재 여부 확인
-        return userRepo.findByProviderAndProviderUserId(AuthProvider.KAKAO, id)
+        return userRepo.findByProviderAndProviderUserId(AuthProvider.KAKAO, providerUserId)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setId(UUID.randomUUID().toString());
+                    u.setId(providerUserId); // ✅ 카카오 ID를 PK로 사용
                     u.setProvider(AuthProvider.KAKAO);
-                    u.setProviderUserId(id);
+                    u.setProviderUserId(providerUserId);
                     u.setEmail(email);
                     u.setName(nickname);
                     u.setPhoneNumber("kakao");
@@ -161,12 +150,15 @@ public class AuthService {
                 });
     }
 
-
     // JWT 발급
     public Map<String, String> issueTokens(User u) {
         String access = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));
         String refresh = jwt.generateRefresh(u.getId());
-        return Map.of("access", access, "refresh", refresh);
+
+        return Map.ofEntries(
+                Map.entry("access", access),
+                Map.entry("refresh", refresh)
+        );
     }
 
     // 테스트 로그 출력용

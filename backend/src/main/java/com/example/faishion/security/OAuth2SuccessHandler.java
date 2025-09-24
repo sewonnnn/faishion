@@ -36,11 +36,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
 
-        // 👇️ 소셜 로그인 성공 직후 JWT를 생성
+        //  소셜 로그인 성공 직후 JWT를 생성
         String accessToken  = jwt.generateAccess(appUserId, List.of("ROLE_USER"));
         String refreshToken = jwt.generateRefresh(appUserId);
 
-        // 👇️ 생성된 JWT를 HttpOnly 쿠키에 담아 응답
+        // 생성된 JWT를 HttpOnly 쿠키에 담아 응답
         Cookie accessCookie = new Cookie("accessToken", accessToken);
         accessCookie.setHttpOnly(true);
         // accessCookie.setSecure(true); // HTTPS 환경에서는 활성화
@@ -55,7 +55,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         refreshCookie.setMaxAge(86400); // 24시간
         response.addCookie(refreshCookie);
 
-        // 👇️ 토큰 없이 성공 페이지로 리디렉션
+        //  토큰 없이 성공 페이지로 리디렉션
         response.sendRedirect(FRONT_SUCCESS_URL);
     }
 }
