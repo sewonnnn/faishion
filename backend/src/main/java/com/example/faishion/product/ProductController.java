@@ -39,14 +39,36 @@ public class ProductController {
 
 
     @PostMapping
-    void createProduct(String sellerId,
+    void createProduct(@AuthenticationPrincipal UserDetails userDetails,
                        @RequestPart("product") Product product,
                        @RequestPart("mainImages") List<MultipartFile> mainImages,
                        @RequestPart("detailImages") List<MultipartFile> detailImages,
                        @RequestPart("stockList") List<Stock> stockList,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
-        if(sellerId == null) sellerId = "tj";
-        productService.createProduct(sellerId, product, mainImages, detailImages, stockList, stockImages);
+        productService.createProduct(userDetails.getUsername(), product, mainImages, detailImages, stockList, stockImages);
+    }
+
+
+    private final ProductRepository productRepository;
+    @PutMapping
+    void updateProduct(@AuthenticationPrincipal UserDetails userDetails,
+                       @RequestPart("product") Product newProduct,
+                       @RequestPart("stockList") List<Stock> stockList
+    ){
+        Product product = productRepository.findById(newProduct.getId()).orElseThrow();
+        product.setName(newProduct.getName());
+        product.setStatus(newProduct.getStatus());
+        product.setDescription(newProduct.getDescription());
+        product.setPrice(newProduct.getPrice());
+        product.setCategory(newProduct.getCategory());
+        product.setDiscountPrice(newProduct.getDiscountPrice());
+        product.setDiscountStartDate(newProduct.getDiscountStartDate());
+        product.setDiscountEndDate(newProduct.getDiscountEndDate());
+
+        System.out.println(product.getStockList().size());
+
+        productRepository.save(product);
+        //productService.updateProduct(userDetails.getUsername(), product);
     }
 
     @GetMapping("/seller/list")

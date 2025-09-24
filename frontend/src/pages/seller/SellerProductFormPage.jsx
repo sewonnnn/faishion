@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
 import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
 import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 
+// 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
+const createFileImageObj = (file) => ({ id: null, file: file, url: null });
+
 const SellerProductFormPage = () => {
+    const navigate = useNavigate();
     const [product, setProduct] = useState({
         name: '',
         status: 1,
@@ -16,8 +21,10 @@ const SellerProductFormPage = () => {
         discountPrice: '',
         discountStartDate: '',
         discountEndDate: '',
+        // 이미지 객체는 { id: null, file: File, url: null } 형태로 관리
         mainImages: [],
         detailImages: [],
+        // 재고 객체는 { id: null, quantity: 0, color: '', size: '', image: ImageObject } 형태로 관리
         stocks: [],
     });
 
@@ -40,8 +47,9 @@ const SellerProductFormPage = () => {
             }
         };
         fetchCategoryGroups();
-    }, []);
+    }, [api]); // api 의존성 추가
 
+    // (handleChange, handlePriceBlur, handleDiscountPriceBlur, handleCategory...Change 는 변경 없음)
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -110,41 +118,22 @@ const SellerProductFormPage = () => {
         }));
     };
 
-    // New handler for updating main images
-    const handleUpdateMainImage = (index, newFile) => {
-        setProduct((prevProduct) => {
-            const newMainImages = [...prevProduct.mainImages];
-            newMainImages[index] = newFile;
-            return {
-                ...prevProduct,
-                mainImages: newMainImages,
-            };
-        });
-    };
+    // -------------------------------------------------------------------------
+    // 이미지/재고 핸들러 수정: 객체 구조에 맞춰 파일 관리
+    // -------------------------------------------------------------------------
 
-    // New handler for updating detail images
-    const handleUpdateDetailImage = (index, newFile) => {
-        setProduct((prevProduct) => {
-            const newDetailImages = [...prevProduct.detailImages];
-            newDetailImages[index] = newFile;
-            return {
-                ...prevProduct,
-                detailImages: newDetailImages,
-            };
-        });
-    };
-
-    // Existing handlers remain the same
+    // 이미지 추가: 파일 객체로 변환하여 추가
     const handleMainImageChange = (e) => {
-        const files = e.target.files;
+        const files = Array.from(e.target.files).map(createFileImageObj);
         if (files.length > 0) {
             setProduct((prevProduct) => ({
                 ...prevProduct,
-                mainImages: [...prevProduct.mainImages, ...Array.from(files)],
+                mainImages: [...prevProduct.mainImages, ...files],
             }));
         }
     };
 
+    // 이미지 삭제: (ID 관리가 필요 없어 단순 제거)
     const handleRemoveMainImage = (index) => {
         setProduct((prevProduct) => ({
             ...prevProduct,
@@ -152,12 +141,25 @@ const SellerProductFormPage = () => {
         }));
     };
 
+    // 이미지 교체: 새 파일 객체로 대체
+    const handleReplaceMainImage = (index, newFile) => {
+        setProduct((prevProduct) => {
+            const newMainImages = [...prevProduct.mainImages];
+            newMainImages[index] = createFileImageObj(newFile);
+            return {
+                ...prevProduct,
+                mainImages: newMainImages,
+            };
+        });
+    };
+
+    // 상세 이미지 핸들러 (대표 이미지와 로직 동일)
     const handleDetailImageChange = (e) => {
-        const files = e.target.files;
+        const files = Array.from(e.target.files).map(createFileImageObj);
         if (files.length > 0) {
             setProduct((prevProduct) => ({
                 ...prevProduct,
-                detailImages: [...prevProduct.detailImages, ...Array.from(files)],
+                detailImages: [...prevProduct.detailImages, ...files],
             }));
         }
     };
@@ -169,12 +171,25 @@ const SellerProductFormPage = () => {
         }));
     };
 
+    const handleReplaceDetailImage = (index, newFile) => {
+        setProduct((prevProduct) => {
+            const newDetailImages = [...prevProduct.detailImages];
+            newDetailImages[index] = createFileImageObj(newFile);
+            return {
+                ...prevProduct,
+                detailImages: newDetailImages,
+            };
+        });
+    };
+
+    // 재고 추가: 새 재고/이미지 객체로 변환하여 추가
     const handleAddStockImage = (e) => {
         const files = e.target.files;
         if (files.length > 0) {
             const newStock = Array.from(files).map(file => ({
-                image: file,
-                count: 0,
+                id: null, // 새 재고
+                image: createFileImageObj(file), // 새 이미지 객체
+                quantity: 0, // count -> quantity로 통일
                 color: '',
                 size: '',
             }));
@@ -193,13 +208,31 @@ const SellerProductFormPage = () => {
     };
 
     const handleUpdateStockItem = (index, key, value) => {
+        // count 대신 quantity 사용하도록 통일
+        const stockKey = key === 'count' ? 'quantity' : key;
         setProduct((prevProduct) => ({
             ...prevProduct,
             stocks: prevProduct.stocks.map((stock, i) =>
-                i === index ? { ...stock, [key]: value } : stock
+                i === index ? { ...stock, [stockKey]: value } : stock
             ),
         }));
     };
+
+    // 재고 이미지 교체: 새 파일 객체로 대체
+    const handleReplaceStockImage = (index, newFile) => {
+        setProduct((prevProduct) => {
+            const newStocks = [...prevProduct.stocks];
+            newStocks[index] = {
+                ...newStocks[index],
+                image: createFileImageObj(newFile)
+            };
+            return {
+                ...prevProduct,
+                stocks: newStocks,
+            };
+        });
+    };
+    // -------------------------------------------------------------------------
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -207,45 +240,32 @@ const SellerProductFormPage = () => {
         const discountPrice = Number(product.discountPrice);
         const { discountStartDate, discountEndDate, stocks, category } = product;
 
-        // Validation remains the same
         if (!category) {
             alert('상품 카테고리를 선택해야 합니다.');
             return;
         }
-
         if (product.mainImages.length === 0) {
             alert('상품 대표 이미지를 1개 이상 등록해야 합니다.');
             return;
         }
-
         if (product.detailImages.length === 0) {
             alert('상품 상세 이미지를 1개 이상 등록해야 합니다.');
             return;
         }
-
         if (product.stocks.length === 0) {
             alert('상품 재고 이미지를 1개 이상 등록해야 합니다.');
             return;
         }
-
         if (discountPrice > 0) {
-            if (!discountStartDate || !discountEndDate) {
-                alert('할인 금액이 있을 경우 할인 기간을 모두 입력해야 합니다.');
-                return;
-            }
-            const startDate = new Date(discountStartDate);
-            const endDate = new Date(discountEndDate);
-            if (endDate <= startDate) {
-                alert('할인 종료일은 시작일 이후여야 합니다.');
+            if (!discountStartDate || !discountEndDate || new Date(discountEndDate) <= new Date(discountStartDate)) {
+                alert('할인 기간을 정확히 입력해야 합니다.');
                 return;
             }
         }
-
         if (discountPrice > price) {
             alert('할인 금액은 상품 가격보다 클 수 없습니다. 상품 정보를 다시 확인해주세요.');
             return;
         }
-
         for (const stock of stocks) {
             if (stock.color.trim() === '' || stock.size.trim() === '') {
                 alert('모든 재고에 대한 색상과 사이즈를 입력해야 합니다.');
@@ -267,23 +287,25 @@ const SellerProductFormPage = () => {
         };
         formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
-        product.mainImages.forEach((image) => {
-            formData.append('mainImages', image);
+        // 이미지 객체에서 'file'만 추출하여 FormData에 추가
+        product.mainImages.forEach((imageObj) => {
+            formData.append('mainImages', imageObj.file);
         });
 
-        product.detailImages.forEach((image) => {
-            formData.append('detailImages', image);
+        product.detailImages.forEach((imageObj) => {
+            formData.append('detailImages', imageObj.file);
         });
 
+        // 재고 객체에서 'quantity' 사용 및 이미지 파일 추출
         const stockData = product.stocks.map(stock => ({
-            quantity: stock.count,
+            quantity: stock.quantity, // count -> quantity로 통일
             color: stock.color,
             size: stock.size,
         }));
         formData.append('stockList', new Blob([JSON.stringify(stockData)], { type: 'application/json' }));
 
         product.stocks.forEach((stock) => {
-            formData.append('stockImages', stock.image);
+            formData.append('stockImages', stock.image.file);
         });
 
         try {
@@ -306,43 +328,26 @@ const SellerProductFormPage = () => {
         <Container className="my-5">
             <h2 className="text-center mb-4">상품 등록</h2>
             <Form onSubmit={handleSubmit}>
+                {/* ... (폼 필드는 변경 없음) ... */}
+
                 <Form.Group as={Row} className="mb-3" controlId="formProductName">
                     <Form.Label column sm="2">상품명 :</Form.Label>
                     <Col sm="10">
-                        <Form.Control
-                            type="text"
-                            name="name"
-                            value={product.name}
-                            onChange={handleChange}
-                            placeholder="상품명 입력"
-                            required
-                        />
+                        <Form.Control type="text" name="name" value={product.name} onChange={handleChange} placeholder="상품명 입력" required/>
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} className="mb-3" controlId="formProductDescription">
                     <Form.Label column sm="2">상품 설명 :</Form.Label>
                     <Col sm="10">
-                        <Form.Control
-                            as="textarea"
-                            name="description"
-                            value={product.description}
-                            onChange={handleChange}
-                            placeholder="상품 설명 입력"
-                            rows={5}
-                            required
-                        />
+                        <Form.Control as="textarea" name="description" value={product.description} onChange={handleChange} placeholder="상품 설명 입력" rows={5} required/>
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} className="mb-3" controlId="formProductStatus">
                     <Form.Label column sm="2">판매 상태 :</Form.Label>
                     <Col sm="10">
-                        <Form.Select
-                            name="status"
-                            value={product.status}
-                            onChange={handleChange}
-                        >
+                        <Form.Select name="status" value={product.status} onChange={handleChange}>
                             <option value={1}>판매 게시</option>
                             <option value={0}>판매 중지</option>
                         </Form.Select>
@@ -352,15 +357,7 @@ const SellerProductFormPage = () => {
                 <Form.Group as={Row} className="mb-3" controlId="formProductPrice">
                     <Form.Label column sm="2">상품 가격 :</Form.Label>
                     <Col sm="10">
-                        <Form.Control
-                            type="number"
-                            name="price"
-                            value={product.price}
-                            onChange={handleChange}
-                            onBlur={handlePriceBlur}
-                            placeholder="상품 가격 입력"
-                            required
-                        />
+                        <Form.Control type="number" name="price" value={product.price} onChange={handleChange} onBlur={handlePriceBlur} placeholder="상품 가격 입력" required/>
                     </Col>
                 </Form.Group>
 
@@ -375,14 +372,7 @@ const SellerProductFormPage = () => {
                 <Form.Group as={Row} className="mb-3" controlId="formProductDiscountPrice">
                     <Form.Label column sm="2">할인 금액 :</Form.Label>
                     <Col sm="10">
-                        <Form.Control
-                            type="number"
-                            name="discountPrice"
-                            value={product.discountPrice}
-                            onChange={handleChange}
-                            onBlur={handleDiscountPriceBlur}
-                            placeholder="할인 금액 입력"
-                        />
+                        <Form.Control type="number" name="discountPrice" value={product.discountPrice} onChange={handleChange} onBlur={handleDiscountPriceBlur} placeholder="할인 금액 입력"/>
                     </Col>
                 </Form.Group>
 
@@ -392,35 +382,25 @@ const SellerProductFormPage = () => {
                         <Col sm="10">
                             <Row>
                                 <Col xs={5}>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="discountStartDate"
-                                        value={product.discountStartDate}
-                                        onChange={handleChange}
-                                    />
+                                    <Form.Control type="datetime-local" name="discountStartDate" value={product.discountStartDate} onChange={handleChange}/>
                                 </Col>
-                                <Col xs={2} className="text-center">
-                                    ~
-                                </Col>
+                                <Col xs={2} className="text-center"> ~ </Col>
                                 <Col xs={5}>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="discountEndDate"
-                                        value={product.discountEndDate}
-                                        onChange={handleChange}
-                                    />
+                                    <Form.Control type="datetime-local" name="discountEndDate" value={product.discountEndDate} onChange={handleChange}/>
                                 </Col>
                             </Row>
                         </Col>
                     </Form.Group>
                 )}
 
+                {/* ---------------------------------------------------------------------------------- */}
+                {/* 이미지 업로더: props 명칭 통일 (onUpdateImage -> onReplaceImage) */}
                 <MultipleImageUploader
                     label="상품 대표 이미지"
                     images={product.mainImages}
                     onAddImage={handleMainImageChange}
                     onRemoveImage={handleRemoveMainImage}
-                    onUpdateImage={handleUpdateMainImage} // New prop for updating
+                    onReplaceImage={handleReplaceMainImage}
                 />
 
                 <MultipleImageUploader
@@ -428,20 +408,23 @@ const SellerProductFormPage = () => {
                     images={product.detailImages}
                     onAddImage={handleDetailImageChange}
                     onRemoveImage={handleRemoveDetailImage}
-                    onUpdateImage={handleUpdateDetailImage} // New prop for updating
+                    onReplaceImage={handleReplaceDetailImage}
                 />
 
+                {/* 재고 이미지 업로더: props 명칭 통일 (onUpdateStockImage -> onReplaceStockImage) */}
                 <MultipleStockImageUploader
                     label="상품 재고 이미지"
                     stocks={product.stocks}
                     onAddStockImage={handleAddStockImage}
                     onRemoveStockImage={handleRemoveStockImage}
                     onUpdateStockItem={handleUpdateStockItem}
+                    onReplaceStockImage={handleReplaceStockImage}
                 />
+                {/* ---------------------------------------------------------------------------------- */}
 
                 <Row className="mt-4">
                     <Col className="text-center">
-                        <Button variant="secondary" className="me-3">
+                        <Button variant="secondary" onClick={() => navigate('/seller/list')} className="me-3">
                             메인으로 가기
                         </Button>
                         <Button variant="success" type="submit">

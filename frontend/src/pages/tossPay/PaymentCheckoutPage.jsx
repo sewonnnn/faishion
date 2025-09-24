@@ -1,4 +1,4 @@
-import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
+//import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
 // 모듈 임포트 연동방식
 // ------  SDK 초기화 ------
