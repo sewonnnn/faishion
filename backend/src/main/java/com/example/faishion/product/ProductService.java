@@ -26,6 +26,7 @@ public class ProductService {
     private final StockRepository stockRepository;
     private final ImageService imageService;
 
+    public List<Product> findAllById(Long id){return productRepository.findAllById(id);}
     public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
         return productRepository.sellerProducts(pageable);
     }

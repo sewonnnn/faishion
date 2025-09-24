@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // 상품 전체 불러오기
-    List<Product> findAllBy();
+    // productId에 맞는 상품들 가져오기
+    List<Product> findAllById(Long id);
 
     @Query("SELECT DISTINCT p FROM Product p " +
             "JOIN FETCH p.category c " +

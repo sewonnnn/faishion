@@ -145,7 +145,7 @@ const ProductRightInfo = ({ productId, product }) => {
 
     const onWishSave = async () => {
         try {
-            const response = await axios.post(`/api/wish/save/${productId}`);
+            const response = await api.post(`/wish/save/${productId}`);
             alert(response.data);
         } catch (error) {
             console.error('Error fetching banner data:', error);

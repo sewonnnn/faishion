@@ -3,7 +3,11 @@ package com.example.faishion.order;
 import com.example.faishion.cart.Cart;
 import com.example.faishion.cart.CartProductDTO;
 import com.example.faishion.cart.CartService;
+import com.example.faishion.user.User;
+import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +20,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final CartService cartService;
-
+    private final UserRepository userRepository;
 
     // 선택된 상품들을 받아 주문을 생성
     @PostMapping("/new")
@@ -27,7 +31,7 @@ public class OrderController {
     }
 
     @GetMapping("/new")
-    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString) {
+    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, @AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("받은 카트 ID들: " + idsString);
 
         // 1. URL 파라미터에서 받은 장바구니의 목록 추출
@@ -38,11 +42,16 @@ public class OrderController {
         // 2. 모든 상품 관련 정보를 한 번에 조회
         List<Cart> carts = cartService.findCartsWithDetailsByIds(cartIds);
 
-
         // 3. 조회된 Carts 리스트를 DTO 리스트로 변환하여 반환
         List<CartProductDTO> orderItems = carts.stream()
                 .map(CartProductDTO::new)
                 .collect(Collectors.toList());
         return orderItems;
     }
+
+//    // 주문 저장하기
+//    @PostMapping("/create")
+//    public String createOrderFromCartItems(@RequestBody List<Long> cartIds) {
+//
+//    }
 }
