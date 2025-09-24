@@ -2,26 +2,20 @@ import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import axios from 'axios';
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const ReviewForm = ({ productId, onReviewSubmitted }) => {
     const [newReview, setNewReview] = useState('');
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [selectedFiles, setSelectedFiles] = useState([]);
-
+    const {api} = useAuth();
     const handleFileChange = (e) => {
         setSelectedFiles(Array.from(e.target.files));
     };
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
-
-        console.log('--- 리뷰 제출 시작 ---'); // 콘솔 로그
-        console.log('productId:', productId);
-        console.log('newReview:', newReview);
-        console.log('rating:', rating);
-        console.log('selectedFiles:', selectedFiles);
-
         if (rating === 0) {
             alert('별점을 선택해주세요.');
             return;
@@ -47,7 +41,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
 
         try {
             console.log('axios POST 요청을 보냅니다.'); // 콘솔 로그
-            const response = await axios.post("/api/review/save", formData, {
+            const response = await api.post("/review/save", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
