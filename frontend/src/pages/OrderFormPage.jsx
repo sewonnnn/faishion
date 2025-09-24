@@ -1,8 +1,8 @@
 import './OrderFormPage.css';
 import {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom";
-
-import axios from 'axios'; // 1. Axios를 임포트
+import {useLocation} from "react-router-dom"
+import axios from 'axios';
+import {PaymentCheckoutPage} from "./tossPay/PaymentCheckoutPage.jsx";
 
 const OrderFormPage = () => {
     const [orderItems, setOrderItems] = useState([]);
@@ -10,25 +10,18 @@ const OrderFormPage = () => {
     const [error, setError] = useState(null);
     const location = useLocation();
 
-    // const {
-    //     requestPayment,
-    //     setPaymentInfo,
-    //     isLoading: isPaymentLoading,
-    //     error: paymentError
-    // } = useTosspay();
+    // ... (기존 useEffect, calculateTotals, getOrderSummary 함수는 동일)
 
     useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const cartIds = queryParams.get('ids');
-
-        if (!cartIds) {
+        const {ids} = location.state;
+        if (!ids) {
             setError("주문할 상품 ID가 없습니다.");
             setIsLoading(false);
             return;
         }
 
         // 2. Axios를 사용하여 GET 요청 보내기
-        axios.get(`http://localhost:8080/order/new?ids=${cartIds}`)
+        axios.get(`http://localhost:8080/order/new?ids=${ids}`)
             .then(response => {
                 // Axios는 응답 데이터를 자동으로 .data에 넣어줌
                 setOrderItems(response.data);
@@ -47,7 +40,7 @@ const OrderFormPage = () => {
                 }
                 setIsLoading(false);
             });
-    }, [location.search]);
+    }, [location.state]); // `location.search` 대신 `location.state` 사용
 
     // 총 가격 계산
     const calculateTotals = () => {
@@ -72,7 +65,10 @@ const OrderFormPage = () => {
 
     const getOrderSummary = () => {
         if (orderItems.length === 0) return "주문 상품 0개";
-        return `${orderItems.length}건`;
+        // 첫 번째 상품명과 총 상품 수를 합쳐서 반환
+        const firstItemName = orderItems[0].productName;
+        const remainingCount = orderItems.length > 1 ? ` 외 ${orderItems.length - 1}건` : '';
+        return `${firstItemName}${remainingCount}`;
     };
 
     if (isLoading) return <div>로딩 중...</div>;
@@ -80,6 +76,7 @@ const OrderFormPage = () => {
 
     return (
         <div className="cart-page-layout">
+            {/* ... (기존 주문 상세 정보 영역은 동일) */}
             <div className="order-details-container">
                 <h2 className="section-header">주문서</h2>
                 <div className="order-section">
@@ -98,7 +95,6 @@ const OrderFormPage = () => {
                         <option>경비실에 맡겨주세요</option>
                     </select>
                 </div>
-
                 <hr className="divider" />
                 <h2 className="section-header">주문 상품 {orderItems.length}개</h2>
                 {orderItems.map((item) => (
@@ -111,7 +107,7 @@ const OrderFormPage = () => {
                         <div className="product-details">
                             <h4>{item.productName}</h4>
                             <p>{item.sellerBusinessName}</p>
-                            <p>상세옵션:  {item.productSize}, {item.productColor}</p>
+                            <p>상세옵션: {item.productSize}, {item.productColor}</p>
                             <p>{item.quantity}개</p>
                             <div className="price-info">
                                 <span className="original-price">{item.productPrice.toLocaleString()}원</span>
@@ -121,7 +117,6 @@ const OrderFormPage = () => {
                     </div>
                 ))}
             </div>
-            {/* 결제 정보 */}
             <div className="price-summary-box">
                 <h3 className="section-header">결제 정보</h3>
                 <div className="price-item">
@@ -140,14 +135,10 @@ const OrderFormPage = () => {
                     <span>총 구매 금액</span>
                     <span>{totals.totalDiscountedPrice.toLocaleString()}원</span>
                 </div>
-                <button
-                    className="order-btn"
-                    // disabled={isPaymentLoading || paymentError}
-                    // onClick={() => requestPayment()}
-                >
-                    결제하기
-                    {/*{isPaymentLoading ? "결제 준비 중..." : `${getOrderSummary()} 결제하기`}*/}
-                </button>
+                <PaymentCheckoutPage
+                    totalAmount={totals.totalDiscountedPrice}
+                    orderName={getOrderSummary()}
+                />
             </div>
         </div>
     );

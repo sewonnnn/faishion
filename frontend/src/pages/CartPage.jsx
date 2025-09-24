@@ -42,7 +42,7 @@ const CartPage = () => {
             const res = await axios.get("http://localhost:8080/order/new", {
                 params: { ids: cartIds },
             });
-
+            res.data.map((item) => {console.log(item)});
             // 받은 데이터와 함께 페이지 이동
             navigate("/order/new", {
                 state: { orderItems: res.data, ids: cartIds },
@@ -59,6 +59,12 @@ const CartPage = () => {
         if (cartList.length === 0) return "주문 상품 0개";
         const totalItems = cartList.length;
         return `${totalItems}건`;
+    };
+
+    // 상품 상세로 이동
+    const goProduct = (productId) => {
+        console.log("상품 상세 이동 상품 id:" + productId)
+        navigate(`/product/${productId}`);
     };
 
     return (
@@ -94,11 +100,11 @@ const CartPage = () => {
                                         className="product-image"
                                     />
                                 </div>
-                                <div className="item-info">
+                                <div className="item-info" onClick={() => goProduct(item.productId)} style={{ cursor: "pointer" }} >
                                     <h4>{item.productName}</h4>
                                     <p>{item.sellerBusinessName}</p>
                                     <p>상세옵션:  {item.productSize}, {item.productColor}</p>
-                                    <p className="item-options">{item.quantity}개 </p>
+                                    <p className="item-options">수량: {item.quantity}개 </p>
                                     <p className="item-price">{item.discountedProductPrice}원</p>
                                 </div>
                             </div>

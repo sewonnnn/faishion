@@ -6,13 +6,23 @@
     cursor: pointer;
 }
 
+/* ✨ 수정된 부분 */
 .card-img-wrapper {
     position: relative;
     overflow: hidden;
     border-radius: 0.25rem;
+    width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+    padding-top: 100%; /* 너비와 동일한 높이를 위한 꼼수 (1:1 비율) */
 }
 
+/* ✨ 수정된 부분 */
 .product-card .card-img-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 비율을 유지하며 부모를 꽉 채우도록 설정 */
     transition: transform 0.3s ease;
 }
 
