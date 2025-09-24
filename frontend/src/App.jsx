@@ -40,7 +40,6 @@ import {AuthProvider, useAuth} from './contexts/AuthContext';
 import {FailPage} from "./pages/tossPay/Fail.jsx";
 import {SuccessPage} from "./pages/tossPay/Success.jsx";
 import {CheckoutPage} from "./pages/tossPay/Checkout.jsx";
-import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
 import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
 import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
 
@@ -120,6 +119,7 @@ function App() {
                                 <Route path="/success" element={<SuccessPage/>}/> {/*주문성공 페이지*/}
                                 <Route path="/fail" element={<FailPage/>}/> {/*토스 실패 페이지*/}
                                 <Route path="/mypage" element={<MyPage/>}/> {/*마이 페이지*/}
+                                <Route path="/mypage/detail" element={<MyPageDetail/>}/> {/* 마이페이지 정보 수정 */}
                                 <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
                                 <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
                                 <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
@@ -139,7 +139,7 @@ function App() {
                                        element={<SellerProductFormPage/>}/> {/*판매자 상품 등록 폼 페이지*/}
                                 <Route path="/seller/product/edit/:productId"
                                        element={<SellerProductFormPage/>}/> {/*판매자 상품 편집 폼 페이지*/}
-
+                                <Route path="/seller/qna/:id" element={<SellerQnaDetail/>}/> {/* 판매자 문의 상세보기 */}
                             </Route>
                         </Route>
 
