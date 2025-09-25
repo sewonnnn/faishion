@@ -1,9 +1,9 @@
 import Banner from "../components/productlist/Banner.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
+import ProductListPage from "./ProductListPage.jsx";
 
 const HomePage = () => {
-
     const { api } = useAuth();
     useEffect(() => {
         const fetchCategories = async () => {
@@ -17,12 +17,12 @@ const HomePage = () => {
         };
         fetchCategories();
     }, [api]);
-
     return (
         <>
             <h1>HomePage</h1>
             <div className="productListPage_Banners">
                 <Banner />
+                <ProductListPage/>
             </div>
         </>
     );

@@ -154,9 +154,9 @@ const Header = () => {
                 <Navbar expand="lg">
                     <Container fluid>
                         <Nav className="main-nav-links me-auto">
-                            <Nav.Link href="#best">베스트</Nav.Link>
-                            <Nav.Link href="#sale">세일</Nav.Link>
-                            <Nav.Link href="#new">신상품</Nav.Link>
+                            <Nav.Link href="/">베스트</Nav.Link>
+                            <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
+                            <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
                             <Nav.Link href="#solo">단독</Nav.Link>
                             <Nav.Link href="#recom">추천</Nav.Link>
                             <Nav.Link href="/product/list?type=women">여성</Nav.Link>
