@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,44 +77,165 @@ public class ProductService {
         productRepository.save(savedProduct);
     }
 
+    @Transactional
+    public void updateProduct(String sellerId,
+                              Product updatedProduct,
+                              List<ProductImageInfoDTO> mainInfos,
+                              List<MultipartFile> mainImages,
+                              List<ProductImageInfoDTO> detailInfos,
+                              List<MultipartFile> detailImages,
+                              List<Stock> stocks,
+                              List<ProductImageInfoDTO> stockInfos,
+                              List<MultipartFile> stockImages,
+                              List<Long> deletedMainImageIds,
+                              List<Long> deletedDetailImageIds,
+                              List<Long> deletedStockIds) throws IOException {
+        Product existingProduct = productRepository.findById(updatedProduct.getId()).orElseThrow();
+        if (!existingProduct.getSeller().getId().equals(sellerId)) {
+            throw new AccessDeniedException("상품을 수정할 권한이 없습니다.");
+        }
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setDescription(updatedProduct.getDescription());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setStatus(updatedProduct.getStatus());
+        existingProduct.setDiscountPrice(updatedProduct.getDiscountPrice());
+        existingProduct.setDiscountStartDate(updatedProduct.getDiscountStartDate());
+        existingProduct.setDiscountEndDate(updatedProduct.getDiscountEndDate());
+        existingProduct.setCategory(updatedProduct.getCategory());
+        if (deletedMainImageIds != null && !deletedMainImageIds.isEmpty()) {
+            List<Image> imagesToRemove = existingProduct.getMainImageList().stream()
+                    .filter(image -> deletedMainImageIds.contains(image.getId()))
+                    .toList();
+            for (Image image : imagesToRemove) {
+                imageService.deleteImage(image.getId());
+                existingProduct.getMainImageList().remove(image);
+            }
+        }
+        if (deletedDetailImageIds != null && !deletedDetailImageIds.isEmpty()) {
+            List<Image> imagesToRemove = existingProduct.getDetailImageList().stream()
+                    .filter(image -> deletedDetailImageIds.contains(image.getId()))
+                    .toList();
+            for (Image image : imagesToRemove) {
+                imageService.deleteImage(image.getId());
+                existingProduct.getDetailImageList().remove(image);
+            }
+        }
+        if(mainInfos != null) {
+            for (ProductImageInfoDTO imageInfo : mainInfos) {
+                MultipartFile file = mainImages.get(imageInfo.getImageFileIdx());
+                if (imageInfo.getImageId() != null) {
+                    imageService.updateImage(imageInfo.getImageId(), file);
+                } else {
+                    existingProduct.getMainImageList().add(imageService.saveImage(file));
+                }
+            }
+        }
+        if(detailInfos != null) {
+            for (ProductImageInfoDTO imageInfo : detailInfos) {
+                MultipartFile file = detailImages.get(imageInfo.getImageFileIdx());
+                if (imageInfo.getImageId() != null) {
+                    imageService.updateImage(imageInfo.getImageId(), file);
+                } else {
+                    existingProduct.getDetailImageList().add(imageService.saveImage(file));
+                }
+            }
+        }
+        //재고 삭제 로직(근데 이 재고를 주문한 사용자가 있다면?)
+        if (deletedStockIds != null && !deletedStockIds.isEmpty()) {
+            List<Stock> stocksToRemove = existingProduct.getStockList().stream()
+                    .filter(stock -> deletedStockIds.contains(stock.getId()))
+                    .toList();
+            for (Stock stock : stocksToRemove) {
+                if (stock.getImage() != null) {
+                    imageService.deleteImage(stock.getImage().getId());
+                }
+                existingProduct.getStockList().remove(stock);
+            }
+        }
 
-    public void updateProduct(String username, Product product, List<MultipartFile> mainImages, List<MultipartFile> detailImages, List<Stock> stocks, List<MultipartFile> stockImages, List<Long> deletedMainImageIds, List<Long> deletedDetailImageIds, List<Long> deletedStockIds) {
-        System.out.println(mainImages);
-        System.out.println(detailImages);
-        System.out.println(mainImages);
-        System.out.println(detailImages);
-        System.out.println(stocks);
-        System.out.println(stockImages);
-        System.out.println(deletedMainImageIds);
-        System.out.println(deletedDetailImageIds);
-        System.out.println(deletedStockIds);
+        if (deletedStockIds != null && !deletedStockIds.isEmpty()) {
+            List<Stock> stocksToRemove = existingProduct.getStockList().stream()
+                    .filter(stock -> deletedStockIds.contains(stock.getId()))
+                    .toList();
+            for (Stock stock : stocksToRemove) {
+                // 연관된 이미지 삭제
+                if (stock.getImage() != null) {
+                    imageService.deleteImage(stock.getImage().getId());
+                }
+                // Stock 엔티티 삭제
+                stockRepository.delete(stock);
+                existingProduct.getStockList().remove(stock);
+            }
+        }
 
+        // 2. 재고 추가 및 수정 처리
+        Map<Long, Stock> existingStocksMap = existingProduct.getStockList().stream()
+                .collect(Collectors.toMap(Stock::getId, stock -> stock, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
-        /*
-        // TODO: **판매자 권한 검증 로직 추가 (필수)**
-        // if (!existingProduct.getSeller().getUsername().equals(sellerUsername)) {
-        //     throw new AccessDeniedException("상품을 수정할 권한이 없습니다.");
-        // }
+        // 이미지 파일 정보 분류
+        Map<Long, Integer> imageIdToFileIdxMap = new LinkedHashMap<>();
+        LinkedHashSet<Integer> newStockFileIndices = new LinkedHashSet<>();
+        if (stockInfos != null) {
+            for (ProductImageInfoDTO info : stockInfos) {
+                if (info.getImageId() != null) {
+                    // 기존 이미지 수정
+                    imageIdToFileIdxMap.put(info.getImageId(), info.getImageFileIdx());
+                } else {
+                    // 새 Stock 생성 (또는 새 이미지)
+                    newStockFileIndices.add(info.getImageFileIdx());
+                }
+            }
+        }
 
-        // 2. 상품 기본 정보 업데이트 (Dirty Checking)
-        existingProduct.updateDetails(updatedProduct);
-        // Category는 ID만 넘어오므로, 필요하다면 CategoryRepository를 통해 Entity를 조회하여 설정해야 합니다.
-        // existingProduct.setCategory(categoryRepository.findById(updatedProduct.getCategory().getId()).orElse(null));
-        // Save를 명시적으로 하지 않아도 @Transactional에 의해 변경사항이 DB에 반영됩니다.
+        Integer nextNewStockFileIdx = newStockFileIndices.stream().findFirst().orElse(null);
 
-        // 3. 이미지 삭제 처리
-        deleteImages(deletedMainImageIds);
-        deleteImages(deletedDetailImageIds);
-        // 재고 이미지 ID는 재고 ID를 통해 삭제되므로 여기서는 생략.
+        for (Stock stockPayload : stocks) {
+            Stock stock;
+            if (stockPayload.getId() != null) {
+                // 기존 Stock 수정
+                stock = existingStocksMap.get(stockPayload.getId());
+                if (stock == null) continue; // 이미 삭제된 ID
 
-        // 4. 재고 업데이트 및 이미지 처리
-        updateStocks(existingProduct, stocks, stockImages, deletedStockIds);
+                // 기본 정보 업데이트
+                stock.setColor(stockPayload.getColor());
+                stock.setSize(stockPayload.getSize());
+                stock.setQuantity(stockPayload.getQuantity());
 
-        // 5. 새로운/교체된 대표/상세 이미지 저장 및 연결
-        saveAndConnectImages(existingProduct, mainImages, ProductImage.ImageType.MAIN);
-        saveAndConnectImages(existingProduct, detailImages, ProductImage.ImageType.DETAIL);
+                // 이미지 업데이트 처리
+                Long imageId = stock.getImage() != null ? stock.getImage().getId() : null;
+                if (imageId != null && imageIdToFileIdxMap.containsKey(imageId)) {
+                    Integer fileIdx = imageIdToFileIdxMap.get(imageId);
+                    MultipartFile file = stockImages.get(fileIdx);
+                    imageService.updateImage(imageId, file);
+                    imageIdToFileIdxMap.remove(imageId);
+                }
+            } else {
+                // 새 Stock 생성
+                stock = new Stock();
+                stock.setProduct(existingProduct);
+                stock.setColor(stockPayload.getColor());
+                stock.setSize(stockPayload.getSize());
+                stock.setQuantity(stockPayload.getQuantity());
 
-         */
+                // 새 Stock의 이미지 처리 (nextNewStockFileIdx를 순차적으로 사용)
+                if (nextNewStockFileIdx != null) {
+                    MultipartFile file = stockImages.get(nextNewStockFileIdx);
+                    Image savedImage = imageService.saveImage(file);
+                    stock.setImage(savedImage);
 
+                    // 다음 파일 인덱스로 포인터 이동
+                    newStockFileIndices.remove(nextNewStockFileIdx);
+                    nextNewStockFileIdx = newStockFileIndices.stream().findFirst().orElse(null);
+                } else {
+                    // Image가 nullable=false 이므로, 이미지가 없으면 Stock 생성 건너뛰기
+                    continue;
+                }
+
+                stockRepository.save(stock);
+                existingProduct.getStockList().add(stock);
+            }
+        }
+
+        productRepository.save(existingProduct);
     }
 }

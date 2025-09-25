@@ -41,9 +41,7 @@ public class ProductController {
     @PostMapping
     void createProduct(@AuthenticationPrincipal UserDetails userDetails,
                        @RequestPart("product") Product product,
-                       @RequestPart("mainInfos") List<ProductImageInfoDTO> mainInfos,
                        @RequestPart("mainImages") List<MultipartFile> mainImages,
-                       @RequestPart("detailInfos") List<ProductImageInfoDTO> detailInfos,
                        @RequestPart("detailImages") List<MultipartFile> detailImages,
                        @RequestPart("stocks") List<Stock> stocks,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
@@ -63,33 +61,8 @@ public class ProductController {
                        @RequestPart(value = "deletedMainImageIds", required = false) List<Long> deletedMainImageIds,
                        @RequestPart(value = "deletedDetailImageIds", required = false) List<Long> deletedDetailImageIds,
                        @RequestPart(value = "deletedStockIds", required = false) List<Long> deletedStockIds) throws IOException {
-        productService.updateProduct(userDetails.getUsername(), product, mainImages, detailImages, stocks, stockImages, deletedMainImageIds, deletedDetailImageIds, deletedStockIds);
+        productService.updateProduct(userDetails.getUsername(), product, mainInfos, mainImages, detailInfos, detailImages, stocks, stockInfos, stockImages, deletedMainImageIds, deletedDetailImageIds, deletedStockIds);
     }
-
-    /*
-    private final ProductRepository productRepository;
-    @PutMapping
-    void updateProduct(@AuthenticationPrincipal UserDetails userDetails,
-                       @RequestPart("product") Product newProduct,
-                       @RequestPart("stockList") List<Stock> stockList
-    ){
-        Product product = productRepository.findById(newProduct.getId()).orElseThrow();
-        product.setName(newProduct.getName());
-        product.setStatus(newProduct.getStatus());
-        product.setDescription(newProduct.getDescription());
-        product.setPrice(newProduct.getPrice());
-        product.setCategory(newProduct.getCategory());
-        product.setDiscountPrice(newProduct.getDiscountPrice());
-        product.setDiscountStartDate(newProduct.getDiscountStartDate());
-        product.setDiscountEndDate(newProduct.getDiscountEndDate());
-
-        System.out.println(product.getStockList().size());
-
-        productRepository.save(product);
-        //productService.updateProduct(userDetails.getUsername(), product);
-    }
-
-     */
 
     @GetMapping("/seller/list")
     public Page<Map<String, Object>> sellerProducts(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable){
