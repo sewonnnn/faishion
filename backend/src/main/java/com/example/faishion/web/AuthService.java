@@ -130,7 +130,7 @@ public class AuthService {
         String tokenUrl = "https://kauth.kakao.com/oauth/token" +
                 "?grant_type=authorization_code" +
                 "&client_id=" + System.getenv("KAKAO_CLIENT_ID") +
-                "&redirect_uri=http://localhost:5173/oauthcallback" +
+                "&redirect_uri=" + System.getenv("KAKAO_REDIRECT_URI") +
                 "&code=" + code;
 
         Map tokenRes = rt.postForObject(tokenUrl, null, Map.class);
@@ -160,12 +160,13 @@ public class AuthService {
         return userRepo.findByProviderAndProviderUserId(AuthProvider.KAKAO, providerUserId)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setId(providerUserId); // ✅ 카카오 ID를 PK로 사용
+                    u.setId("KAKAO_" + providerUserId); // PK 충돌 방지
                     u.setProvider(AuthProvider.KAKAO);
                     u.setProviderUserId(providerUserId);
-                    u.setEmail(email);
+                    u.setEmail(email != null ? email : "no-email@kakao.com");
+                    u.setName(nickname != null ? nickname : "카카오사용자");
                     u.setName(nickname);
-                    u.setPhoneNumber("kakao");
+                    u.setPhoneNumber("010-0000-0000");
                     return userRepo.save(u);
                 });
     }
