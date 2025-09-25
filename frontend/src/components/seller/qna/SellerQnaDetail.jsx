@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Form, Button, Row, Col, Alert, Spinner } from "react-bootstrap";
-import axios from "axios";
 import {useAuth} from "../../../contexts/AuthContext.jsx";
 
 const SellerQnaDetail = () => {
@@ -12,7 +11,8 @@ const SellerQnaDetail = () => {
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const {api} = useAuth();
+    const { api } = useAuth();
+
     useEffect(() => {
         const fetchQnaDetail = async () => {
             try {
@@ -20,7 +20,6 @@ const SellerQnaDetail = () => {
                 console.log(response.data);
                 setQna(response.data);
 
-                // 이미 답변이 있다면, 답변 내용을 폼에 미리 채워넣기
                 if (response.data.answer) {
                     setAnswerText(response.data.answer);
                 }
@@ -32,7 +31,7 @@ const SellerQnaDetail = () => {
             }
         };
         fetchQnaDetail();
-    }, [id]);
+    }, [id, api]); // 'api'를 의존성 배열에 추가하여 린트 경고를 피합니다.
 
     const handleAnswerSubmit = async (e) => {
         e.preventDefault();
@@ -46,20 +45,19 @@ const SellerQnaDetail = () => {
         }
 
         try {
-            // Qna 엔티티의 answeredBy 필드에 해당하는 판매자 정보(현재 로그인한 판매자)를 백엔드에서 처리한다고 가정
-            const response = await axios.post(`http://localhost:8080/qna/${id}/answer`, {
+            // ✅ URL과 메소드를 백엔드 API에 맞게 수정
+            const response = await api.put(`/qna/answer/${id}`, {
                 answer: answerText,
             });
 
             if (response.status === 200) {
                 setMessage("답변이 성공적으로 등록되었습니다.");
                 // 답변이 성공하면 Q&A 상세 정보 새로고침
-                const updatedResponse = await axios.get(`http://localhost:8080/qna/${id}`);
+                const updatedResponse = await api.get(`/qna/${id}`);
                 setQna(updatedResponse.data);
             }
         } catch (error) {
             console.error("답변 등록 중 오류 발생:", error);
-            // 백엔드에서 보낸 에러 메시지가 있다면 사용
             const errorMessage = error.response?.data?.message || "답변 등록에 실패했습니다. 다시 시도해주세요.";
             setMessage(errorMessage);
         } finally {
@@ -101,13 +99,14 @@ const SellerQnaDetail = () => {
                     </span>
                 </Card.Header>
                 <Card.Body>
-                    <Card.Text>
+                    {/* ✅ <Card.Text>를 제거하고 <div>로 감싸서 HTML 구조 오류 해결 */}
+                    <div>
                         <p><strong>작성자:</strong> {qna.user_id}</p>
                         {qna.product && <p><strong>상품:</strong> {qna.productName}</p>}
                         <hr />
                         <strong>문의 내용:</strong>
                         <div dangerouslySetInnerHTML={{ __html: qna.content.replace(/\n/g, '<br />') }} className="p-3 border rounded bg-light mt-2" />
-                    </Card.Text>
+                    </div>
                 </Card.Body>
             </Card>
 

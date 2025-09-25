@@ -10,7 +10,12 @@ const ProductLiftInfo = ({ images }) => {
         <div className="ProductLiftInfo">
             <Row>
                 {/* 썸네일 이미지 컬럼 */}
-                <Col xs={2} className="d-flex flex-column gap-2">
+                <Col xs={2}
+                     className="d-flex flex-column gap-2 hide-scrollbar"
+                     style={{
+                         maxHeight: '520px',
+                         overflowY: 'auto'
+                     }}>
                     {images.map((img, index) => (
                         <Image
                             key={index}
