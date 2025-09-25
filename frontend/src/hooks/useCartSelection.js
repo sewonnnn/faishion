@@ -4,6 +4,7 @@ import axios from 'axios';
 const useCartSelection = (cartList, fetchCartData) => {
     // 선택된 상품 ID
     const [selectedItems, setSelectedItems] = useState([]);
+
     // 전체 선택 체크박스 상태
     const [isAllSelected, setIsAllSelected] = useState(false);
 

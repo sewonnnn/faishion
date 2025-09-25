@@ -62,7 +62,7 @@ public class QnaService {
 
     @Transactional
     public List<Qna> findByProduct_Id(Long productId) {
-        String currentUserId = "sewon"; // ✅ 임시 사용자 ID
+        String currentUserId = "sewon"; // 임시 사용자 ID
 
         // 상품 정보를 가져와 판매자 ID를 확인합니다.
         Product product = productRepository.findById(productId)

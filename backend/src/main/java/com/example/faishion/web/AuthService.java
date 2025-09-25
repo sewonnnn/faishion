@@ -92,7 +92,7 @@ public class AuthService {
         return userRepo.findByProviderAndProviderUserId(AuthProvider.NAVER, providerUserId)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setId(providerUserId); // ✅ 네이버 ID를 PK로 사용
+                    u.setId(providerUserId); // 네이버 ID를 PK로 사용
                     u.setProvider(AuthProvider.NAVER);
                     u.setProviderUserId(providerUserId);
                     u.setEmail(email);
@@ -140,7 +140,7 @@ public class AuthService {
         return userRepo.findByProviderAndProviderUserId(AuthProvider.KAKAO, providerUserId)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setId(providerUserId); // ✅ 카카오 ID를 PK로 사용
+                    u.setId(providerUserId); // 카카오 ID를 PK로 사용
                     u.setProvider(AuthProvider.KAKAO);
                     u.setProviderUserId(providerUserId);
                     u.setEmail(email);

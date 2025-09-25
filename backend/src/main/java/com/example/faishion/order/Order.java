@@ -43,7 +43,7 @@ public class Order {
     private Integer usedPoint; //주문에 사용된 포인트
      */
 
-    private String status; //주문 상태
+    private String status; // 주문 상태 (PENDING, COMPLETED, FAILED 등)
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItemList = new ArrayList<>();
@@ -57,4 +57,14 @@ public class Order {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    // ⭐⭐ 결제 연동을 위한 최소 필수 필드 추가 ⭐⭐
+    @Column(nullable = false, unique = true) // 토스페이먼츠와 통신할 고유 주문 ID
+    private String clientOrderId;
+
+    @Column(nullable = false) // 결제창에 표시될 주문명 (예: "상품명 외 N건")
+    private String orderName;
+
+    @Column(nullable = false) // 최종 결제 금액 (백엔드 검증에 필수)
+    private double totalAmount;
 }
