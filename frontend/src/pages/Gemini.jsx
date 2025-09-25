@@ -1,26 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react"; // useRef 추가
 import { Container, Row, Col, Form, Button, Image, Spinner } from "react-bootstrap";
-import { useParams, useSearchParams } from "react-router-dom";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import axios from "axios";
 import {useAuth} from "../contexts/AuthContext.jsx";
 
 const Gemini = () => {
+    // ... (기존 상태 및 훅 선언)
     const { productId } = useParams();
     const [searchParams] = useSearchParams();
     const [productImages, setProductImages] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
-    const [modelImageUrl, setModelImageUrl] = useState(null); // modelFile 대신 URL 상태로 변경
+    const [modelImageUrl, setModelImageUrl] = useState(null);
     const [resultImageUrl, setResultImageUrl] = useState("https://placehold.co/600x600/E5E7EB/A1A1AA?text=결과+이미지");
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
     const {api} = useAuth();
+    const nav = useNavigate();
+
+    // ⭐ useRef를 사용하여 첫 실행을 추적
+    const isMounted = useRef(false);
 
     useEffect(() => {
+        // Strict Mode에서 두 번 실행되는 것을 방지
+        if (isMounted.current) {
+            return;
+        }
+        isMounted.current = true;
+
         const fetchImages = async () => {
+            let userImageUrl = null;
+            let imageUrls = [];
+
             try {
                 const BASE_URL = "http://localhost:8080";
-                let imageUrls = [];
-                let userImageUrl = null;
                 const stockIds = searchParams.get("stockIds");
 
                 if (stockIds) {
@@ -44,13 +56,19 @@ const Gemini = () => {
                     }
                 }
 
+                // ⭐ 사용자 이미지 부재 시 알림/이동 (로직 자체는 유지)
+                if(!userImageUrl){
+                    alert("AI 스타일링을 위해서는 마이페이지에서 본인의 이미지를 등록해야합니다.");
+                    nav("/mypage/detail");
+                    return; // 함수 종료
+                }
+
+                // 정상 상태 업데이트
                 setProductImages(imageUrls);
-                setModelImageUrl(userImageUrl); // 사용자 이미지 URL을 모델 이미지 상태로 설정
+                setModelImageUrl(userImageUrl);
 
                 if (imageUrls.length === 0) {
                     setMessage("이미지 목록을 불러오는 데 실패했거나 이미지가 없습니다.");
-                } else if (!userImageUrl) {
-                    setMessage("사용자 이미지를 불러오는 데 실패했습니다.");
                 }
 
             } catch (error) {
@@ -60,8 +78,10 @@ const Gemini = () => {
         };
 
         fetchImages();
-    }, [productId, searchParams, api]);
+        // 의존성 배열은 그대로 유지하지만, Strict Mode 재실행은 useRef로 제어
+    }, [productId, searchParams, api, nav]);
 
+    // ... (나머지 handleImageToggle, getBase64, handleGenerateClick 함수는 동일)
     const handleImageToggle = (image) => {
         setSelectedImages(prevImages => {
             if (prevImages.includes(image)) {
@@ -102,7 +122,7 @@ const Gemini = () => {
             const modelBlob = await fetch(modelImageUrl).then(res => res.blob());
             const base64ModelImage = await getBase64(modelBlob);
 
-            const response = await axios.post("http://localhost:8080/gemini/generate-image", {
+            const response = await api.post("/gemini/generate-image", {
                 image1: base64Images,
                 image2: base64ModelImage,
             });

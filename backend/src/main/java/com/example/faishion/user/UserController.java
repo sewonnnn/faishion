@@ -30,7 +30,15 @@ public class UserController {
         String zipcode = "";
         String street = "";
         String detail = "";
-
+        int height;
+        int weight;
+        if(user.getHeight() != 0){
+            height = user.getHeight();
+            weight = user.getWeight();
+        }else{
+            height = 0;
+            weight = 0;
+        }
         // 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
         Optional<Address> defaultAddress = user.getAddressList().stream()
                 .filter(Address::getIsDefault)
@@ -43,13 +51,16 @@ public class UserController {
             detail = userAddress.getDetail();
         }
 
-        return ResponseEntity.ok(new UserUpdateDTO(user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getImage(), zipcode, street, detail));
+        return ResponseEntity.ok(new UserUpdateDTO(user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getImage(),height,weight, zipcode, street, detail));
     }
 
+    // 유저정보 업데이트
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserUpdateDTO userUpdateDTO) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        existingUser.setHeight(userUpdateDTO.getHeight());
+        existingUser.setWeight(userUpdateDTO.getWeight());
 
         // 사용자 기본 정보 업데이트 - 값이 있을 때만 업데이트
         if (userUpdateDTO.getName() != null) {

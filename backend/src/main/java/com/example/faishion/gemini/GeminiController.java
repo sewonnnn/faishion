@@ -51,6 +51,30 @@ public class GeminiController {
         return "index.html";
     }
 
+    /**
+     * 사용자 이미지 URL을 가져와 JSON 응답에 추가합니다.
+     * 이미지가 없는 경우 "userImageUrl" 속성에 null 값을 추가합니다.
+     * 이 유틸리티 메서드는 두 개의 GetMapping에서 모두 사용됩니다.
+     */
+    private void addUserImageUrl(JsonObject responseJson, UserDetails userDetails) {
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // 사용자 객체는 존재하지만, user.getImage()가 null일 수 있습니다.
+            if (user.getImage() != null) {
+                String userImageUrl = "/image/" + user.getImage().getId();
+                responseJson.addProperty("userImageUrl", userImageUrl);
+            } else {
+                // 사용자는 존재하지만 이미지가 없는 경우, null을 명시적으로 추가
+                responseJson.addProperty("userImageUrl", (String) null);
+            }
+        } else {
+            // 사용자를 찾을 수 없는 경우에도 null을 명시적으로 추가
+            responseJson.addProperty("userImageUrl", (String) null);
+        }
+    }
+
+
     @GetMapping("/{productId}")
     @ResponseBody // 상품 상세보기에서 바로 이동
     public String getProductImage(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -68,12 +92,10 @@ public class GeminiController {
         } else {
             responseJson.addProperty("error", "해당 상품의 재고를 찾을 수 없습니다.");
         }
-        // 사용자 이미지 URL 추가
-        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
-        if (userOptional.isPresent()) {
-            String userImageUrl = "/image/" + userOptional.get().getImage().getId();
-            responseJson.addProperty("userImageUrl", userImageUrl);
-        }
+
+        // ⭐ 사용자 이미지 URL 추가 로직 (수정)
+        addUserImageUrl(responseJson, userDetails);
+
         return gson.toJson(responseJson);
     }
 
@@ -115,19 +137,21 @@ public class GeminiController {
         }
         responseJson.add("imageUrls", imageUrlArray);
 
-        // 사용자 이미지 URL 추가
-        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
-        if (userOptional.isPresent()) {
-            String userImageUrl = "/image/" + userOptional.get().getImage().getId();
-            responseJson.addProperty("userImageUrl", userImageUrl);
-        }
+        // ⭐ 사용자 이미지 URL 추가 로직 (수정)
+        addUserImageUrl(responseJson, userDetails);
 
         return gson.toJson(responseJson);
     }
 
     @PostMapping("/generate-image")
     @ResponseBody
-    public String generateImage(@org.springframework.web.bind.annotation.RequestBody String requestBody) {
+    public String generateImage(@org.springframework.web.bind.annotation.RequestBody String requestBody, @AuthenticationPrincipal UserDetails userDetails) {
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        User user = new User();
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+
+        }
         if (apiKey == null || apiKey.isEmpty()) {
             return "{\"error\": \"API key is not configured or is invalid\"}";
         }
@@ -140,7 +164,7 @@ public class GeminiController {
             String prompt = "image1 is a full-body image of a person. All subsequent images (from image2 to imageX, up to six images)" +
                     " are fashion items, which can include clothing, accessories, footwear, or headwear. Create a single photorealistic " +
                     "full-body image of the person from image1 wearing and styled with all the fashion items from the other images. " +
-                    "The person should have a height of 180cm and a weight of 73kg, ensuring their body shape and " +
+                    "The person should have a height of "+user.getHeight()+"cm and a weight of "+user.getWeight()+"kg, ensuring their body shape and " +
                     "proportions are consistent with these measurements. Focus on seamless integration of all items, maintaining a realistic fit, " +
                     "natural proportions, high-quality textures, and appropriate lighting.";
 
