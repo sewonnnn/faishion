@@ -1,7 +1,7 @@
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useEffect, useState, useRef} from "react";
 import {Container, Card, Form, Button, Row, Col, Image as BootstrapImage} from 'react-bootstrap';
-import {FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight} from 'react-icons/fa';
+import {FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight, FaEye, FaEyeSlash} from 'react-icons/fa';
 import PostcodeSearch from "./PostcodeSearch.jsx";
 import defaultImage from "../../assets/user.jpg";
 import "../../pages/MyPage.css";
@@ -21,10 +21,13 @@ const MyPageDetail = () => {
         street: '',
         detail: '',
     });
-    // ⭐ 비밀번호 확인 상태 추가
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    // ⭐ 비밀번호 오류 메시지 상태 추가
     const [passwordError, setPasswordError] = useState('');
+    const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false);
+    // ⭐ 추가: 비밀번호 저장 완료 상태
+    const [isPasswordSaved, setIsPasswordSaved] = useState(false);
+    // ⭐ 추가: 비밀번호 가시성 상태
+    const [showPassword, setShowPassword] = useState(false);
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState('');
@@ -50,10 +53,10 @@ const MyPageDetail = () => {
                     street: userData.street,
                     detail: userData.detail,
                 });
-                // 기존 비밀번호 정보가 없으므로 비밀번호 확인도 빈 문자열로 설정
                 setPasswordConfirm('');
                 setPasswordError('');
-
+                setIsPasswordChangeMode(false);
+                setIsPasswordSaved(false); // 상태 초기화
 
                 if (userData.image && userData.image.id) {
                     setImagePreviewUrl(`${api.defaults.baseURL}/image/${userData.image.id}`);
@@ -72,14 +75,12 @@ const MyPageDetail = () => {
     const handleInputChange = (e) => {
         const {name, value} = e.target;
 
-        // 비밀번호 입력 시 오류 메시지 초기화
         if (name === 'password' || name === 'passwordConfirm') {
             setPasswordError('');
         }
 
         const updatedValue = (name === 'height' || name === 'weight') ? (value === '' ? '' : Number(value)) : value;
 
-        // ⭐ 비밀번호 확인 필드는 별도의 상태로 관리
         if (name === 'passwordConfirm') {
             setPasswordConfirm(value);
         } else {
@@ -119,20 +120,55 @@ const MyPageDetail = () => {
         }
     };
 
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setPasswordError(''); // 제출 시도 시 오류 메시지 초기화
+    // ⭐ 추가: 비밀번호 저장 버튼 핸들러
+    const handlePasswordSave = () => {
+        // 정규화: 문자, 숫자, 특수문자(@$!%*#?&) 포함 8자 이상
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
 
         if (formData.password !== passwordConfirm) {
             setPasswordError("비밀번호가 일치하지 않습니다.");
+            setIsPasswordSaved(false);
+            return;
+        }
+
+        if (!passwordRegex.test(formData.password)) {
+            setPasswordError("비밀번호는 8자 이상, 문자, 숫자, 특수문자를 포함해야 합니다.");
+            setIsPasswordSaved(false);
+            return;
+        }
+
+        // 유효성 검사 통과 시
+        setPasswordError("");
+        setIsPasswordSaved(true);
+    };
+
+    // ⭐ 추가: 비밀번호 재설정 버튼 핸들러
+    const handlePasswordReset = () => {
+      setIsPasswordSaved(false);
+      setFormData(prev => ({ ...prev, password: '' }));
+      setPasswordConfirm('');
+      setPasswordError('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setPasswordError('');
+
+        // 비밀번호 변경 모드인데 저장되지 않았을 경우 제출 방지
+        if (isPasswordChangeMode && !isPasswordSaved) {
+            alert("비밀번호를 먼저 저장해주세요.");
             return;
         }
 
         try {
             let updatedUserData = {...formData};
 
-            // 이미지 처리 로직 (생략 없음)
+            if (!isPasswordChangeMode || (isPasswordChangeMode && !isPasswordSaved)) {
+                // 비밀번호 변경 모드가 아니거나 저장되지 않았으면 비밀번호를 전송하지 않음
+                delete updatedUserData.password;
+            }
+
+            // 이미지 처리 로직
             if (selectedImage) {
                 const imageFormData = new FormData();
                 imageFormData.append('file', selectedImage);
@@ -148,7 +184,6 @@ const MyPageDetail = () => {
                 updatedUserData = { ...updatedUserData, image: null };
             }
 
-
             updatedUserData.zipcode = formData.zipcode;
             updatedUserData.street = formData.street;
             updatedUserData.detail = formData.detail;
@@ -156,7 +191,6 @@ const MyPageDetail = () => {
             await api.put(`/user/${updatedUserData.id}`, updatedUserData);
             alert("회원 정보가 성공적으로 수정되었습니다.");
 
-            // 수정 후 사용자 데이터를 다시 불러와 최신 상태로 반영
             const response = await api.get(`/user/`);
             setCustomer(response.data);
             if (response.data.image && response.data.image.id) {
@@ -168,8 +202,11 @@ const MyPageDetail = () => {
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
-            setPasswordConfirm(''); // 비밀번호 확인 초기화
-
+            // 수정 완료 후 상태 초기화
+            setPasswordConfirm('');
+            setFormData(prev => ({ ...prev, password: '' }));
+            setIsPasswordChangeMode(false);
+            setIsPasswordSaved(false);
 
         } catch (error) {
             console.error("회원 정보 수정 실패:", error.response ? error.response.data : error.message);
@@ -231,34 +268,87 @@ const MyPageDetail = () => {
                                     </div>
                                 </Form.Group>
 
-                                {/* 비밀번호 (필수 입력) */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>비밀번호 (*)</Form.Label>
-                                    <div className="input-group">
-                                        <div className="input-group-text"><FaLock /></div>
-                                        <Form.Control
-                                            type="password"
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                </Form.Group>
+                                {/* 비밀번호 입력 섹션 */}
+                                {isPasswordChangeMode ? (
+                                    isPasswordSaved ? (
+                                        <>
+                                            <Form.Group className="mb-3">
+                                                <div className="alert alert-success p-2 text-center" role="alert">
+                                                    비밀번호가 안전하게 저장되었습니다.
+                                                </div>
+                                            </Form.Group>
+                                            <Form.Group className="mb-3">
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    className="w-100"
+                                                    onClick={handlePasswordReset}
+                                                >
+                                                    비밀번호 재설정
+                                                </Button>
+                                            </Form.Group>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>비밀번호 (*)</Form.Label>
+                                                <div className="input-group">
+                                                    <div className="input-group-text"><FaLock /></div>
+                                                    <Form.Control
+                                                        type={showPassword ? 'text' : 'password'}
+                                                        name="password"
+                                                        value={formData.password}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                    <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+                                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                    </Button>
+                                                </div>
+                                            </Form.Group>
 
-                                {/* ⭐ 비밀번호 확인 (필수 입력) */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>비밀번호 확인 (*)</Form.Label>
-                                    <div className="input-group">
-                                        <div className="input-group-text"><FaLock /></div>
-                                        <Form.Control
-                                            type="password"
-                                            name="passwordConfirm"
-                                            value={passwordConfirm}
-                                            onChange={handleInputChange}
-                                            isInvalid={!!passwordError} // 오류 메시지가 있으면 빨간색 테두리
-                                        />
-                                    </div>
-                                </Form.Group>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>비밀번호 확인 (*)</Form.Label>
+                                                <div className="input-group">
+                                                    <div className="input-group-text"><FaLock /></div>
+                                                    <Form.Control
+                                                        type={showPassword ? 'text' : 'password'}
+                                                        name="passwordConfirm"
+                                                        value={passwordConfirm}
+                                                        onChange={handleInputChange}
+                                                        isInvalid={!!passwordError}
+                                                        required
+                                                    />
+                                                    <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+                                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                    </Button>
+                                                </div>
+                                                <Form.Control.Feedback type="!invalid">
+                                                    {passwordError}
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                            <Form.Group className="mb-3">
+                                                <Button
+                                                    variant="primary"
+                                                    className="w-100"
+                                                    onClick={handlePasswordSave}
+                                                >
+                                                    비밀번호 저장
+                                                </Button>
+                                            </Form.Group>
+                                        </>
+                                    )
+                                ) : (
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>비밀번호</Form.Label>
+                                        <Button
+                                            variant="outline-secondary"
+                                            className="w-100"
+                                            onClick={() => setIsPasswordChangeMode(true)}
+                                        >
+                                            비밀번호 변경
+                                        </Button>
+                                    </Form.Group>
+                                )}
 
                                 {/* 이름 */}
                                 <Form.Group className="mb-3">

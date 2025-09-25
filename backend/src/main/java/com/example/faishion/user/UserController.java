@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder; // ⭐추가
 import org.springframework.web.bind.annotation.*;
 import com.example.faishion.address.Address;
 import java.util.Optional;
@@ -20,7 +21,8 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-    private final AddressService addressService; // 수정: AddressService 주입
+    private final AddressService addressService;
+    private final PasswordEncoder passwordEncoder; // ⭐ 추가: PasswordEncoder 주입
 
     @GetMapping("/")
     public ResponseEntity<UserUpdateDTO> tokenUser(@AuthenticationPrincipal UserDetails userDetails) {
@@ -39,6 +41,7 @@ public class UserController {
             height = 0;
             weight = 0;
         }
+
         // 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
         Optional<Address> defaultAddress = user.getAddressList().stream()
                 .filter(Address::getIsDefault)
@@ -59,6 +62,14 @@ public class UserController {
     public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserUpdateDTO userUpdateDTO) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        // ⭐ 비밀번호 업데이트 로직 추가
+        // DTO에 비밀번호가 존재하고 비어있지 않은 경우에만 암호화하여 저장
+        if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
+            existingUser.setPwHash(hashedPassword);
+        }
+
         existingUser.setHeight(userUpdateDTO.getHeight());
         existingUser.setWeight(userUpdateDTO.getWeight());
 
@@ -72,9 +83,8 @@ public class UserController {
         if (userUpdateDTO.getPhoneNumber() != null) {
             existingUser.setPhoneNumber(userUpdateDTO.getPhoneNumber());
         }
-        // 비밀번호 업데이트는 별도 로직이 필요하며, 보안을 위해 현재 예시에서는 제외
 
-        // 이미지 업데이트 로직 - 이미지 정보가 null이 아닐 때만 업데이트
+        // 이미지 업데이트 로직
         if (userUpdateDTO.getImage() != null) {
             if (userUpdateDTO.getImage().getId() != null) {
                 Image image = imageRepository.findById(userUpdateDTO.getImage().getId())
@@ -84,12 +94,14 @@ public class UserController {
                 // 이미지가 null이고 ID도 없으면 이미지 삭제로 판단
                 existingUser.setImage(null);
             }
+        } else if (existingUser.getImage() != null) {
+            // DTO의 이미지가 null인데 기존 사용자는 이미지가 있는 경우, 기존 이미지를 삭제
+            existingUser.setImage(null);
         }
 
         userRepository.save(existingUser);
 
-        // 주소 업데이트 로직은 AddressService에 위임 (이미 구현된 대로 작동)
-        // 주소 필드는 프론트엔드에서 항상 빈 문자열로라도 전송되므로 null 체크는 필요 없습니다.
+        // 주소 업데이트 로직은 AddressService에 위임
         addressService.updateOrCreateDefaultAddress(
                 id,
                 userUpdateDTO.getZipcode(),
