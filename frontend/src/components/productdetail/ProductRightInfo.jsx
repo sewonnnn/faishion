@@ -265,7 +265,6 @@ const ProductRightInfo = ({ productId, product }) => {
                                 <Form.Control
                                     aria-label="Quantity"
                                     value={option.quantity}
-                                    readOnly
                                     className="text-center"
                                 />
                                 <Button variant="outline-secondary" onClick={() => handleQuantityChange(index, 1)}>+</Button>

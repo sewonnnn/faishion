@@ -5,7 +5,11 @@ import com.example.faishion.cart.CartRepository;
 import com.example.faishion.image.Image;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
+import com.example.faishion.user.User;
+import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +37,7 @@ public class GeminiController {
 
     private final StockRepository stockRepository;
     private final CartRepository cartRepository;
+    private final UserRepository userRepository;
     private final OkHttpClient client = new OkHttpClient.Builder()
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
@@ -47,8 +52,8 @@ public class GeminiController {
     }
 
     @GetMapping("/{productId}")
-    @ResponseBody
-    public String getProductImage(@PathVariable Long productId) {
+    @ResponseBody // 상품 상세보기에서 바로 이동
+    public String getProductImage(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
         List<Stock> stocks = stockRepository.findByProductId(productId);
         JsonObject responseJson = new JsonObject();
         if (!stocks.isEmpty()) {
@@ -63,27 +68,13 @@ public class GeminiController {
         } else {
             responseJson.addProperty("error", "해당 상품의 재고를 찾을 수 없습니다.");
         }
-        return gson.toJson(responseJson);
-    }
-
-    @GetMapping("/cart")
-    @ResponseBody
-    public String getCartImages() {
-        JsonArray cartItems = new JsonArray();
-        String[] productIds = {"1", "2", "3"};
-        String[] imageUrls = {
-                "https://placehold.co/150x150/FFC0CB/000000?text=핑크+드레스",
-                "https://placehold.co/150x150/ADD8E6/000000?text=파란색+자켓",
-                "https://placehold.co/150x150/90EE90/000000?text=초록색+티셔츠"
-        };
-        for (int i = 0; i < productIds.length; i++) {
-            JsonObject productJson = new JsonObject();
-            productJson.addProperty("imageUrl", imageUrls[i]);
-            JsonObject itemJson = new JsonObject();
-            itemJson.add("product", productJson);
-            cartItems.add(itemJson);
+        // 사용자 이미지 URL 추가
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (userOptional.isPresent()) {
+            String userImageUrl = "/image/" + userOptional.get().getImage().getId();
+            responseJson.addProperty("userImageUrl", userImageUrl);
         }
-        return gson.toJson(cartItems);
+        return gson.toJson(responseJson);
     }
 
     @GetMapping("/cart-stocks")
@@ -109,19 +100,28 @@ public class GeminiController {
     }
 
     @GetMapping("/cart-images")
-    @ResponseBody
-    public String getProductImagesFromStockIds(@RequestParam List<Long> ids) {
+    @ResponseBody // 카트에 담아서 AI 이동
+    public String getProductImagesFromStockIds(@RequestParam List<Long> ids, @AuthenticationPrincipal UserDetails userDetails) {
         List<Stock> stocks = stockRepository.findAllByIdIn(ids);
         List<String> imageUrls = stocks.stream()
                 .filter(stock -> stock.getImage() != null)
                 .map(stock -> "/image/" + stock.getImage().getId())
                 .collect(Collectors.toList());
+
         JsonObject responseJson = new JsonObject();
         JsonArray imageUrlArray = new JsonArray();
         for (String url : imageUrls) {
             imageUrlArray.add(url);
         }
         responseJson.add("imageUrls", imageUrlArray);
+
+        // 사용자 이미지 URL 추가
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (userOptional.isPresent()) {
+            String userImageUrl = "/image/" + userOptional.get().getImage().getId();
+            responseJson.addProperty("userImageUrl", userImageUrl);
+        }
+
         return gson.toJson(responseJson);
     }
 

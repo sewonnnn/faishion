@@ -20,7 +20,6 @@ const ProductCard = ({ product }) => {
         isExclusive,
         isRecommend,
         brandName,
-        hasCoupon,
         reviewRating,
         reviewCount
     } = product;
@@ -44,7 +43,6 @@ const ProductCard = ({ product }) => {
                 <Card.Title className="product-brand mb-1">{brandName}</Card.Title>
                 <Card.Text className="product-name mb-1">{name}</Card.Text>
 
-                가격 정보
                 <div className="price-info d-flex align-items-center mb-1">
                     {discountRate && (
                         <span className="discount-rate me-2">{discountRate}%</span>
@@ -57,7 +55,6 @@ const ProductCard = ({ product }) => {
 
                 {/* 쿠폰, 리뷰 정보 등 */}
                 <div className="d-flex align-items-center mb-1">
-                    {hasCoupon && <div className="coupon-badge me-2">쿠폰</div>}
                     <span className="rating-info text-muted">
                         <BsStarFill className="star-icon me-1" />
                         {reviewRating ? reviewRating.toFixed(1) : '0.0'}점 ({reviewCount})

@@ -96,11 +96,9 @@ public class ProductController {
                     Map<String, Object> map = new LinkedHashMap<>();
                     Product p = (Product) objects[0];
                     map.put("productId", p.getId());
-
-                    map.put("brandName", "브랜드명");//임시
+                    map.put("brandName", p.getSeller().getBusinessName());
                     map.put("isExclusive", true);//임시
                     map.put("isRecommend", true);//임시
-                    map.put("hasCoupon", true);//임시
 
                     LocalDateTime now = LocalDateTime.now();
                     boolean isDiscounting = p.getDiscountStartDate() != null && p.getDiscountEndDate() != null && now.isAfter(p.getDiscountStartDate()) && now.isBefore(p.getDiscountEndDate());

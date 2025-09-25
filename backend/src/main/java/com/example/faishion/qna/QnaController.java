@@ -85,22 +85,55 @@ public class QnaController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<QnaResponseDTO>> getQuestionsByProductId(@PathVariable Long productId) {
-        // qnaService에 상품 ID를 전달하여 해당 상품의 문의만 가져옵니다.
+    public ResponseEntity<List<QnaResponseDTO>> getQuestionsByProductId(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
         List<Qna> questions = qnaService.findByProduct_Id(productId);
+        String currentUsername = (userDetails != null) ? userDetails.getUsername() : null; // 현재 로그인된 사용자 ID (username)
 
-        // Qna 엔티티 리스트를 QnaResponseDTO 리스트로 변환
         List<QnaResponseDTO> responseDTOs = questions.stream()
                 .map(qna -> {
-                    String userName = (qna.getUser() != null) ? qna.getUser().getName() : "익명";
-                    return new QnaResponseDTO(
-                            qna.getId(),
-                            userName,
-                            qna.getTitle(),
-                            qna.getContent(),
-                            qna.isSecret(),
-                            qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-                    );
+                    String userName = (qna.getUser() != null) ? qna.getUser().getId() : "익명";
+                    boolean isUserLoggedIn = (currentUsername != null);
+                    boolean isAuthor = isUserLoggedIn && qna.getUser() != null && currentUsername.equals(qna.getUser().getId());
+                    // 비밀글인 경우
+                    if (qna.isSecret()) {
+                        if (isAuthor) {
+                            // 현재 사용자가 글 작성자인 경우, 제목과 내용 모두 보여줌
+                            return new QnaResponseDTO(
+                                    qna.getId(),
+                                    userName,
+                                    qna.getTitle(),
+                                    qna.getContent(),
+                                    qna.getAnswer(),
+                                    true,
+                                    qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                                    true
+                            );
+                        } else {
+                            // 다른 사용자의 비밀글은 내용과 제목 숨김 처리
+                            return new QnaResponseDTO(
+                                    qna.getId(),
+                                    userName,
+                                    "비밀글입니다",
+                                    "🔒 비밀글입니다. 작성자만 열람할 수 있습니다.",
+                                    qna.getAnswer(),
+                                    true,
+                                    qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                                    false
+                            );
+                        }
+                    } else {
+                        // 비밀글이 아닌 경우
+                        return new QnaResponseDTO(
+                                qna.getId(),
+                                userName,
+                                qna.getTitle(),
+                                qna.getContent(),
+                                qna.getAnswer(),
+                                false,
+                                qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                                isAuthor
+                        );
+                    }
                 })
                 .collect(Collectors.toList());
 
@@ -118,9 +151,8 @@ public class QnaController {
             if (!userOptional.isPresent()) {
                 return ResponseEntity.ok("로그인된 유저가 없습니다.");
             }
-
+            System.out.println(qnaSaveDTO.isSecret()); // < 여기가 false로 나와 체크해서 보내도
             User user = userOptional.get();
-
             Qna qna = new Qna();
             qna.setTitle(qnaSaveDTO.getTitle());
             qna.setContent(qnaSaveDTO.getContent());
