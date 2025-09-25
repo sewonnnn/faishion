@@ -1,102 +1,71 @@
-.product-card-container {
-    padding: 20px;
-}
+/* ProductCard.css */
 
 .product-card {
+    /* 기존 스타일 유지 */
+    /* height: 100%; */
+
+    /* 1. 기본 입체감 부여 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약한 그림자 */
+
+    /* 2. 호버 효과를 위한 부드러운 전환 설정 */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    /* 카드 클릭 커서 표시 */
     cursor: pointer;
 }
 
-/* ✨ 수정된 부분 */
+/* 3. 마우스 호버 시 효과 추가 */
+.product-card:hover {
+    /* 카드를 살짝 위로 들어 올리는 효과 */
+    transform: translateY(-5px);
+
+    /* 그림자를 더 진하게 하여 입체감 강조 */
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+
 .card-img-wrapper {
     position: relative;
+    height: 300px; /* 고정 높이 설정 */
     overflow: hidden;
-    border-radius: 0.25rem;
-    width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
-    padding-top: 100%; /* 너비와 동일한 높이를 위한 꼼수 (1:1 비율) */
 }
 
-/* ✨ 수정된 부분 */
-.product-card .card-img-top {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* React-Bootstrap의 Card.Img 컴포넌트에 적용되는 클래스 */
+.card-img-wrapper .card-img-top {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 이미지가 비율을 유지하며 부모를 꽉 채우도록 설정 */
-    transition: transform 0.3s ease;
+    object-fit: cover;
 }
 
-.product-card:hover .card-img-top {
-    transform: scale(1.05); /* 마우스 오버 시 이미지 확대 효과 */
-}
-
-/* 상품 이미지 위에 오버레이 되는 배지 */
-.exclusive-badge,
-.recommend-badge {
+/* 배지 관련 스타일 (변경 없음) */
+.badge-overlay {
     position: absolute;
     top: 10px;
     left: 10px;
-    padding: 4px 8px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #555;
-    border-radius: 3px;
     z-index: 10;
+    display: flex;
+    gap: 5px;
 }
 
-.recommend-badge {
-    background-color: #e50012; /* 빨간색 추천 배지 */
-}
-
-/* 상품 정보 텍스트 스타일 */
-.product-brand {
-    font-size: 0.9rem;
+.badge-overlay > div {
+    /* 공통 배지 스타일 */
+    padding: 3px 8px;
+    font-size: 12px;
     font-weight: bold;
-    color: #555;
-}
-
-.product-name {
-    font-size: 0.85rem;
-    color: #333;
-}
-
-/* 가격 정보 스타일 */
-.price-info {
-    font-size: 1rem;
-}
-
-.discount-rate {
-    font-size: 1rem;
-    color: #e50012;
-    font-weight: bold;
-}
-
-.final-price {
-    font-size: 1rem;
-    color: #000;
-}
-
-.original-price {
-    font-size: 0.8rem;
-    text-decoration: line-through;
-}
-
-/* 쿠폰 및 리뷰 정보 */
-.coupon-badge {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border: 1px solid #e50012;
-    color: #e50012;
+    color: white;
     border-radius: 3px;
-    font-weight: bold;
+    white-space: nowrap;
 }
 
-.rating-info {
-    font-size: 0.8rem;
-    color: #666;
+.badge-new {
+    background-color: #007bff;
 }
 
-.bi-star-fill {
-    color: #f7a049;
+.badge-sale {
+    background-color: #dc3545;
+}
+
+.badge-best {
+    background-color: #ffc107;
+    color: #343a40;
 }

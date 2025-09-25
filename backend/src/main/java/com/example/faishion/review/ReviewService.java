@@ -25,6 +25,15 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ImageService imageService;
 
+    // 리뷰 평균 찾기
+    public Optional<Double> findRatingAverage(Long productId) {
+        return reviewRepository.findAverageRatingByProductId(productId);
+    }
+
+    // 리뷰 갯수 찾기
+    public Optional<Integer> findCountByProductId(Long productId) {
+        return reviewRepository.findCountByProductId(productId);
+    }
     // 리뷰 아이디로 리뷰 찾기
     public Review findById(Long id) {
         return reviewRepository.findById(id).orElse(null);

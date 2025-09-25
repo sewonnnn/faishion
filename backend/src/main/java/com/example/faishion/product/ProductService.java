@@ -2,6 +2,7 @@ package com.example.faishion.product;
 
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageService;
+import com.example.faishion.review.Review;
 import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
@@ -13,9 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +26,6 @@ public class ProductService {
     private final StockRepository stockRepository;
     private final ImageService imageService;
 
-    public List<Product> findAllById(Long id){return productRepository.findAllById(id);}
     public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
         return productRepository.sellerProducts(pageable);
     }
@@ -76,4 +75,35 @@ public class ProductService {
         productRepository.save(savedProduct);
     }
 
+    // 카테고리 타입에 맞는 상품 불러오기
+    public List<Product> findAllByType(String type){
+        List<Product> products = new ArrayList<>();
+        switch(type){
+            case "sale": // 할인가격이 있는 상품만 불러오기
+                products = productRepository.findByDiscountPriceIsNotNullAndDiscountPriceGreaterThan(0);
+                break;
+            case "new": // 상품등록 3일 이내인 상품
+                LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+                products = productRepository.findByCreatedAtAfter(threeDaysAgo);
+                break;
+            case "best": // 리뷰점수가 4점 이상인 상품
+                products = productRepository.findBestProducts();
+                break;
+            default:
+                break;
+        }
+        return products;
+    }
+
+    // 상품의 평균 리뷰가 4점이상인지 확인
+    public boolean findBestProduct(Set<Review> reviewList) {
+        double rating = 0;
+        int count = 0;
+        for(Review review : reviewList){
+            rating += review.getRating();
+            count += 1;
+        }
+
+        return (rating/count) >= 4;
+    }
 }
