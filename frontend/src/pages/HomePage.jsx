@@ -1,5 +1,5 @@
 import React from 'react';
-import ImageSplitView from '../components/common/home/ImageSplitView';
+import ImageSplitView from '../components/home/ImageSplitView';
 
 function HomePage() {
   return (
