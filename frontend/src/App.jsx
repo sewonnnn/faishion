@@ -39,7 +39,6 @@ import LoginSuccessPage from "./pages/LoginSuccessPage.jsx";
 import NoticeFormPage from "./pages/NoticeFormPage.jsx";
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import {PaymentCheckoutPage} from "./pages/tossPay/PaymentCheckoutPage.jsx";
-import SellerProductEditFormPage from "./pages/seller/SellerProductEditFormPage.jsx";
 
 function Layout() {
     return (
@@ -130,7 +129,7 @@ function App() {
                     <Route path="/seller/product/list" element={<SellerProductListPage />} />   {/*판매자 상품 목록 페이지*/}
                     <Route path="/seller/product/:productId" element={<SellerProductDetailPage />} />   {/*판매자 상품 상세 조회 페이지*/}
                     <Route path="/seller/product/new" element={<SellerProductFormPage />} />   {/*판매자 상품 등록 폼 페이지*/}
-                    <Route path="/seller/product/edit" element={<SellerProductEditFormPage />}/>  {/*판매자 상품 편집 폼 페이지*/}
+                    <Route path="/seller/product/edit" element={<SellerProductFormPage />}/>  {/*판매자 상품 편집 폼 페이지*/}
                 </Route>
              </Route>
 

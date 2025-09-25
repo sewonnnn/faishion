@@ -75,4 +75,44 @@ public class ProductService {
         productRepository.save(savedProduct);
     }
 
+
+    public void updateProduct(String username, Product product, List<MultipartFile> mainImages, List<MultipartFile> detailImages, List<Stock> stocks, List<MultipartFile> stockImages, List<Long> deletedMainImageIds, List<Long> deletedDetailImageIds, List<Long> deletedStockIds) {
+        System.out.println(mainImages);
+        System.out.println(detailImages);
+        System.out.println(mainImages);
+        System.out.println(detailImages);
+        System.out.println(stocks);
+        System.out.println(stockImages);
+        System.out.println(deletedMainImageIds);
+        System.out.println(deletedDetailImageIds);
+        System.out.println(deletedStockIds);
+
+
+        /*
+        // TODO: **판매자 권한 검증 로직 추가 (필수)**
+        // if (!existingProduct.getSeller().getUsername().equals(sellerUsername)) {
+        //     throw new AccessDeniedException("상품을 수정할 권한이 없습니다.");
+        // }
+
+        // 2. 상품 기본 정보 업데이트 (Dirty Checking)
+        existingProduct.updateDetails(updatedProduct);
+        // Category는 ID만 넘어오므로, 필요하다면 CategoryRepository를 통해 Entity를 조회하여 설정해야 합니다.
+        // existingProduct.setCategory(categoryRepository.findById(updatedProduct.getCategory().getId()).orElse(null));
+        // Save를 명시적으로 하지 않아도 @Transactional에 의해 변경사항이 DB에 반영됩니다.
+
+        // 3. 이미지 삭제 처리
+        deleteImages(deletedMainImageIds);
+        deleteImages(deletedDetailImageIds);
+        // 재고 이미지 ID는 재고 ID를 통해 삭제되므로 여기서는 생략.
+
+        // 4. 재고 업데이트 및 이미지 처리
+        updateStocks(existingProduct, stocks, stockImages, deletedStockIds);
+
+        // 5. 새로운/교체된 대표/상세 이미지 저장 및 연결
+        saveAndConnectImages(existingProduct, mainImages, ProductImage.ImageType.MAIN);
+        saveAndConnectImages(existingProduct, detailImages, ProductImage.ImageType.DETAIL);
+
+         */
+
+    }
 }

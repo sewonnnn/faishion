@@ -41,14 +41,32 @@ public class ProductController {
     @PostMapping
     void createProduct(@AuthenticationPrincipal UserDetails userDetails,
                        @RequestPart("product") Product product,
+                       @RequestPart("mainInfos") List<ProductImageInfoDTO> mainInfos,
                        @RequestPart("mainImages") List<MultipartFile> mainImages,
+                       @RequestPart("detailInfos") List<ProductImageInfoDTO> detailInfos,
                        @RequestPart("detailImages") List<MultipartFile> detailImages,
-                       @RequestPart("stockList") List<Stock> stockList,
+                       @RequestPart("stocks") List<Stock> stocks,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
-        productService.createProduct(userDetails.getUsername(), product, mainImages, detailImages, stockList, stockImages);
+        productService.createProduct(userDetails.getUsername(), product, mainImages, detailImages, stocks, stockImages);
     }
 
+    @PutMapping
+    void updateProduct(@AuthenticationPrincipal UserDetails userDetails,
+                       @RequestPart("product") Product product,
+                       @RequestPart("mainInfos") List<ProductImageInfoDTO> mainInfos,
+                       @RequestPart(value = "mainImages", required = false) List<MultipartFile> mainImages,
+                       @RequestPart("detailInfos") List<ProductImageInfoDTO> detailInfos,
+                       @RequestPart(value = "detailImages", required = false) List<MultipartFile> detailImages,
+                       @RequestPart("stocks") List<Stock> stocks,
+                       @RequestPart("stockInfos") List<ProductImageInfoDTO> stockInfos,
+                       @RequestPart(value = "stockImages", required = false) List<MultipartFile> stockImages,
+                       @RequestPart(value = "deletedMainImageIds", required = false) List<Long> deletedMainImageIds,
+                       @RequestPart(value = "deletedDetailImageIds", required = false) List<Long> deletedDetailImageIds,
+                       @RequestPart(value = "deletedStockIds", required = false) List<Long> deletedStockIds) throws IOException {
+        productService.updateProduct(userDetails.getUsername(), product, mainImages, detailImages, stocks, stockImages, deletedMainImageIds, deletedDetailImageIds, deletedStockIds);
+    }
 
+    /*
     private final ProductRepository productRepository;
     @PutMapping
     void updateProduct(@AuthenticationPrincipal UserDetails userDetails,
@@ -70,6 +88,8 @@ public class ProductController {
         productRepository.save(product);
         //productService.updateProduct(userDetails.getUsername(), product);
     }
+
+     */
 
     @GetMapping("/seller/list")
     public Page<Map<String, Object>> sellerProducts(@AuthenticationPrincipal UserDetails userDetails, Pageable pageable){

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
 import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
@@ -9,33 +9,51 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 
 // 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
 const createFileImageObj = (file) => ({ id: null, file: file, url: null });
+const updateFileImageObj = (id, file) => ({ id : id, file : file, url : null});
+const createUrlImageObj = (id) => ({ id: id, file: null, url: `http://localhost:8080/image/${id}` });
+const createStockImageObj = (stock) => ({
+    id: stock.id || null, // 재고 ID
+    quantity: stock.quantity || 0,
+    color: stock.color || '',
+    size: stock.size || '',
+    image: createUrlImageObj(stock.image)
+});
 
 const SellerProductFormPage = () => {
+    const location = useLocation();
     const navigate = useNavigate();
+
+    // 백엔드에서 받은 데이터 구조에 맞춰 product, imageList, stockList를 가져옵니다.
+    const { product: initialProduct } = location.state || {};
+
+    // 1. 초기 상태 설정: 객체 구조를 통일합니다.
     const [product, setProduct] = useState({
-        name: '',
-        status: 1,
-        description: '',
-        price: '',
-        category: null,
-        discountPrice: '',
-        discountStartDate: '',
-        discountEndDate: '',
-        // 이미지 객체는 { id: null, file: File, url: null } 형태로 관리
-        mainImages: [],
-        detailImages: [],
-        // 재고 객체는 { id: null, quantity: 0, color: '', size: '', image: ImageObject } 형태로 관리
-        stocks: [],
+        id: initialProduct?.id || null,
+        name: initialProduct?.name || '',
+        status: initialProduct?.status || 1,
+        description: initialProduct?.description || '',
+        price: initialProduct?.price || '',
+        category: initialProduct?.category || null,
+        discountPrice: initialProduct?.discountPrice || '',
+        discountStartDate: initialProduct?.discountStartDate || '',
+        discountEndDate: initialProduct?.discountEndDate || '',
+        // 이미지 목록 초기화: 기존 URL/ID를 객체 형태로 변환
+        mainImages: (initialProduct?.mainImageList || []).map(img => createUrlImageObj(img)),
+        detailImages: (initialProduct?.detailImageList || []).map(img => createUrlImageObj(img)),
+        // 재고 목록 초기화: 재고 객체와 재고 이미지 객체로 변환 (count -> quantity)
+        stocks: (initialProduct?.stockList || []).map(createStockImageObj),
     });
 
-    useEffect(()=>{
-        console.log(product);
-    }, [product]);
-
     const [categoryGroups, setCategoryGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState(String(initialProduct?.category?.categoryGroup?.id || ''));
+    const [selectedCategory, setSelectedCategory] = useState(String(initialProduct?.category?.id || ''));
     const { api } = useAuth();
+
+    const [deletedImageIds, setDeletedImageIds] = useState({
+        main: [],
+        detail: [],
+        stock: [],
+    });
 
     useEffect(() => {
         const fetchCategoryGroups = async () => {
@@ -135,17 +153,26 @@ const SellerProductFormPage = () => {
 
     // 이미지 삭제: (ID 관리가 필요 없어 단순 제거)
     const handleRemoveMainImage = (index) => {
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            mainImages: prevProduct.mainImages.filter((_, i) => i !== index),
-        }));
+        setProduct((prevProduct) => {
+            const removedImage = prevProduct.mainImages[index];
+            if (removedImage.id !== null) {
+                setDeletedImageIds(prevDeleted => ({
+                    ...prevDeleted,
+                    main: [...prevDeleted.main, removedImage.id],
+                }));
+            }
+            return {
+                ...prevProduct,
+                mainImages: prevProduct.mainImages.filter((_, i) => i !== index),
+            };
+        });
     };
 
     // 이미지 교체: 새 파일 객체로 대체
     const handleReplaceMainImage = (index, newFile) => {
         setProduct((prevProduct) => {
             const newMainImages = [...prevProduct.mainImages];
-            newMainImages[index] = createFileImageObj(newFile);
+            newMainImages[index] = updateFileImageObj(newMainImages[index].id, newFile);
             return {
                 ...prevProduct,
                 mainImages: newMainImages,
@@ -174,7 +201,7 @@ const SellerProductFormPage = () => {
     const handleReplaceDetailImage = (index, newFile) => {
         setProduct((prevProduct) => {
             const newDetailImages = [...prevProduct.detailImages];
-            newDetailImages[index] = createFileImageObj(newFile);
+            newDetailImages[index] = updateFileImageObj(newDetailImages[index].id, newFile);
             return {
                 ...prevProduct,
                 detailImages: newDetailImages,
@@ -208,7 +235,6 @@ const SellerProductFormPage = () => {
     };
 
     const handleUpdateStockItem = (index, key, value) => {
-        // count 대신 quantity 사용하도록 통일
         const stockKey = key === 'count' ? 'quantity' : key;
         setProduct((prevProduct) => ({
             ...prevProduct,
@@ -224,7 +250,7 @@ const SellerProductFormPage = () => {
             const newStocks = [...prevProduct.stocks];
             newStocks[index] = {
                 ...newStocks[index],
-                image: createFileImageObj(newFile)
+                image: updateFileImageObj(newStocks[index].id ,newFile)
             };
             return {
                 ...prevProduct,
@@ -238,7 +264,7 @@ const SellerProductFormPage = () => {
         e.preventDefault();
         const price = Number(product.price);
         const discountPrice = Number(product.discountPrice);
-        const { discountStartDate, discountEndDate, stocks, category } = product;
+        const { discountStartDate, discountEndDate, category } = product;
 
         if (!category) {
             alert('상품 카테고리를 선택해야 합니다.');
@@ -266,16 +292,15 @@ const SellerProductFormPage = () => {
             alert('할인 금액은 상품 가격보다 클 수 없습니다. 상품 정보를 다시 확인해주세요.');
             return;
         }
-        for (const stock of stocks) {
+        for (const stock of product.stocks) {
             if (stock.color.trim() === '' || stock.size.trim() === '') {
                 alert('모든 재고에 대한 색상과 사이즈를 입력해야 합니다.');
                 return;
             }
         }
-
         const formData = new FormData();
-
         const productData = {
+            id: product.id,
             name: product.name,
             status: product.status,
             description: product.description,
@@ -287,33 +312,67 @@ const SellerProductFormPage = () => {
         };
         formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
-        // 이미지 객체에서 'file'만 추출하여 FormData에 추가
-        product.mainImages.forEach((imageObj) => {
-            formData.append('mainImages', imageObj.file);
-        });
-
-        product.detailImages.forEach((imageObj) => {
-            formData.append('detailImages', imageObj.file);
-        });
-
-        // 재고 객체에서 'quantity' 사용 및 이미지 파일 추출
-        const stockData = product.stocks.map(stock => ({
-            quantity: stock.quantity, // count -> quantity로 통일
-            color: stock.color,
-            size: stock.size,
+        const mainImagesWithFile = product.mainImages.filter(img => img.file);
+        const mainInfos = mainImagesWithFile.map((mainInfo, idx) => ({
+            imageId : mainInfo.id,
+            imageFileIdx : mainImagesWithFile.findIndex(img => img.id === mainInfo.id || img.file === mainInfo.file) // 파일이 있는 경우에만 index를 부여하도록 수정
         }));
-        formData.append('stockList', new Blob([JSON.stringify(stockData)], { type: 'application/json' }));
+        formData.append('mainInfos', new Blob([JSON.stringify(mainInfos)], { type: 'application/json' }));
+        mainImagesWithFile.forEach((image) => {
+            formData.append('mainImages', image.file);
+        });
 
-        product.stocks.forEach((stock) => {
+        const detailImagesWithFile = product.detailImages.filter(img => img.file);
+        const detailInfos = detailImagesWithFile.map((detailInfo, idx) => ({
+            imageId : detailInfo.id,
+            imageFileIdx : detailImagesWithFile.findIndex(img => img.id === detailInfo.id || img.file === detailInfo.file)
+        }));
+        formData.append('detailInfos', new Blob([JSON.stringify(detailInfos)], { type: 'application/json' }));
+        detailImagesWithFile.forEach((image) => {
+            formData.append('detailImages', image.file);
+        });
+        const stocksPayload = product.stocks.map((stock) => ({
+            id : stock.id,
+            quantity: stock.quantity,
+            color: stock.color,
+            size: stock.size
+        }));
+        formData.append('stocks', new Blob([JSON.stringify(stocksPayload)], { type: 'application/json' }));
+        const stocksWithFile = product.stocks.filter(stock => stock.image.file);
+        const stockInfos = stocksWithFile.map((stock, idx) => ({
+            imageId : stock.image.id,
+            imageFileIdx : idx
+        }));
+        formData.append('stockInfos', new Blob([JSON.stringify(stockInfos)], { type: 'application/json' }));
+        stocksWithFile.forEach((stock)=>{
             formData.append('stockImages', stock.image.file);
         });
-
+        if (initialProduct) {
+            const currMainIds = product.mainImages.map(item => item.id);
+            const currDetailIds = product.detailImages.map(item => item.id);
+            const currStocks = product.stocks.map(item => item.id);
+            const deletedMainImageIds = initialProduct.mainImageList.filter(id => !currMainIds.includes(id));
+            const deletedDetailImageIds = initialProduct.detailImageList.filter(id => !currDetailIds.includes(id));
+            const deletedStockIds = initialProduct.stockList.map(stock => stock.id).filter(id => !currStocks.includes(id));
+            formData.append('deletedMainImageIds', new Blob([JSON.stringify(deletedMainImageIds)], { type: 'application/json' }));
+            formData.append('deletedDetailImageIds', new Blob([JSON.stringify(deletedDetailImageIds)], { type: 'application/json' }));
+            formData.append('deletedStockIds', new Blob([JSON.stringify(deletedStockIds)], { type: 'application/json' }));
+        }
         try {
-            const response = await api.post('/product', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            let response;
+            if(!initialProduct){
+                response = await api.post('/product', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            }else{
+                response = await api.put('/product', formData, {
+                     headers: {
+                         'Content-Type': 'multipart/form-data',
+                     },
+                 });
+            }
             console.log('Product registered successfully:', response.data);
             alert('상품이 성공적으로 등록되었습니다.');
         } catch (error) {
