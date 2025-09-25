@@ -1,8 +1,11 @@
 package com.example.faishion.tosspay;
 
+import com.example.faishion.address.Address;
 import com.example.faishion.order.Order;
 import com.example.faishion.order.OrderItem;
 import com.example.faishion.order.OrderService;
+import com.example.faishion.payment.Payment;
+import com.example.faishion.user.User;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -82,37 +85,91 @@ public class WidgetController {
                 return ResponseEntity.status(code).body(tossRes);
             }
 
+            // tossRes에서 결제수단(method) 안전하게 추출
+            String paymentType = safeExtractPaymentMethod(tossRes);
+
+
+            // amount는 Payment.amount(Integer)에 맞춰 int로 변환(범위 체크)
+            int paidAmount = toIntExact(amount);
+
+            // Service에서 처리
+            Payment saved = orderService.recordSuccessPaymentAndCompleteOrder(
+                    orderId,        //clientOrderId
+                    paymentKey,
+                    paymentType,
+                    paidAmount
+            );
+
+
             // --- 3) 주문 조회 + DTO 구성 ---
-            // orderId == clientOrderId 로 조회
             Order order = orderService.findOrderWithItems(orderId);
             if (order == null) {
                 return ResponseEntity.status(404).body(error("ORDER_NOT_FOUND", "주문을 찾을 수 없습니다: " + orderId));
             }
-
 
             JSONObject result = new JSONObject();
             result.put("orderId", order.getId());               // 내부 PK
             result.put("clientOrderId", order.getClientOrderId());
             result.put("orderName", order.getOrderName());
             result.put("totalAmount", order.getTotalAmount());
+            result.put("status", order.getStatus());
+            result.put("paymentId", saved.getId());
+            result.put("paymentKey", paymentKey);
+            result.put("paymentType", paymentType);
+            result.put("paidAmount", saved.getAmount());
 
+            /* 배송/주문자 정보 */
+            User user = order.getUser();
+            Address addr = order.getAddress();
+
+            String receiverName = (user != null) ? nullToEmpty(user.getName()) : "";
+            String phone        = (user != null) ? nullToEmpty(user.getPhoneNumber()) : "";
+            String zipcode      = (addr != null) ? nullToEmpty(addr.getZipcode()) : "";
+            String street       = (addr != null) ? nullToEmpty(addr.getStreet()) : "";
+            String detail       = (addr != null) ? nullToEmpty(addr.getDetail()) : "";
+            String requestMsg   = (addr != null) ? nullToEmpty(addr.getRequestMsg()) : "";
+
+            String fullAddress  = joinNonBlank(street, detail, zipcode);
+
+            result.put("receiverName", receiverName);
+            result.put("address", fullAddress);
+            result.put("phone", phone);
+            if (!requestMsg.isBlank()) {
+                result.put("requestMsg", requestMsg);
+            }
+
+            /* 상품 목록 */
             List<JSONObject> items = new ArrayList<>();
             for (OrderItem item : order.getOrderItemList()) {
                 JSONObject ji = new JSONObject();
-                // ⭐️ 엔티티 구조: OrderItem -> Stock -> Product
+
                 String productName = null;
+                String brand = null;
+                Integer originalPrice = null;
+                Long productImageId = null;
+
                 if (item.getStock() != null && item.getStock().getProduct() != null) {
-                    productName = item.getStock().getProduct().getName();
+                    var product = item.getStock().getProduct();
+
+                    productName   = nullToEmpty(product.getName());
+                    brand         = (product.getSeller() != null) ? nullToEmpty(product.getSeller().getBusinessName()) : "";
+                    originalPrice = product.getPrice();
+
+                    // Product.mainImageList에서 대표 이미지 1장 뽑기
+                    productImageId = firstImageId(product.getMainImageList());
                 }
+
                 ji.put("productName", productName);
+                ji.put("brand", brand);
+                if (productImageId != null) ji.put("productImageId", productImageId);
+                if (originalPrice != null)  ji.put("originalPrice", originalPrice);
+
                 ji.put("quantity", item.getQuantity());
-                ji.put("price", item.getPrice());
+                ji.put("price", item.getPrice()); // 주문 시점 확정 단가
                 items.add(ji);
             }
             result.put("items", items);
 
-            // (선택) 주문 상태 업데이트
-            // orderService.markCompleted(order.getId());
 
             return ResponseEntity.ok(result);
 
@@ -138,5 +195,51 @@ public class WidgetController {
         o.put("code", code);
         o.put("message", message);
         return o;
+    }
+
+    // long → int 변환 (범위 체크 포함)
+    private static int toIntExact(long v) {
+        if (v > Integer.MAX_VALUE || v < Integer.MIN_VALUE) {
+            throw new IllegalArgumentException("amount 범위를 벗어났습니다: " + v);
+        }
+        return (int) v;
+    }
+
+    // Toss 응답에서 결제수단(method) 안전하게 추출
+    private static String safeExtractPaymentMethod(JSONObject tossRes) {
+        String method = asString(tossRes.get("method"));
+        if (method != null && !method.isBlank()) return method;
+
+        // 일부 응답에서는 하위 객체로만 제공될 수 있음
+        if (tossRes.get("card") != null) return "CARD";
+        if (tossRes.get("virtualAccount") != null) return "VIRTUAL_ACCOUNT";
+        if (tossRes.get("transfer") != null) return "TRANSFER";
+        if (tossRes.get("mobilePhone") != null) return "MOBILE_PHONE";
+        if (tossRes.get("giftCertificate") != null) return "GIFT_CERTIFICATE";
+        if (tossRes.get("cashReceipt") != null) return "CASH_RECEIPT";
+        return "UNKNOWN";
+    }
+
+    private static String nullToEmpty(String s) {
+        return (s == null) ? "" : s;
+    }
+
+    private static String joinNonBlank(String... parts) {
+        StringBuilder sb = new StringBuilder();
+        for (String p : parts) {
+            if (p != null && !p.isBlank()) {
+                if (sb.length() > 0) sb.append(' ');
+                sb.append(p.trim());
+            }
+        }
+        return sb.toString();
+    }
+
+    private static Long firstImageId(java.util.Set<com.example.faishion.image.Image> images) {
+        if (images == null || images.isEmpty()) return null;
+        for (var img : images) {
+            if (img != null && img.getId() != null) return img.getId();
+        }
+        return null;
     }
 }

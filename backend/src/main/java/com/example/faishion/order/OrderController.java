@@ -71,18 +71,17 @@ public class OrderController {
     public ResponseEntity<JSONObject> createPendingOrder(
             @RequestBody OrderCreateRequestDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
-
+        System.out.println("로그인한 사용자:"+userDetails.getUsername());
         System.out.println("-----------주문 생성 시작----------------------");
         // 1. 사용자 및 배송지 엔티티 조회
-        if(userDetails == null) throw new RuntimeException("");
+        if(userDetails == null) throw new RuntimeException("인증된 사용자 정보가 없습니다.");
 
-        User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException(""));
+        User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        System.out.println("주문자 아이디:"+user.getId());
+        Address address = addressRepository.findByUser(user);
 
-        Address address = addressRepository.findById(request.getAddressId())
-                .orElseThrow(() -> new IllegalArgumentException("배송지를 찾을 수 없습니다."));
         System.out.println("주문자 주소:"+address.getDetail());
+
         // 2. 주문 생성
         String clientOrderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + System.currentTimeMillis();
 
@@ -122,7 +121,7 @@ public class OrderController {
 
         // 5. 응답 반환
         JSONObject response = new JSONObject();
-        response.put("orderId", clientOrderId);
+        response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
     }
 }

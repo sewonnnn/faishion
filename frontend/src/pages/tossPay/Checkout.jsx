@@ -77,7 +77,7 @@ export function CheckoutPage() {
                             return;
                         }
                         await widgets.requestPayment({
-                            orderId: String(clientOrderId),   // ✅ 무조건 서버에서 받은 clientOrderId 사용
+                            orderId: String(clientOrderId),   // 무조건 서버에서 받은 clientOrderId 사용
                             orderName: String(orderName || "주문상품"),
                             successUrl: `${window.location.origin}/success`,
                             failUrl: `${window.location.origin}/fail`,

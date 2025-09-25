@@ -30,11 +30,6 @@ const CartPage = () => {
     } = useCartSelection(cartList, fetchCartData);
 
     const goSelectedItemsOrder = async () => {
-        console.log("함수 시작됨");
-
-        console.log("selectedItems:", selectedItems);
-        console.log("타입:", typeof selectedItems);
-        console.log("배열인지?", Array.isArray(selectedItems));
 
         try {
             if (selectedItems.length === 0) {
@@ -49,9 +44,9 @@ const CartPage = () => {
                 params: { ids: cartIds },
             });
             res.data.map((item) => {console.log(item)});
-            // 받은 데이터와 함께 페이지 이동
+            // 받은 데이터와 함께 페이지 이동*/
             navigate("/order/new", {
-                state: { orderItems: res.data, ids: cartIds },
+                state: { ids: cartIds }, // orderItems: res.data,
                 replace: false,
             });
         } catch (e) {
@@ -85,8 +80,10 @@ const CartPage = () => {
 
     // 주문 상품 개수
     const getOrderSummary = () => {
-        if (cartList.length === 0) return "주문 상품 0개";
-        const totalItems = cartList.length;
+        if (selectedItems.length === 0) return "주문 상품 0개";
+
+        const totalItems = selectedItems.length;
+
         return `${totalItems}건`;
     };
 
@@ -130,8 +127,9 @@ const CartPage = () => {
                                     />
                                 </div>
                                 <div className="item-info" onClick={() => goProduct(item.productId)} style={{ cursor: "pointer" }} >
-                                    <h4>{item.productName}</h4>
-                                    <p>{item.sellerBusinessName}</p>
+
+                                    <h4>{item.sellerBusinessName}</h4>
+                                    <p>{item.productName}</p>
                                     <p>상세옵션:  {item.productSize}, {item.productColor}</p>
                                     <p className="item-options">수량: {item.quantity}개 </p>
                                     <p className="item-price">{item.discountedProductPrice}원</p>

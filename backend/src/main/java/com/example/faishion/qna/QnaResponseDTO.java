@@ -1,6 +1,6 @@
 package com.example.faishion.qna;
 
-// ✅ QnaResponseDTO.java 추가 (목록 조회용)
+// QnaResponseDTO 목록 조회용)
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
