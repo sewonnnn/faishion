@@ -17,8 +17,9 @@ const ProductCard = ({ product }) => {
         finalPrice,
         discountRate,
         originalPrice,
-        isExclusive,
-        isRecommend,
+        isNew,
+        isSale,
+        isBest,
         brandName,
         reviewRating,
         reviewCount
@@ -34,8 +35,16 @@ const ProductCard = ({ product }) => {
             {/* 상품 이미지 */}
             <div className="card-img-wrapper">
                 <Card.Img variant="top" src={imageUrl || reactLogo} alt={name} />
-                {isExclusive && <div className="exclusive-badge">단독</div>}
-                {isRecommend && <div className="recommend-badge">추천</div>}
+
+                {/* 뱃지 컨테이너: isNew, isSale, isBest 모두 여기에 표시됩니다. */}
+                {/* 셋 중 하나라도 true이면 컨테이너를 렌더링합니다. */}
+                {(isNew || isSale || isBest) && (
+                    <div className="badge-overlay">
+                        {isNew && <div className="badge-new me-1">신상품</div>}
+                        {isSale && <div className="badge-sale me-1">할인중</div>}
+                        {isBest && <div className="badge-best">추천</div>}
+                    </div>
+                )}
             </div>
 
             {/* 상품 정보 */}
