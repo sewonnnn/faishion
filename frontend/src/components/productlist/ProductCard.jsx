@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './ProductCard.css';
 import { BsStarFill } from 'react-icons/bs';
 import { useNavigate } from "react-router-dom";
-import reactLogo from "../../assets/test.jpg"; // Replace with your actual image path
 
 const ProductCard = ({ product }) => {
     const nav = useNavigate();

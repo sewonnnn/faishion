@@ -32,6 +32,7 @@ const ProductListPage = () => {
                         size: pageSize
                     }
                 });
+                console.log(response.data);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setLoading(false);
@@ -60,15 +61,11 @@ const ProductListPage = () => {
     return (
         <Container className="my-5">
             {/* 페이지 헤더는 ProductListPage에서 직접 렌더링 */}
-            <h1 className="text-center mb-4">상품 목록</h1>
-            <div className="text-center mb-4 p-3 bg-light rounded">
-                <p className="mb-0"><strong>{typeName}</strong>
-                </p>
-            </div>
+            {/*<div className="mb-5">*/}
+            {/*    <Banner/>*/}
+            {/*</div>*/}
+            <h1 className="text-center mb-4 bg-light rounded py-4">{typeName ? typeName : "전체상품"}</h1>
 
-            <div className="mb-5">
-                <Banner/>
-            </div>
 
             <ProductList
                 products={products}

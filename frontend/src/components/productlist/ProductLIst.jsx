@@ -13,7 +13,6 @@ const ProductList = ({ products, loading, currentPage, totalPages, setCurrentPag
             </div>
         );
     }
-
     const renderPaginationItems = () => {
         let items = [];
         for (let number = 0; number < totalPages; number++) {
