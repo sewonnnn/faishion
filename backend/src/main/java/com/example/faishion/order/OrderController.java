@@ -12,6 +12,8 @@ import com.example.faishion.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -126,4 +128,24 @@ public class OrderController {
         response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/seller")
+    public ResponseEntity<Page<Order>> getSellerOrders(
+            @AuthenticationPrincipal String sellerId,
+            Pageable pageable) {
+
+        Page<Order> ordersPage = orderService.getOrdersBySellerId(sellerId, pageable);
+
+
+        return ResponseEntity.ok(ordersPage);
+    }
+    /*
+    @GetMapping("/seller")
+    public ResponseEntity<JSONObject> getSellerOrders(@AuthenticationPrincipal String sellerId, Pageable pageable) {
+        Page<Order> ordersPage = orderService.getOrdersBySellerId(sellerId, pageable);
+        JSONObject response = new JSONObject();
+        return ResponseEntity.ok(response);
+    }
+
+     */
 }
