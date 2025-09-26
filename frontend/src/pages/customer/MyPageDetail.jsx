@@ -24,9 +24,7 @@ const MyPageDetail = () => {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false);
-    // ⭐ 추가: 비밀번호 저장 완료 상태
     const [isPasswordSaved, setIsPasswordSaved] = useState(false);
-    // ⭐ 추가: 비밀번호 가시성 상태
     const [showPassword, setShowPassword] = useState(false);
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -142,7 +140,6 @@ const MyPageDetail = () => {
         setIsPasswordSaved(true);
     };
 
-    // ⭐ 추가: 비밀번호 재설정 버튼 핸들러
     const handlePasswordReset = () => {
       setIsPasswordSaved(false);
       setFormData(prev => ({ ...prev, password: '' }));
@@ -322,7 +319,7 @@ const MyPageDetail = () => {
                                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                                     </Button>
                                                 </div>
-                                                <Form.Control.Feedback type="!invalid">
+                                                <Form.Control.Feedback type="!invalid" className="text-danger">
                                                     {passwordError}
                                                 </Form.Control.Feedback>
                                             </Form.Group>
