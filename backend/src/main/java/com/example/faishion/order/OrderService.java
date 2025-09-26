@@ -1,56 +1,72 @@
 package com.example.faishion.order;
 
-import com.example.faishion.cart.Cart;
+import com.example.faishion.payment.Payment;
 import com.example.faishion.cart.CartRepository;
+import com.example.faishion.payment.PaymentRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
-        CartRepository cartRepository;
-        UserRepository userRepository;
-        OrderRepository orderRepository;
-        OrderItemRepository orderItemRepository;
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final PaymentRepository paymentRepository;
 
-    // 장바구니 항목들로 주문을 생성
-    public void createOrderFromCartItems(List<Long> cartIds) {
-        //cartIds에 해당하는 모든 장바구니 항목을 조회
-        List<Cart> cartItems = cartRepository.findAllById(cartIds);
 
-        if (cartItems.isEmpty()) {
-            throw new IllegalArgumentException("주문할 상품이 장바구니에 존재하지 않습니다.");
+    public Order findOrderWithItems(String clientOrderId) {
+        return orderRepository.findByClientOrderId(clientOrderId).orElse(null);
+    }
+
+    @Transactional
+    public Payment recordSuccessPaymentAndCompleteOrder(String clientOrderId,
+                                                        String paymentKey,
+                                                        String paymentType,
+                                                        int amount) {
+        // 1) 주문 조회 (clientOrderId 기준)
+        Order order = orderRepository.findByClientOrderId(clientOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문 없음: " + clientOrderId));
+
+        // 2) (권장) 금액 검증 – 위·변조 방지
+        // Order.totalAmount 이 double 이므로 반올림/캐스팅 주의
+        int orderAmount = (int) Math.round(order.getTotalAmount());
+        if (orderAmount != amount) {
+            throw new IllegalStateException("결제 금액 불일치 (order=" + orderAmount + ", paid=" + amount + ")");
         }
 
-        // 새로운 주문 생성
-        User user = userRepository.getReferenceById("sewon");
-        Order newOrder = new Order();
-        newOrder.setUser(user);
+        // 3) (idempotency) 이미 같은 paymentKey로 저장된 결제가 있는지 확인
+        if (paymentRepository.findByPaymentKey(paymentKey).isPresent()) {
+            // 이미 처리된 건이면 그대로 반환하거나 예외 처리
+            // 여기선 기존 결제를 반환해 idempotent 하게 유지
+            return paymentRepository.findByPaymentKey(paymentKey).get();
+        }
 
-        // 주문을 저장
-        Order savedOrder = orderRepository.save(newOrder);
+        // 4) Payment 생성/저장
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setUser(order.getUser());
+        payment.setPaymentKey(paymentKey);
+        payment.setPaymentType(paymentType); // 카드/가상계좌 등
+        payment.setAmount(amount);
+        paymentRepository.save(payment);
 
-        // 각 장바구니 항목을 주문 상품(OrderItem) 엔티티로 변환
-        List<OrderItem> orderItems = cartItems.stream()
-                .map(cartItem -> {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setOrder(savedOrder); // 생성된 주문 엔티티와 연결
-                    orderItem.setStock(cartItem.getStock()); // 주문 상품 정보 연결
-                    orderItem.setQuantity(cartItem.getQuantity()); // 수량 연결
+        // 5) 주문 상태 업데이트
+        order.setStatus("COMPLETED");
+        orderRepository.save(order);
 
-                    // 주문 당시의 가격(할인 포함)
-                    orderItem.setPrice(cartItem.getStock().getProduct().getDiscountPrice());
-                    return orderItem;
-                })
-                .collect(Collectors.toList());
-
-        // 주문 상품들 한번에 저장
-        orderItemRepository.saveAll(orderItems);
-
-        // 주문이 완료된 장바구니 항목 삭제
-        cartRepository.deleteAllById(cartIds);
+        return payment;
     }
+
+    public void createOrderFromCartItems(List<Long> cartIds) {
+
+    }
+
 }

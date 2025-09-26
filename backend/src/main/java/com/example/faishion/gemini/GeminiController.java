@@ -1,10 +1,15 @@
-/*
 package com.example.faishion.gemini;
 
+import com.example.faishion.cart.Cart;
+import com.example.faishion.cart.CartRepository;
 import com.example.faishion.image.Image;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
+import com.example.faishion.user.User;
+import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,12 +24,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/gemini")
@@ -32,7 +36,8 @@ import java.util.Map;
 public class GeminiController {
 
     private final StockRepository stockRepository;
-
+    private final CartRepository cartRepository;
+    private final UserRepository userRepository;
     private final OkHttpClient client = new OkHttpClient.Builder()
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
@@ -41,101 +46,153 @@ public class GeminiController {
     @Value("${google.api.key}")
     private String apiKey;
 
-    // 루트 URL ('/')로 들어오는 GET 요청을 처리하여 index.html을 반환합니다.
     @GetMapping("/")
     public String showHomePage() {
-//        System.out.println("GET / 요청 처리 - index.html 반환");
         return "index.html";
     }
 
-    @GetMapping("/{productId}")
-    @ResponseBody
-    public String getProductImage(@PathVariable Long productId) {
-//        System.out.println("GET /api/gemini/" + productId + " 요청 수신.");
-        Stock stock = stockRepository.findByProductId(productId); // 선택된 상품 정보 가지고오기
-        Image image = stock.getImage();
+    /**
+     * 사용자 이미지 URL을 가져와 JSON 응답에 추가합니다.
+     * 이미지가 없는 경우 "userImageUrl" 속성에 null 값을 추가합니다.
+     * 이 유틸리티 메서드는 두 개의 GetMapping에서 모두 사용됩니다.
+     */
+    private void addUserImageUrl(JsonObject responseJson, UserDetails userDetails) {
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // 사용자 객체는 존재하지만, user.getImage()가 null일 수 있습니다.
+            if (user.getImage() != null) {
+                String userImageUrl = "/image/" + user.getImage().getId();
+                responseJson.addProperty("userImageUrl", userImageUrl);
+            } else {
+                // 사용자는 존재하지만 이미지가 없는 경우, null을 명시적으로 추가
+                responseJson.addProperty("userImageUrl", (String) null);
+            }
+        } else {
+            // 사용자를 찾을 수 없는 경우에도 null을 명시적으로 추가
+            responseJson.addProperty("userImageUrl", (String) null);
+        }
+    }
 
+
+    @GetMapping("/{productId}")
+    @ResponseBody // 상품 상세보기에서 바로 이동
+    public String getProductImage(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
+        List<Stock> stocks = stockRepository.findByProductId(productId);
         JsonObject responseJson = new JsonObject();
-        responseJson.addProperty("imageUrl", "/api/image/"+image.getId());
-//        System.out.println("productId " + productId + "에 대한 이미지 URL: " + image.getOriginName());
+        if (!stocks.isEmpty()) {
+            Stock stock = stocks.get(0);
+            Image image = stock.getImage();
+            if (image != null) {
+                String imageUrl = "/image/" + image.getId();
+                responseJson.addProperty("imageUrl", imageUrl);
+            } else {
+                responseJson.addProperty("error", "해당 상품의 이미지가 없습니다.");
+            }
+        } else {
+            responseJson.addProperty("error", "해당 상품의 재고를 찾을 수 없습니다.");
+        }
+
+        // ⭐ 사용자 이미지 URL 추가 로직 (수정)
+        addUserImageUrl(responseJson, userDetails);
 
         return gson.toJson(responseJson);
     }
 
-    @GetMapping("/cart")
+    @GetMapping("/cart-stocks")
     @ResponseBody
-    public String getCartImages() {
-//        System.out.println("GET /api/cart 요청 수신.");
-
-        JsonArray cartItems = new JsonArray();
-        String[] productIds = {"1", "2", "3"};
-        String[] imageUrls = {
-                "https://placehold.co/150x150/FFC0CB/000000?text=핑크+드레스",
-                "https://placehold.co/150x150/ADD8E6/000000?text=파란색+자켓",
-                "https://placehold.co/150x150/90EE90/000000?text=초록색+티셔츠"
-        };
-
-        for (int i = 0; i < productIds.length; i++) {
-            JsonObject productJson = new JsonObject();
-            productJson.addProperty("imageUrl", imageUrls[i]);
-
-            JsonObject itemJson = new JsonObject();
-            itemJson.add("product", productJson);
-            cartItems.add(itemJson);
+    public String getStockIdsFromCart(@RequestParam List<Long> ids) {
+        List<Stock> stocks = new ArrayList<>();
+        List<Cart> cartItems = cartRepository.findAllByIdIn(ids);
+        for (Cart cart : cartItems) {
+            if (cart.getStock() != null) {
+                stocks.add(cart.getStock());
+            }
         }
-
-//        System.out.println("장바구니 이미지 목록 반환.");
-        return gson.toJson(cartItems);
+        List<Long> stockIds = stocks.stream()
+                .map(Stock::getId)
+                .collect(Collectors.toList());
+        JsonObject responseJson = new JsonObject();
+        JsonArray stockIdArray = new JsonArray();
+        for (Long stockId : stockIds) {
+            stockIdArray.add(stockId);
+        }
+        responseJson.add("stockIds", stockIdArray);
+        return gson.toJson(responseJson);
     }
 
-    // '/generate-image' 엔드포인트에 대한 POST 요청을 처리합니다.
+    @GetMapping("/cart-images")
+    @ResponseBody // 카트에 담아서 AI 이동
+    public String getProductImagesFromStockIds(@RequestParam List<Long> ids, @AuthenticationPrincipal UserDetails userDetails) {
+        List<Stock> stocks = stockRepository.findAllByIdIn(ids);
+        List<String> imageUrls = stocks.stream()
+                .filter(stock -> stock.getImage() != null)
+                .map(stock -> "/image/" + stock.getImage().getId())
+                .collect(Collectors.toList());
+
+        JsonObject responseJson = new JsonObject();
+        JsonArray imageUrlArray = new JsonArray();
+        for (String url : imageUrls) {
+            imageUrlArray.add(url);
+        }
+        responseJson.add("imageUrls", imageUrlArray);
+
+        // ⭐ 사용자 이미지 URL 추가 로직 (수정)
+        addUserImageUrl(responseJson, userDetails);
+
+        return gson.toJson(responseJson);
+    }
+
     @PostMapping("/generate-image")
     @ResponseBody
-    public String generateImage(@org.springframework.web.bind.annotation.RequestBody String requestBody) {
-        System.out.println("POST /generate-image 요청 수신.");
-        System.out.println("GOOGLE_API_KEY 존재 여부: " + (apiKey != null && !apiKey.isEmpty()));
-        System.out.println("요청 본문 (일부): " + requestBody.substring(0, Math.min(requestBody.length(), 200)) + "...");
+    public String generateImage(@org.springframework.web.bind.annotation.RequestBody String requestBody, @AuthenticationPrincipal UserDetails userDetails) {
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        User user = new User();
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
 
-        // API 키가 설정되지 않았을 경우 오류를 반환합니다.
+        }
         if (apiKey == null || apiKey.isEmpty()) {
-            System.err.println("API key is not configured or is invalid.");
             return "{\"error\": \"API key is not configured or is invalid\"}";
         }
-
         try {
-            // 요청 본문을 JSON 객체로 파싱합니다.
             JsonObject requestJson = gson.fromJson(requestBody, JsonObject.class);
-            // 프런트엔드에서 전송한 두 이미지의 Base64 데이터를 추출합니다.
-            String base64Image1 = requestJson.get("image1").getAsString(); // 상품 이미지
-            String base64Image2 = requestJson.get("image2").getAsString(); // 모델 이미지
+            // 프런트엔드에서 배열로 전송된 Base64 데이터를 가져옴
+            JsonArray base64Images = requestJson.getAsJsonArray("image1");
+            String base64ModelImage = requestJson.get("image2").getAsString();
 
-//            System.out.println("요청 파싱 완료: image1 길이=" + base64Image1.length() + ", image2 길이=" + base64Image2.length());
-
-            // --- Gemini API 요청 페이로드 구성 ---
-            // 프런트엔드에서 프롬프트를 보내지 않으므로, 백엔드에서 고정 프롬프트를 설정합니다.
-            String prompt = "이 옷 사진을 사람 사진이 입고 있는 사진으로 합성해줘 키는 160cm이고 몸무게는 90kg야. 결과 이미지로만 응답해. 다른 텍스트는 포함하지마.";
-
-            JsonObject inlineData1 = new JsonObject();
-            inlineData1.addProperty("mimeType", "image/png");
-            inlineData1.addProperty("data", base64Image1);
-
-            JsonObject part1 = new JsonObject();
-            part1.add("inlineData", inlineData1);
-
-            JsonObject inlineData2 = new JsonObject();
-            inlineData2.addProperty("mimeType", "image/png");
-            inlineData2.addProperty("data", base64Image2);
-
-            JsonObject part2 = new JsonObject();
-            part2.add("inlineData", inlineData2);
-
-            JsonObject part3 = new JsonObject();
-            part3.addProperty("text", prompt);
+            String prompt = "image1 is a full-body image of a person. All subsequent images (from image2 to imageX, up to six images)" +
+                    " are fashion items, which can include clothing, accessories, footwear, or headwear. Create a single photorealistic " +
+                    "full-body image of the person from image1 wearing and styled with all the fashion items from the other images. " +
+                    "The person should have a height of "+user.getHeight()+"cm and a weight of "+user.getWeight()+"kg, ensuring their body shape and " +
+                    "proportions are consistent with these measurements. Focus on seamless integration of all items, maintaining a realistic fit, " +
+                    "natural proportions, high-quality textures, and appropriate lighting.";
 
             JsonArray partsArray = new JsonArray();
-            partsArray.add(part1);
-            partsArray.add(part2);
-            partsArray.add(part3);
+
+            // 선택된 모든 상품 이미지들을 partsArray에 추가
+            for (JsonElement base64ImageElement : base64Images) {
+                String base64Data = base64ImageElement.getAsString();
+                JsonObject inlineData = new JsonObject();
+                inlineData.addProperty("mimeType", "image/png");
+                inlineData.addProperty("data", base64Data);
+                JsonObject part = new JsonObject();
+                part.add("inlineData", inlineData);
+                partsArray.add(part);
+            }
+
+            // 모델 이미지 추가
+            JsonObject inlineModelData = new JsonObject();
+            inlineModelData.addProperty("mimeType", "image/png");
+            inlineModelData.addProperty("data", base64ModelImage);
+            JsonObject modelPart = new JsonObject();
+            modelPart.add("inlineData", inlineModelData);
+            partsArray.add(modelPart);
+
+            // 프롬프트 텍스트 추가
+            JsonObject promptPart = new JsonObject();
+            promptPart.addProperty("text", prompt);
+            partsArray.add(promptPart);
 
             JsonObject contentObject = new JsonObject();
             contentObject.add("parts", partsArray);
@@ -145,7 +202,7 @@ public class GeminiController {
 
             JsonObject generationConfig = new JsonObject();
             JsonArray responseModalities = new JsonArray();
-            generationConfig.addProperty("temperature", 0);
+            generationConfig.addProperty("temperature", 0); // Ai 창의성 레벨 0~1
             responseModalities.add("IMAGE");
             generationConfig.add("responseModalities", responseModalities);
 
@@ -154,83 +211,57 @@ public class GeminiController {
             mainPayload.add("generationConfig", generationConfig);
 
             String payloadString = mainPayload.toString();
-//            System.out.println("Gemini API 요청 페이로드 (일부): " + payloadString.substring(0, Math.min(payloadString.length(), 200)) + "...");
 
-            // --- Gemini API 요청 전송 ---
             Request request = new Request.Builder()
                     .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=" + apiKey)
                     .post(okhttp3.RequestBody.create(payloadString, MediaType.get("application/json; charset=utf-8")))
                     .build();
 
-//            System.out.println("Gemini API로 요청 전송 중...");
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body().string();
-//                System.out.println("Gemini API 응답 수신. 상태 코드: " + response.code());
-//                System.out.println("Gemini API 응답 본문 (일부): " + responseBody.substring(0, Math.min(responseBody.length(), 200)) + "...");
-
-                // 응답이 성공적인지 확인합니다.
                 if (!response.isSuccessful()) {
-//                    System.err.println("Gemini API 요청 실패: " + response.code() + " - " + response.message());
                     return "{\"error\": \"" + response.code() + " - " + response.message() + "\"}";
                 }
 
-                // --- API 응답 파싱 ---
                 try {
                     JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
                     JsonArray candidates = jsonObject.getAsJsonArray("candidates");
-
                     if (candidates == null || candidates.size() == 0) {
-//                        System.err.println("API 응답에서 candidates를 찾을 수 없습니다.");
                         return "{\"error\": \"No candidates found in API response.\"}";
                     }
-
                     JsonObject candidate = candidates.get(0).getAsJsonObject();
                     JsonArray parts = candidate.getAsJsonObject("content").getAsJsonArray("parts");
-
                     if (parts == null || parts.size() == 0) {
-                        System.err.println("API 응답의 content에서 parts를 찾을 수 없습니다.");
                         return "{\"error\": \"No parts found in API response.\"}";
                     }
-
-                    // JsonArray에서 "inlineData"를 포함하는 객체 찾기
                     JsonObject imagePart = null;
                     for (JsonElement part : parts) {
                         JsonObject partObject = part.getAsJsonObject();
                         if (partObject.has("inlineData")) {
                             imagePart = partObject;
-//                            System.out.println("이미지 part (inlineData) 발견.");
                             break;
                         }
                     }
-
                     if (imagePart != null && imagePart.has("inlineData")) {
                         String base64Data = imagePart.getAsJsonObject("inlineData").get("data").getAsString();
-//                        System.out.println("추출된 Base64 데이터 (앞 50자): " + base64Data.substring(0, Math.min(base64Data.length(), 50)) + "...");
                         return "{\"base64Data\": \"" + base64Data + "\"}";
                     } else {
-//                        System.err.println("API 응답 형식 오류: 이미지 데이터 (inlineData)를 찾을 수 없음.");
                         return "{\"error\": \"Unexpected API response format. No image data found.\"}";
                     }
-
                 } catch (JsonSyntaxException | NullPointerException e) {
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));
-//                    System.err.println("API 응답 JSON 파싱 오류: " + sw.toString());
                     return "{\"error\": \"Failed to parse API response: Invalid JSON structure.\"}";
                 }
             }
         } catch (IOException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-//            System.err.println("네트워크 오류 또는 타임아웃 발생: " + sw.toString());
             return "{\"error\": \"Image generation failed due to a network error or timeout.\"}";
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-//            System.err.println("예상치 못한 오류 발생: " + sw.toString());
             return "{\"error\": \"An unexpected error occurred.\"}";
         }
     }
 }
-*/
-

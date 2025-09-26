@@ -1,57 +1,75 @@
 import './OrderFormPage.css';
-import {useEffect, useState} from "react";
-import {useLocation} from "react-router-dom"
-import axios from 'axios';
-import {PaymentCheckoutPage} from "./tossPay/PaymentCheckoutPage.jsx";
+import {useEffect, useState, useMemo, useCallback} from "react";
+import {useLocation, useNavigate} from "react-router-dom"
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const OrderFormPage = () => {
+    const [userProfile, setUserProfile] = useState(null);
     const [orderItems, setOrderItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const location = useLocation();
-
-    // ... (기존 useEffect, calculateTotals, getOrderSummary 함수는 동일)
+    const navigate = useNavigate();
+    const { api } = useAuth();
 
     useEffect(() => {
-        const {ids} = location.state;
-        if (!ids) {
-            setError("주문할 상품 ID가 없습니다.");
-            setIsLoading(false);
-            return;
-        }
+        const fetchAllData = async () => {
+            // ⭐ 로딩 시작
+            setIsLoading(true);
+            setError(null);
 
-        // 2. Axios를 사용하여 GET 요청 보내기
-        axios.get(`http://localhost:8080/order/new?ids=${ids}`)
-            .then(response => {
-                // Axios는 응답 데이터를 자동으로 .data에 넣어줌
-                setOrderItems(response.data);
-                setIsLoading(false);
-                console.log('선택된 상품들:', response.data);
-            })
-            .catch(err => {
-                if (err.response) {
-                    setError(`서버 오류: ${err.response.status}`);
-                } else if (err.request) {
-                    // 요청은 보냈지만 응답을 받지 못한 경우
-                    setError("네트워크 오류: 서버에 연결할 수 없습니다.");
-                } else {
-                    // 요청 설정 중 오류가 발생한 경우
-                    setError("요청 설정 오류: " + err.message);
+            // 사용자 정보가 없으면 에러 처리
+            // if (!user || !user.id) {
+            //     setError("사용자 정보가 없어 주문을 진행할 수 없습니다. 다시 로그인해주세요.");
+            //     setIsLoading(false);
+            //     return;
+            // }
+
+            try {
+                // 1. 사용자 상세 정보 조회
+                const userResponse = await api.get('/user/');
+                setUserProfile(userResponse.data);
+                console.log('불러온 사용자 프로필:', userResponse.data);
+
+                // 2. 주문할 상품 ID 확인
+                const { ids } = location.state || {};
+                if (!ids || ids.length === 0) {
+                    setError("주문할 상품 ID가 없습니다.");
+                    setIsLoading(false);
+                    return;
                 }
+
+                // 3. 주문 상품 정보 조회
+                const orderItemsResponse = await api.get(`/order/new?ids=${ids}`);
+                setOrderItems(orderItemsResponse.data);
+
+                // 모든 데이터 로딩이 성공적으로 완료되면 isLoading을 false로 설정합니다.
                 setIsLoading(false);
-            });
-    }, [location.state]); // `location.search` 대신 `location.state` 사용
+            } catch (err) {
+                console.error("데이터 로딩 중 오류 발생:", err.response?.data || err.message);
+                setError("데이터를 불러오는 데 실패했습니다.");
+                // 에러가 발생해도 로딩 상태는 종료합니다.
+                setIsLoading(false);
+            }
+        };
+
+
+            fetchAllData();
+
+    }, [location.state, api]); // location.state와 user, api 객체에 의존합니다.
+
 
     // 총 가격 계산
-    const calculateTotals = () => {
+    const totals = useMemo(() => {
         let totalOriginal = 0;
         let totalDiscounted = 0;
         let totalDisc = 0;
 
         orderItems.forEach(item => {
             totalOriginal += item.productPrice * item.quantity;
-            totalDiscounted += item.discountedProductPrice * item.quantity;
-            totalDisc += (item.productPrice - item.discountedProductPrice) * item.quantity;
+            const priceToUse = item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice;
+            totalDiscounted += priceToUse * item.quantity;
+            totalDisc += (item.productPrice - priceToUse) * item.quantity;
         });
 
         return {
@@ -59,35 +77,90 @@ const OrderFormPage = () => {
             totalDiscountedPrice: totalDiscounted,
             totalDiscount: totalDisc
         };
-    };
+    }, [orderItems]);
 
-    const totals = calculateTotals();
-
-    const getOrderSummary = () => {
+    // 주문 요약 생성
+    const getOrderSummary = useCallback(() => {
         if (orderItems.length === 0) return "주문 상품 0개";
-        // 첫 번째 상품명과 총 상품 수를 합쳐서 반환
         const firstItemName = orderItems[0].productName;
         const remainingCount = orderItems.length > 1 ? ` 외 ${orderItems.length - 1}건` : '';
         return `${firstItemName}${remainingCount}`;
+    }, [orderItems]);
+
+    // 토스페이 결제로 이동
+    const goTossPay = async () => {
+        if (orderItems.length === 0 || totals.totalDiscountedPrice <= 0) {
+            alert("결제할 상품 정보가 올바르지 않습니다.");
+            return;
+        }
+
+        if (!userProfile || !userProfile.id ) {
+            alert("사용자 정보가 아직 로딩되지 않았습니다. 잠시 후 다시 시도해주세요.");
+            return;
+        }
+
+        try {
+            const requestData = {
+                userId: userProfile.id,
+                addressId: userProfile.addressId,
+                orderName: getOrderSummary(),
+                totalAmount: totals.totalDiscountedPrice,
+                items: orderItems.map(item => ({
+                    stockId: item.stockId,
+                    quantity: item.quantity,
+                    price: item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice,
+                })),
+            };
+
+
+            console.log("백엔드로 보낼 주문 생성 요청 데이터:", requestData);
+
+            const response = await api.post("/order/create", requestData);
+            const { clientOrderId } = response.data;
+
+            navigate('/order/check', {
+                state: {
+                    totalAmount: totals.totalDiscountedPrice,
+                    orderName: requestData.orderName,
+                    clientOrderId: clientOrderId,
+                },
+            });
+
+        } catch (error) {
+            console.error("주문 생성 중 오류 발생:", error.response?.data || error.message);
+            alert("주문을 처리하는 중 오류가 발생했습니다. 다시 시도해주세요.");
+        }
     };
 
-    if (isLoading) return <div>로딩 중...</div>;
-    if (error) return <div>오류가 발생했습니다: {error}</div>;
+
+    // ⭐ 로딩 및 에러 상태 처리
+    if (isLoading) {
+        return <div className="loading-message">로딩 중...</div>;
+    }
+
+    if (error) {
+        return <div className="error-message">오류가 발생했습니다: {error}</div>;
+    }
+
+    // 주문할 상품이 없을 때 메시지
+    if (orderItems.length === 0) {
+        return <div className="no-items-message">주문할 상품이 없습니다.</div>;
+    }
 
     return (
         <div className="cart-page-layout">
-            {/* ... (기존 주문 상세 정보 영역은 동일) */}
             <div className="order-details-container">
                 <h2 className="section-header">주문서</h2>
                 <div className="order-section">
                     <div className="delivery-info-header">
-                        <h3>박세원</h3>
+                        <h3>{userProfile?.name || "사용자 이름"}</h3>
                         <button className="change-address-btn">
                             배송지 변경
                         </button>
                     </div>
-                    <p className="delivery-text">서울특별시 관악구</p>
-                    <p className="delivery-text">010-1234-5678</p>
+                    <p className="delivery-text">{userProfile?.street || "배송지 정보"}</p>
+                    <p className="delivery-text">{userProfile?.phoneNumber
+                         || "연락처 정보"}</p>
                     <select className="delivery-select">
                         <option>직접 수령</option>
                         <option>문 앞에 놔주세요</option>
@@ -98,20 +171,34 @@ const OrderFormPage = () => {
                 <hr className="divider" />
                 <h2 className="section-header">주문 상품 {orderItems.length}개</h2>
                 {orderItems.map((item) => (
-                    <div className="order-item" key={item.id}>
+                    <div className="order-item" key={item.stockId}>
                         <img
                             src={`http://localhost:8080/image/${item.productImageId}`}
                             alt={item.productName}
-                            className="product-image"
-                        />
+                            className="product-image"/>
                         <div className="product-details">
-                            <h4>{item.productName}</h4>
-                            <p>{item.sellerBusinessName}</p>
+                            <h4>{item.sellerBusinessName}</h4>
+                            <p>{item.productName}</p>
                             <p>상세옵션: {item.productSize}, {item.productColor}</p>
                             <p>{item.quantity}개</p>
                             <div className="price-info">
-                                <span className="original-price">{item.productPrice.toLocaleString()}원</span>
-                                <span className="sale-price">{item.discountedProductPrice.toLocaleString()}원</span>
+                                {item.discountedProductPrice != null && item.discountedProductPrice !== item.productPrice ? (
+                                    <>
+                                        <span className="original-price" style={{ textDecoration: 'line-through', color: '#888' }}>
+                                            {item.productPrice.toLocaleString()}원
+                                        </span>
+                                        <span className="sale-price" style={{ marginLeft: '10px', fontWeight: 'bold' }}>
+                                            {item.discountedProductPrice.toLocaleString()}원
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span></span>
+                                        <span className="sale-price" style={{ fontWeight: 'bold' }}>
+                                        {item.productPrice.toLocaleString()}원
+                                    </span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -135,10 +222,12 @@ const OrderFormPage = () => {
                     <span>총 구매 금액</span>
                     <span>{totals.totalDiscountedPrice.toLocaleString()}원</span>
                 </div>
-                <PaymentCheckoutPage
-                    totalAmount={totals.totalDiscountedPrice}
-                    orderName={getOrderSummary()}
-                />
+                <button
+                    onClick={goTossPay}
+                    className="button"
+                >
+                    {getOrderSummary()} 결제하기
+                </button>
             </div>
         </div>
     );

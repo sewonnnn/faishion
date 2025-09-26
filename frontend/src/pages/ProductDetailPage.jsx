@@ -5,18 +5,18 @@ import ProductRightInfo from "../components/productdetail/ProductRightInfo.jsx";
 import { useParams } from "react-router-dom";
 import ProductBody from "../components/productdetail/ProductBody.jsx";
 import ProductFooter from "../components/productdetail/ProductFooter.jsx";
-import axios from "axios";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const ProductDetailPage = () => {
     const { productId } = useParams();
     const [productData, setProductData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const { api } = useAuth();
     useEffect(() => {
         const findProduct = async () => {
             try {
-                const response = await axios.get(`/api/product/${productId}`);
+                const response = await api.get(`/product/${productId}`);
                 setProductData(response.data); // DTO로 받은 데이터를 상태에 저장
             } catch (error) {
                 console.error('Error fetching product data:', error);

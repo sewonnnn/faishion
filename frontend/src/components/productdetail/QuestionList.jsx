@@ -1,31 +1,32 @@
-// QuestionList.jsx
 import React, { useState, useEffect } from 'react';
-import { ListGroup, Form, Button } from 'react-bootstrap';
-import { BsLockFill, BsLock } from 'react-icons/bs';
-import axios from 'axios';
+import { ListGroup, Form } from 'react-bootstrap';
+import { BsLockFill } from 'react-icons/bs';
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
-const QuestionList = ({ productId }) => {
+const QuestionList = ({ productId, onQuestionUpdate }) => {
     const [questions, setQuestions] = useState([]);
     const [showSecret, setShowSecret] = useState(false);
+    const { api } = useAuth();
+
+    const fetchQuestions = async () => {
+        try {
+            const response = await api.get(`/qna/product/${productId}`);
+            setQuestions(response.data);
+        } catch (error) {
+            console.error('문의 목록을 불러오는 데 실패했습니다:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchQuestions = async () => {
-            try {
-                // 백엔드 API에서 답변 정보를 함께 가져와야 합니다.
-                const response = await axios.get(`/api/qna/product/${productId}`);
-                setQuestions(response.data);
-            } catch (error) {
-                console.error('문의 목록을 불러오는 데 실패했습니다:', error);
-            }
-        };
-
         fetchQuestions();
-    }, [productId]);
+    }, [productId, onQuestionUpdate]);
 
-    // 비밀글 제외 여부에 따라 필터링
-    const filteredQuestions = showSecret
-        ? questions.filter(q => !q.isSecret)
-        : questions;
+    const filteredQuestions = questions.filter(question => {
+        if (showSecret) {
+            return !question.isSecret;
+        }
+        return true;
+    });
 
     return (
         <div>
@@ -43,17 +44,23 @@ const QuestionList = ({ productId }) => {
                     filteredQuestions.map((question) => (
                         <ListGroup.Item key={question.id}>
                             <div className="d-flex justify-content-between align-items-center">
-                                <strong>{question.title}</strong>
+                                <strong>
+                                    {question.isSecret && !question.isMine
+                                        ? "🔒 비밀글입니다"
+                                        : question.title}
+                                </strong>
                                 <div>
-                                    {question.isSecret ? <BsLockFill className="me-2" /> : <BsLock className="me-2" />}
+                                    {question.isSecret ? <BsLockFill className="me-2" /> : null}
                                     <small className="text-muted">{question.createdAt}</small>
                                 </div>
                             </div>
                             <p className="mt-2 mb-0">
-                                {question.isSecret ? "🔒 비밀글입니다." : question.content}
+                                {question.isSecret && !question.isMine
+                                    ? "🔒 작성자만 열람할 수 있습니다."
+                                    : question.content}
                             </p>
                             <small className="text-muted">
-                                {question.answer ? "답변완료" : "답변 대기 중"} · {question.authorName} · {question.createdAt.split('T')[0]}
+                                {question.answer ? "답변완료" : "답변 대기 중"} · {question.userName}
                             </small>
                         </ListGroup.Item>
                     ))

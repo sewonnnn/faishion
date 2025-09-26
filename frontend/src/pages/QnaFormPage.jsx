@@ -1,18 +1,20 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const QnaFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [login, setLogin] = useState("sewon"); // 로그인 유저 관리 (임시)
     const navigate = useNavigate();
+    const {api} = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            await axios.post("http://localhost:8080/qna", {
+            await api.post("/qna", {
                 user: { id: "test-user" }, // 로그인된 사용자 ID (임시)
                 product: { id: 1 },        // 질문할 상품 ID (임시)
                 title,

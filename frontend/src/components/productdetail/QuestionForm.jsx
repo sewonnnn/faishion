@@ -1,18 +1,18 @@
 // QuestionForm.jsx
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import axios from 'axios';
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const QuestionForm = ({ productId, onQuestionSubmitted }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [isSecret, setIsSecret] = useState(false);
-
+    const {api} = useAuth();
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const newQuestion = { productId, title, content, isSecret };
-            await axios.post('/api/qna/save', newQuestion);
+            await api.post('/qna/save', newQuestion);
             alert('문의가 성공적으로 등록되었습니다.');
             setTitle('');
             setContent('');

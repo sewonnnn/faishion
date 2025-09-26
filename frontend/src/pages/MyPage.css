@@ -6,6 +6,51 @@
     background: #fff;
     color: #333;
 }
+/* 프로필 이미지 섹션 스타일 추가 */
+.profile-image-wrapper {
+    position: relative; /* 자식 요소(버튼)의 absolute 기준 */
+    display: inline-block; /* 크기를 내부 이미지에 맞춤 */
+}
+
+/* 이미지 삭제 버튼 스타일 */
+.profile-image-wrapper .image-delete-btn {
+    position: absolute;
+    top: 5px; /* 이미지 상단으로부터의 거리 */
+    right: 5px; /* 이미지 우측으로부터의 거리 */
+    padding: 0;
+    line-height: 1;
+    z-index: 10; /* 이미지 위에 표시되도록 Z축 올리기 */
+    background: none;
+    border: none;
+    color: #888; /* 회색 X표시 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    opacity: 0.8; /* 투명도 */
+    transition: opacity 0.2s;
+    cursor: pointer;
+}
+
+.profile-image-wrapper .image-delete-btn:hover {
+    opacity: 1;
+    color: #f00; /* 호버 시 빨간색으로 변경 */
+}
+
+/* 파일 선택 입력 필드 숨기기 (Bootstrap의 visually-hidden과 유사) */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* 프로필 사진 변경 라벨을 버튼처럼 보이게 */
+#formFile label {
+    cursor: pointer;
+}
 
 /* 프로필 */
 .profile-section {

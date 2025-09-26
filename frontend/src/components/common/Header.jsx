@@ -16,11 +16,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    // 검색 입력창의 값을 관리하기 위한 상태
     const [searchQuery, setSearchQuery] = useState('');
-    // API에서 가져올 카테고리 데이터를 위한 상태
     const [categories, setCategories] = useState([]);
-    // URL 변경을 위한 navigate 훅 사용
     const navigate = useNavigate();
 
     const { user, login, logout, api } = useAuth();
@@ -38,17 +35,29 @@ const Header = () => {
         fetchCategories();
     }, [api]);
 
+    const handleCategoryClick = (id) => {
+        navigate(`/product/list?categoryId=${id}`);
+        setIsMenuOpen(false); // 메뉴 닫기
+    };
+
     const renderSubCategories = (subCategories) => {
         return (
             <div className="row">
                 <div className="col">
                     <ul className="list-unstyled">
                         {subCategories.map((item) => {
-                            // url 생성 시 categoryName과 item.name을 사용합니다.
-                            const url = `/product/list?categoryId=${item.id}`;
                             return (
                                 <li key={item.id}>
-                                    <a href={url}>{item.name}</a>
+                                    {/* Link 컴포넌트나 useNavigate를 사용해 URL 이동 */}
+                                    <a
+                                        href={`/product/list?categoryId=${item.id}`}
+                                        onClick={(e) => {
+                                            e.preventDefault(); // 기본 링크 동작 방지
+                                            handleCategoryClick(item.id);
+                                        }}
+                                    >
+                                        {item.name}
+                                    </a>
                                 </li>
                             );
                         })}
@@ -154,13 +163,11 @@ const Header = () => {
                 <Navbar expand="lg">
                     <Container fluid>
                         <Nav className="main-nav-links me-auto">
-                            <Nav.Link href="#best">베스트</Nav.Link>
-                            <Nav.Link href="#sale">세일</Nav.Link>
-                            <Nav.Link href="#new">신상품</Nav.Link>
+                            <Nav.Link href="/product/list?type=best">베스트</Nav.Link>
+                            <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
+                            <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
                             <Nav.Link href="#solo">단독</Nav.Link>
                             <Nav.Link href="#recom">추천</Nav.Link>
-                            <Nav.Link href="/product/list?type=women">여성</Nav.Link>
-                            <Nav.Link href="/product/list?type=men">남성</Nav.Link>
                         </Nav>
                         <div className={"user-info"}>
                             <Form className="d-flex seantrch-bar" onSubmit={handleSearch}>

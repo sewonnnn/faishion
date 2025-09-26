@@ -1,9 +1,1 @@
-// settings.gradle의 가장 첫 부분에 위치해야 합니다.
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-}
-
 rootProject.name = 'faishion'

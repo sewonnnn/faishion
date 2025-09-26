@@ -6,12 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // 상품 전체 불러오기
-    List<Product> findAllBy();
+    // productId에 맞는 상품들 가져오기
+    List<Product> findAllById(Long id);
 
     @Query("SELECT DISTINCT p FROM Product p " +
             "JOIN FETCH p.category c " +
@@ -42,4 +43,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "GROUP BY p.id, p.createdAt " + // You must group by createdAt too since you're ordering by it
             "ORDER BY p.createdAt DESC")
     Page<Object[]> findProductsBySearch(@Param("searchQuery")String searchQuery, @Param("categoryId") Long categoryId, Pageable pageable);
+
+
+    // 할인상품 찾기
+    List<Product> findByDiscountPriceIsNotNullAndDiscountPriceGreaterThan(Integer discountPrice);
+
+    // 신상품 찾기
+    List<Product> findByCreatedAtAfter(LocalDateTime date);
+
+    // 별점높은 상품 찾기
+    @Query("SELECT p FROM Product p LEFT JOIN p.reviewList r GROUP BY p HAVING AVG(r.rating) >= 4.0")
+    List<Product> findBestProducts();
 }

@@ -1,4 +1,114 @@
 package com.example.faishion.user;
 
+import com.example.faishion.address.AddressService;
+import com.example.faishion.image.Image;
+import com.example.faishion.image.ImageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder; // ⭐추가
+import org.springframework.web.bind.annotation.*;
+import com.example.faishion.address.Address;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/user")
 public class UserController {
+
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final ImageRepository imageRepository;
+    private final AddressService addressService;
+    private final PasswordEncoder passwordEncoder; // ⭐ 추가: PasswordEncoder 주입
+
+    @GetMapping("/")
+    public ResponseEntity<UserUpdateDTO> tokenUser(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        String zipcode = "";
+        String street = "";
+        String detail = "";
+        int height;
+        int weight;
+        if(user.getHeight() != 0){
+            height = user.getHeight();
+            weight = user.getWeight();
+        }else{
+            height = 0;
+            weight = 0;
+        }
+
+        // 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
+        Optional<Address> defaultAddress = user.getAddressList().stream()
+                .filter(Address::getIsDefault)
+                .findFirst();
+
+        if (defaultAddress.isPresent()) {
+            Address userAddress = defaultAddress.get();
+            zipcode = userAddress.getZipcode();
+            street = userAddress.getStreet();
+            detail = userAddress.getDetail();
+        }
+
+        return ResponseEntity.ok(new UserUpdateDTO(user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getImage(),height,weight, zipcode, street, detail));
+    }
+
+    // 유저정보 업데이트
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserUpdateDTO userUpdateDTO) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        // ⭐ 비밀번호 업데이트 로직 추가
+        // DTO에 비밀번호가 존재하고 비어있지 않은 경우에만 암호화하여 저장
+        if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
+            existingUser.setPwHash(hashedPassword);
+        }
+
+        existingUser.setHeight(userUpdateDTO.getHeight());
+        existingUser.setWeight(userUpdateDTO.getWeight());
+
+        // 사용자 기본 정보 업데이트 - 값이 있을 때만 업데이트
+        if (userUpdateDTO.getName() != null) {
+            existingUser.setName(userUpdateDTO.getName());
+        }
+        if (userUpdateDTO.getEmail() != null) {
+            existingUser.setEmail(userUpdateDTO.getEmail());
+        }
+        if (userUpdateDTO.getPhoneNumber() != null) {
+            existingUser.setPhoneNumber(userUpdateDTO.getPhoneNumber());
+        }
+
+        // 이미지 업데이트 로직
+        if (userUpdateDTO.getImage() != null) {
+            if (userUpdateDTO.getImage().getId() != null) {
+                Image image = imageRepository.findById(userUpdateDTO.getImage().getId())
+                        .orElseThrow(() -> new RuntimeException("Image not found with ID: " + userUpdateDTO.getImage().getId()));
+                existingUser.setImage(image);
+            } else {
+                // 이미지가 null이고 ID도 없으면 이미지 삭제로 판단
+                existingUser.setImage(null);
+            }
+        } else if (existingUser.getImage() != null) {
+            // DTO의 이미지가 null인데 기존 사용자는 이미지가 있는 경우, 기존 이미지를 삭제
+            existingUser.setImage(null);
+        }
+
+        userRepository.save(existingUser);
+
+        // 주소 업데이트 로직은 AddressService에 위임
+        addressService.updateOrCreateDefaultAddress(
+                id,
+                userUpdateDTO.getZipcode(),
+                userUpdateDTO.getStreet(),
+                userUpdateDTO.getDetail()
+        );
+
+        return ResponseEntity.ok("User and address updated successfully!");
+    }
 }

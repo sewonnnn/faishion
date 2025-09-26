@@ -25,16 +25,14 @@ public class ProductDetailDTO {
     private Set<String> imageUrls;
     private LocalDateTime discountStartDate;
     private LocalDateTime discountEndDate;
-
-    // ✨ 추가된 필드: 색상과 사이즈별 재고를 저장하는 맵
-    // Map<String, Map<String, Integer>> -> Map<색상, Map<사이즈, 수량>>
+    private String username;
     private Map<String, Map<String, Integer>> stockByColorAndSize;
 
-    public ProductDetailDTO(Product product, String domain) {
+    public ProductDetailDTO(Product product, String domain,  String username) {
         this.id = product.getId();
         this.name = product.getName();
         this.brand = product.getSeller().getBusinessName();
-
+        this.username = username;
         // 가격 정보 설정
         boolean isDiscounting = product.getDiscountStartDate() != null && product.getDiscountEndDate() != null &&
                 LocalDateTime.now().isAfter(product.getDiscountStartDate()) && LocalDateTime.now().isBefore(product.getDiscountEndDate());
