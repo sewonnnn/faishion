@@ -46,17 +46,17 @@ const LoginPage = () => {
         let socialAuthUrl = "";
 
         if (provider === "naver") {
-            const naverClientId = "UbIrUTt9yAJ42TARcJC5";
+            const naverClientId = "7e54dc8103249a34b8a7ecc4392498d1";
             const naverRedirectUri = encodeURIComponent(
-                "http://localhost:5173/oauthcallback?provider=naver"
+                "http://localhost:5173/oauthcallback/naver?provider=naver"
             );
             socialAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${Math.random()
                 .toString(36)
                 .substring(2)}`;
         } else if (provider === "kakao") {
-            const kakaoClientId = "YOUR_KAKAO_CLIENT_ID";
+            const kakaoClientId = "8812c02a41849df87cbe44e3dc84a15d";
             const kakaoRedirectUri = encodeURIComponent(
-                "http://localhost:5173/oauthcallback?provider=kakao"
+                "http://localhost:5173/oauthcallback/kakao?provider=kakao"
             );
             socialAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&scope=profile_nickname,account_email,phone_number`;
         } else {
