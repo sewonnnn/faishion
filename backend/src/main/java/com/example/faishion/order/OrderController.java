@@ -146,7 +146,7 @@ public class OrderController {
                 dto.setProductImageId(stock.getImage().getId());
                 dto.setProductName(stock.getProduct().getName());
                 dto.setProductPrice(stock.getProduct().getPrice());
-                dto.setDiscountedProductPrice(dto.getProductPrice());
+                 dto.setDiscountedProductPrice(stock.getProduct().getPrice());
                 dto.setProductColor(stock.getColor());
                 dto.setProductSize(stock.getSize());
                 dto.setQuantity(itemDTO.getQuantity());

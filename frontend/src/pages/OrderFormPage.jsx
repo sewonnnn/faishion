@@ -128,7 +128,7 @@ const OrderFormPage = () => {
                         productId: productId,
                         items: items // ProductRightInfo에서 받은 selectedOptions를 그대로 사용
                     };
-                    // 새로 만든 백엔드 API를 POST로 호출합니다.
+                    // ✅ 새로 만든 백엔드 API를 POST로 호출합니다.
                     const response = await api.post('/order/new-direct', payload);
                     orderItemsData = response.data;
                 }
