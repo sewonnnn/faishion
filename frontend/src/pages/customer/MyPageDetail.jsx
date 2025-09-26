@@ -21,14 +21,15 @@ const MyPageDetail = () => {
         street: '',
         detail: '',
     });
-    const [passwordConfirm, setPasswordConfirm] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false);
-    const [isPasswordSaved, setIsPasswordSaved] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
 
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState(''); // 비밀번호 작성창
+    const [passwordError, setPasswordError] = useState(''); // 패스워드 에러메시지
+    const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false); // 비밀번호 저장모드 전환
+    const [isPasswordSaved, setIsPasswordSaved] = useState(false); // 비밀번호 저장가능 여부 (정규화)
+    const [showPassword, setShowPassword] = useState(false); // 비밀번호 가시화
+
+    const [selectedImage, setSelectedImage] = useState(null); // 이미지 선택
+    const [imagePreviewUrl, setImagePreviewUrl] = useState(''); // 이미지 url
 
     const fileInputRef = useRef(null);
 
@@ -118,7 +119,6 @@ const MyPageDetail = () => {
         }
     };
 
-    // ⭐ 추가: 비밀번호 저장 버튼 핸들러
     const handlePasswordSave = () => {
         // 정규화: 문자, 숫자, 특수문자(@$!%*#?&) 포함 8자 이상
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -326,10 +326,17 @@ const MyPageDetail = () => {
                                             <Form.Group className="mb-3">
                                                 <Button
                                                     variant="primary"
-                                                    className="w-100"
+                                                    className="w-50"
                                                     onClick={handlePasswordSave}
                                                 >
                                                     비밀번호 저장
+                                                </Button>
+                                                <Button
+                                                    variant="secondary"
+                                                    className="w-50"
+                                                    onClick={()=>setIsPasswordChangeMode(false)}
+                                                >
+                                                    비밀번호 변경취소
                                                 </Button>
                                             </Form.Group>
                                         </>

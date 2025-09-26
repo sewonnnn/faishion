@@ -63,7 +63,7 @@ public class UserController {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
-        // ⭐ 비밀번호 업데이트 로직 추가
+        System.out.println("유저 비밀번호 수정 : "+userUpdateDTO.getPassword());
         // DTO에 비밀번호가 존재하고 비어있지 않은 경우에만 암호화하여 저장
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
