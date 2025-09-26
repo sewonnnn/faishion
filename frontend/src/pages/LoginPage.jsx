@@ -10,7 +10,6 @@ const LoginPage = () => {
     const [form, setForm] = useState({ id: "", password: "" });
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
-
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
@@ -34,8 +33,8 @@ const LoginPage = () => {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
-            console.log(res.data);
             login(res.data);
+
             alert("로그인 성공!");
             nav("/");
         } catch (err) {

@@ -1,31 +1,31 @@
 import "./Banner.css";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
 import { Carousel } from 'react-bootstrap'; // Bootstrap Carousel 컴포넌트 import
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS import
 import ban from "../../assets/ban.jpg";
 const Banner = () => {
-    const [bannerItems, setBannerItems] = useState([]); // 이름 변경: banner -> bannerItems
-
-    useEffect(() => {
-        const fetchBannerData = async () => {
-            try {
-                const response = await axios.get('/api/product/banner');
-                // API 응답 데이터 구조 예시:
-                // [{ imageUrl: "url1", title: "PAULA'S CHOICE", description: "과학과 진실에 근거한 브랜드" }, ...]
-                if (Array.isArray(response.data)) {
-                    setBannerItems(response.data);
-                } else {
-                    console.error('API response is not an array:', response.data);
-                    setBannerItems([]); // 에러 시 빈 배열로 초기화
-                }
-            } catch (error) {
-                console.error('Error fetching banner data:', error);
-                setBannerItems([]); // 에러 시 빈 배열로 초기화
-            }
-        };
-        fetchBannerData();
-    }, []);
+    // const [bannerItems, setBannerItems] = useState([]); // 이름 변경: banner -> bannerItems
+    //
+    // useEffect(() => {
+    //     const fetchBannerData = async () => {
+    //         try {
+    //             const response = await axios.get('/api/product/banner');
+    //             // API 응답 데이터 구조 예시:
+    //             // [{ imageUrl: "url1", title: "PAULA'S CHOICE", description: "과학과 진실에 근거한 브랜드" }, ...]
+    //             if (Array.isArray(response.data)) {
+    //                 setBannerItems(response.data);
+    //             } else {
+    //                 console.error('API response is not an array:', response.data);
+    //                 setBannerItems([]); // 에러 시 빈 배열로 초기화
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching banner data:', error);
+    //             setBannerItems([]); // 에러 시 빈 배열로 초기화
+    //         }
+    //     };
+    //     fetchBannerData();
+    // }, []);
 
     // // 배너 데이터가 없을 경우 로딩 메시지 또는 빈 컴포넌트 반환
     // if (bannerItems.length === 0) {

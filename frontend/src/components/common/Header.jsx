@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
     Navbar,
@@ -96,20 +97,20 @@ const Header = () => {
 
     const [selectedRole, setSelectedRole] = useState('USER');
     const createTempToken = async () => {
-            try {
-                const response = await api.post('/auth/temp/token',
-                    {
-                        id : "asdf",
-                        role : selectedRole
-                    }
-                );
-                login(response.data);
-                alert('토큰이 성공적으로 발급되었습니다!');
-            } catch (error) {
-                console.error('토큰 발급 실패:', error);
-                alert('토큰 발급에 실패했습니다.');
-            }
-        };
+        try {
+            const response = await api.post('/auth/temp/token',
+                {
+                    id : "asdf",
+                    role : selectedRole
+                }
+            );
+            login(response.data);
+            alert('토큰이 성공적으로 발급되었습니다!');
+        } catch (error) {
+            console.error('토큰 발급 실패:', error);
+            alert('토큰 발급에 실패했습니다.');
+        }
+    };
 
     return (
         <>
