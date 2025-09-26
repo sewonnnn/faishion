@@ -4,7 +4,9 @@ import com.example.faishion.admin.Admin;
 import com.example.faishion.admin.AdminRepository;
 import com.example.faishion.security.JwtTokenProvider;
 import com.example.faishion.seller.Seller;
+import com.example.faishion.seller.SellerDTO;
 import com.example.faishion.seller.SellerRepository;
+import com.example.faishion.seller.SellerService;
 import com.example.faishion.user.AuthProvider;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
@@ -19,10 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -33,6 +33,10 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final JwtTokenProvider jwt;
     private final AuthService authService;
+    private final SellerService sellerService;
+    private final SellerRepository sellerRepo;
+    private final AdminRepository adminRepo;
+
 
     // 로컬 회원가입
     @PostMapping("/register")
@@ -47,21 +51,26 @@ public class AuthController {
 
     // 로컬 로그인: id 또는 email 허용
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
-        try {
+    public ResponseEntity<String> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
             User u = authService.loginLocal(req.getId(), req.getPassword()); // id 기반 로그인
-            var tokens = authService.issueTokens(u);
+            return token(req.getId(), "USER");
+    }
 
-            Cookie refreshCookie = new Cookie("refreshToken", tokens.get("refresh"));
-            refreshCookie.setHttpOnly(true);
-            refreshCookie.setPath("/");
-            refreshCookie.setMaxAge(1209600); // 2주
-            response.addCookie(refreshCookie);
-
-            return ResponseEntity.ok(new AuthDto.TokenRes(tokens.get("access"), tokens.get("refresh")));
+    // 판매자 회원가입
+    @PostMapping("/seller/register")
+    public ResponseEntity<?> register(@RequestBody SellerDTO dto) {
+        try {
+            Seller seller = sellerService.registerSeller(dto);
+            return ResponseEntity.ok("판매자 회원가입 성공: " + seller.getEmail());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @PostMapping("/seller/login")
+    public ResponseEntity<?> sellerLogin(@RequestBody SellerDTO dto) {
+        Seller seller = sellerService.loginSeller(dto.getId(), dto.getPassword());
+        return token(seller.getId(), "SELLER");
     }
 
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
@@ -174,9 +183,6 @@ public class AuthController {
         response.addCookie(refreshCookie);
     }
 
-
-    private final SellerRepository sellerRepo;
-    private final AdminRepository adminRepo;
     @PostMapping("/temp/token")
     public ResponseEntity<String> tempLogin(@RequestBody Map<String, String> req){
         String id = "temp";
@@ -217,6 +223,10 @@ public class AuthController {
                 }
                 break;
         }
+        return token(id, role);
+    }
+
+    private ResponseEntity<String> token(String id, String role){
         String accessToken = jwt.generateAccess(id, List.of(role));
         // 리프레시 토큰 생성
         String refreshToken = jwt.generateRefresh(id, List.of(role));
@@ -228,10 +238,10 @@ public class AuthController {
                 .maxAge(86400)
                 .build();
         // 액세스 토큰은 JSON 응답으로, 리프레시 토큰은 쿠키 헤더에 담아 전송
-
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(accessToken);
     }
+
 
 }
