@@ -38,10 +38,8 @@ const MyPageDetail = () => {
         try {
             const response = await api.get(`/user/`);
             const userData = response.data;
-            setCustomer(userData);
-
-            // ⭐ defaultAddress 상태 분리
-            setDefaultAddress(userData.defaultAddress);
+            setCustomer(userData); // 유저정보
+            setDefaultAddress(userData.address); // 주소정보
 
             setFormData({
                 id: userData.id,
@@ -51,7 +49,6 @@ const MyPageDetail = () => {
                 password: '',
                 height: userData.height || '',
                 weight: userData.weight || '',
-                // ❌ zipcode, street, detail 초기화 로직 제거
             });
             setPasswordConfirm('');
             setPasswordError('');

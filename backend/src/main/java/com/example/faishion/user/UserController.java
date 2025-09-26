@@ -1,5 +1,6 @@
 package com.example.faishion.user;
 
+import com.example.faishion.address.AddressDTO;
 import com.example.faishion.address.AddressService;
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageRepository;
@@ -38,7 +39,18 @@ public class UserController {
                 .findFirst()
                 .orElse(null); // 없으면 null 반환
 
-        // ⭐ DTO 생성자 변경: 주소 필드 대신 defaultAddress 객체를 전달
+        AddressDTO addressDTO = null;
+        if (address != null) {
+            addressDTO = new AddressDTO(
+                    address.getId(),
+                    address.getZipcode(),
+                    address.getStreet(),
+                    address.getDetail(),
+                    address.getIsDefault(),
+                    address.getRequestMsg()
+            );
+        }
+
         return ResponseEntity.ok(new UserUpdateDTO(
                 user.getId(),
                 user.getName(),
@@ -47,7 +59,7 @@ public class UserController {
                 user.getImage(),
                 height,
                 weight,
-                address
+                addressDTO
         ));
     }
 
