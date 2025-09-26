@@ -17,6 +17,8 @@ public class UserUpdateDTO {
     private String phoneNumber;
     private String password;
     private Image image;
+    private int height;
+    private int weight;
 
     // 주소 관련 필드 추가
     private String zipcode;
@@ -24,12 +26,14 @@ public class UserUpdateDTO {
     private String detail;
 
     // 편의를 위한 생성자 추가
-    public UserUpdateDTO(String id, String name, String email, String phoneNumber, Image image,  String zipcode, String street, String detail) {
+    public UserUpdateDTO(String id, String name, String email, String phoneNumber, Image image, int height, int weight, String zipcode, String street, String detail) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.image = image;
+        this.height = height;
+        this.weight = weight;
         this.zipcode = zipcode;
         this.street = street;
         this.detail = detail;

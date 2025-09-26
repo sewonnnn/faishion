@@ -51,6 +51,9 @@ public class User {
     @Column(name="phone_number", nullable=false, length=20)
     private String phoneNumber;
 
+    private int height;
+    private int weight;
+
     @Column(name="pw_hash", length=100) // LOCAL만 사용 // 소셜은 null
     private String pwHash; //Spring Security 암호화
 
