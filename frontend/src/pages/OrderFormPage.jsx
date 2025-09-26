@@ -114,16 +114,34 @@ const OrderFormPage = () => {
                     //requestMsg: userData.requestMsg || '',
                 });
 
-                const { ids } = location.state || {};
-                if (!ids || ids.length === 0) {
-                    setError("주문할 상품 ID가 없습니다.");
+                const { ids, items, productId } = location.state || {};
+                let orderItemsData;
+
+                // 1. 장바구니에서 넘어온 경우
+                if (ids && ids.length > 0) {
+                    const response = await api.get(`/order/new?ids=${ids}`);
+                    orderItemsData = response.data;
+                }
+                // 2. 상품 상세 페이지에서 바로 넘어온 경우 (새로운 로직)
+                else if (items && items.length > 0 && productId) {
+                    const payload = {
+                        productId: productId,
+                        items: items // ProductRightInfo에서 받은 selectedOptions를 그대로 사용
+                    };
+                    // 새로 만든 백엔드 API를 POST로 호출합니다.
+                    const response = await api.post('/order/new-direct', payload);
+                    orderItemsData = response.data;
+                }
+                // 3. 주문 정보가 없는 경우
+                else {
+                    setError("주문할 상품 정보가 없습니다.");
                     setIsLoading(false);
                     return;
                 }
 
-                const orderItemsResponse = await api.get(`/order/new?ids=${ids}`);
-                setOrderItems(orderItemsResponse.data);
+                setOrderItems(orderItemsData);
                 setIsLoading(false);
+
             } catch (err) {
                 console.error("데이터 로딩 중 오류 발생:", err.response?.data || err.message);
                 setError("데이터를 불러오는 데 실패했습니다.");

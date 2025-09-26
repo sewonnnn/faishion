@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
     Button,
     Form,
@@ -101,7 +100,19 @@ const ProductRightInfo = ({ productId, product }) => {
     };
 
     const onOrderForm = () => {
-        navigate(`/order/new/${productId}`, { state: { items: selectedOptions } });
+
+        // 바로 구매' 시, 선택된 옵션이 있는지 확인
+        if (selectedOptions.length === 0) {
+            alert("상품 옵션을 선택해 주세요.");
+            return;
+        }
+
+        navigate(`/order/new`, {
+            state: {
+                productId: productId,
+                items: selectedOptions
+            }
+        });
     };
 
     const onCartSave = async () => {

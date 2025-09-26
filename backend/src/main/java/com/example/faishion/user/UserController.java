@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder; // ⭐추가
 import org.springframework.web.bind.annotation.*;
 import com.example.faishion.address.Address;
+
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -28,13 +30,14 @@ public class UserController {
     public ResponseEntity<UserUpdateDTO> tokenUser(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findById(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
-
         int height = user.getHeight();
         int weight = user.getWeight();
-
         // ⭐ 주소: 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
+        System.out.println("ㅁ:" + user.getAddressList());
+        List<Address> addressList = user.getAddressList();
+
         Address address = user.getAddressList().stream()
-                .filter(Address::getIsDefault)
+                //.filter(Address::getIsDefault)
                 .findFirst()
                 .orElse(null); // 없으면 null 반환
 

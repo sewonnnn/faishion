@@ -17,9 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -45,8 +43,10 @@ public class OrderController {
 
     // 주문서 생성
     @GetMapping("/new")
-    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, @AuthenticationPrincipal UserDetails userDetails) {
+    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, Long productId
+            , @AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("받은 카트 ID들: " + idsString);
+
 
         // 1. URL 파라미터에서 받은 장바구니의 목록 추출
         List<Long> cartIds = Arrays.stream(idsString.split(","))
@@ -125,5 +125,40 @@ public class OrderController {
         JSONObject response = new JSONObject();
         response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
+    }
+
+    // 바로 구매 요청 처리용 새로운 엔드포인트 추가
+    @PostMapping("/new-direct")
+    public List<CartProductDTO> getDirectOrderData(@RequestBody DirectOrderRequestDTO request) {
+
+        List<CartProductDTO> orderItems = new ArrayList<>();
+
+        for (OrderItemRequestDTO itemDTO : request.getItems()) {
+            // 프론트에서 받은 상품 ID, 색상, 사이즈로 Stock 엔티티를 조회합니다.
+            Optional<Stock> stockOpt = stockRepository.findByProductIdAndColorAndSize(request.getProductId(), itemDTO.getColor(), itemDTO.getSize());
+
+            if (stockOpt.isPresent()) {
+                Stock stock = stockOpt.get();
+                // CartProductDTO를 만들어 주문 상품 정보를 구성합니다.
+                CartProductDTO dto = new CartProductDTO();
+                dto.setStockId(stock.getId());
+                dto.setProductId(stock.getProduct().getId());
+                dto.setProductImageId(stock.getImage().getId());
+                dto.setProductName(stock.getProduct().getName());
+                dto.setProductPrice(stock.getProduct().getPrice());
+                dto.setDiscountedProductPrice(dto.getProductPrice());
+                dto.setProductColor(stock.getColor());
+                dto.setProductSize(stock.getSize());
+                dto.setQuantity(itemDTO.getQuantity());
+                dto.setSellerBusinessName(stock.getProduct().getSeller().getBusinessName());
+
+                orderItems.add(dto);
+            } else {
+                // 유효하지 않은 옵션에 대한 처리
+                throw new IllegalArgumentException("상품 옵션을 찾을 수 없습니다: " + itemDTO.getColor() + ", " + itemDTO.getSize());
+            }
+        }
+
+        return orderItems;
     }
 }
