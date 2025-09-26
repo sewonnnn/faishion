@@ -39,10 +39,10 @@ public class ReviewController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
-            // 1. 로그인한 사용자의 username으로 Optional<User> 객체를 찾습니다.
+            // 1. 로그인한 사용자의 username으로 Optional<User> 객체 찾음
             Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
 
-            // 2. 만약 userOptional이 비어있다면, 인증 오류를 반환합니다.
+            // 2. 만약 userOptional이 비어있다면, 인증 오류를 반환
             //    (user가 존재하지 않는 경우)
             if (!userOptional.isPresent()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인한 사용자를 찾을 수 없습니다.");

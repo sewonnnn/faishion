@@ -80,7 +80,7 @@ public class AuthController {
                     .queryParam("state", body.get("state"))
                     .toUriString();
 
-            // JSON 응답을 Map으로 바로 받습니다.
+            // JSON 응답을 Map으로 바로 받음
             ResponseEntity<Map> tokenResponse = restTemplate.getForEntity(tokenUrl, Map.class);
             Map<String, Object> tokenBody = tokenResponse.getBody();
             String accessToken = (String) tokenBody.get("access_token");
@@ -111,9 +111,8 @@ public class AuthController {
             //String naverUserEmail = (String) profileData.get("email");
 
             // 3. 로그인 처리
-            // naverUserId를 사용하여 서비스의 DB에서 사용자를 조회하거나, 새로 생성하는 로직을 추가합니다.
-            // 세션에 사용자 정보를 저장하거나 JWT 토큰을 발급하여 클라이언트에 전달합니다.
-
+            // naverUserId를 사용하여 서비스의 DB에서 사용자를 조회하거나, 새로 생성하는 로직을 추가
+            // 세션에 사용자 정보를 저장하거나 JWT 토큰을 발급하여 클라이언트에 전달
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {

@@ -45,7 +45,7 @@ const SellerQnaDetail = () => {
         }
 
         try {
-            // ✅ URL과 메소드를 백엔드 API에 맞게 수정
+            // URL과 메소드를 백엔드 API에 맞게 수정
             const response = await api.put(`/qna/answer/${id}`, {
                 answer: answerText,
             });
@@ -99,7 +99,7 @@ const SellerQnaDetail = () => {
                     </span>
                 </Card.Header>
                 <Card.Body>
-                    {/* ✅ <Card.Text>를 제거하고 <div>로 감싸서 HTML 구조 오류 해결 */}
+                    {/* <Card.Text>를 제거하고 <div>로 감싸서 HTML 구조 오류 해결 */}
                     <div>
                         <p><strong>작성자:</strong> {qna.user_id}</p>
                         {qna.product && <p><strong>상품:</strong> {qna.productName}</p>}

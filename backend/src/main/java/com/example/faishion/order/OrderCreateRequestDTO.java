@@ -13,14 +13,17 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderCreateRequestDTO {
     private String userId; // JSON의 "userId"와 매핑
+
+    private String zipcode;
+    private String street;
+    private String detail;
+    private String requestMsg;
     private Long addressId; // JSON의 "addressId"와 매핑
     private String orderName; // JSON의 "orderName"과 매핑
     private double totalAmount; // JSON의 "totalAmount"와 매핑
     private List<OrderItemDTO> items; // JSON의 "items" 배열과 매핑
 
 
-
-    // ⭐ OrderItemDTO를 OrderCreateRequestDTO 내부에 정적 클래스로 정의
     @Getter
     @Setter
     @NoArgsConstructor

@@ -78,7 +78,6 @@ const MyPageDetail = () => {
             let updatedUserData = {...formData};
 
             // 이미지 파일이 선택되지 않았을 경우, 기존 이미지 정보를 그대로 사용
-            // (주의: customer 상태에 image 정보가 올바르게 담겨 있어야 합니다)
             if (!selectedImage && customer && customer.image) {
                 updatedUserData = { ...updatedUserData, image: { id: customer.image.id } };
             } else if (selectedImage) {

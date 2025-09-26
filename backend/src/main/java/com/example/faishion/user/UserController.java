@@ -77,8 +77,6 @@ public class UserController {
 
         userRepository.save(existingUser);
 
-        // 주소 업데이트 로직은 AddressService에 위임 (이미 구현된 대로 작동)
-        // 주소 필드는 프론트엔드에서 항상 빈 문자열로라도 전송되므로 null 체크는 필요 없습니다.
         addressService.updateOrCreateDefaultAddress(
                 id,
                 userUpdateDTO.getZipcode(),
