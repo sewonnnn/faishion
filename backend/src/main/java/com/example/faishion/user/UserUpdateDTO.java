@@ -1,6 +1,7 @@
 package com.example.faishion.user;
 
 import com.example.faishion.address.Address;
+import com.example.faishion.address.AddressDTO;
 import com.example.faishion.image.Image;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +21,10 @@ public class UserUpdateDTO {
     private Image image;
     private int height;
     private int weight;
-    private Address address;
+    private AddressDTO address;
 
     // 편의를 위한 생성자 추가
-    public UserUpdateDTO(String id, String name, String email, String phoneNumber, Image image, int height, int weight, Address address) {
+    public UserUpdateDTO(String id, String name, String email, String phoneNumber, Image image, int height, int weight, AddressDTO address) {
         this.id = id;
         this.name = name;
         this.email = email;
