@@ -158,16 +158,6 @@ public class AuthController {
     }
 
 
-    // 카카오 로그인
-    @PostMapping("/login/kakao")
-    public ResponseEntity<?> loginKakao(@RequestBody Map<String, String> body, HttpServletResponse response) {
-        User u = authService.loginKakao(body.get("code"));
-        var tokens = authService.issueTokens(u);
-
-        setCookies(response, tokens);
-        return ResponseEntity.ok(new AuthDto.TokenRes(tokens.get("access"), tokens.get("refresh")));
-    }
-
     // 공통 쿠키 저장 메소드
     private void setCookies(HttpServletResponse response, Map<String, String> tokens) {
         Cookie accessCookie = new Cookie("accessToken", tokens.get("access"));

@@ -123,55 +123,6 @@ public class AuthService {
                 });
     }
 
-    // 카카오 로그인
-    public User loginKakao(String code) {
-        RestTemplate rt = new RestTemplate();
-
-        // 1. 액세스 토큰 요청
-        String tokenUrl = "https://kauth.kakao.com/oauth/token" +
-                "?grant_type=authorization_code" +
-                "&client_id=" + System.getenv("KAKAO_CLIENT_ID") +
-                "&redirect_uri=" + System.getenv("KAKAO_REDIRECT_URI") +
-                "&code=" + code;
-
-        Map tokenRes = rt.postForObject(tokenUrl, null, Map.class);
-        String accessToken = (String) tokenRes.get("access_token");
-
-        // 2. 사용자 정보 요청
-        var headers = new org.springframework.http.HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        var entity = new org.springframework.http.HttpEntity<>(headers);
-
-        var profileRes = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                org.springframework.http.HttpMethod.GET,
-                entity,
-                Map.class
-        );
-
-        Map resp = profileRes.getBody();
-        String providerUserId = String.valueOf(resp.get("id"));
-
-        Map kakaoAccount = (Map) resp.get("kakao_account");
-        String email = (String) kakaoAccount.get("email");
-        Map profile = (Map) kakaoAccount.get("profile");
-        String nickname = (String) profile.get("nickname");
-
-        // 3. DB에 사용자 존재 여부 확인
-        return userRepo.findByProviderAndProviderUserId(AuthProvider.KAKAO, providerUserId)
-                .orElseGet(() -> {
-                    User u = new User();
-                    u.setId("KAKAO_" + providerUserId); // PK 충돌 방지
-                    u.setProvider(AuthProvider.KAKAO);
-                    u.setProviderUserId(providerUserId);
-                    u.setEmail(email != null ? email : "no-email@kakao.com");
-                    u.setName(nickname != null ? nickname : "카카오사용자");
-                    u.setName(nickname);
-                    u.setPhoneNumber("010-0000-0000");
-                    return userRepo.save(u);
-                });
-    }
-
     // JWT 발급
     public Map<String, String> issueTokens(User u) {
         String access = jwt.generateAccess(u.getId(), List.of("ROLE_USER"));

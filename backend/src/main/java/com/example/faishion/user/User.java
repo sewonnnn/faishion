@@ -37,7 +37,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private AuthProvider provider; // LOCAL, NAVER, KAKAO
+    private AuthProvider provider; // LOCAL, NAVER
 
     @Column(name="provider_user_id", length=100)
     private String providerUserId; // LOCAL일 땐 null
