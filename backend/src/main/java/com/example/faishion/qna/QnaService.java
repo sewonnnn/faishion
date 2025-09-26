@@ -64,7 +64,7 @@ public class QnaService {
     public List<Qna> findByProduct_Id(Long productId) {
         String currentUserId = "sewon"; // 임시 사용자 ID
 
-        // 상품 정보를 가져와 판매자 ID를 확인합니다.
+        // 상품 정보를 가져와 판매자 ID를 확인
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
         String sellerId = product.getSeller().getId();

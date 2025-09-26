@@ -4,7 +4,12 @@ import { Button, Form } from 'react-bootstrap';
 // props로 postcode와 baseAddress를 받음
 const PostcodeSearch = ({ postcode, baseAddress, onAddressSelect }) => {
 
+    console.log(postcode);
+    console.log(baseAddress);
+    console.log(onAddressSelect);
+
     const openPostcode = () => {
+
         new window.daum.Postcode({
             oncomplete: function(data) {
                 let fullAddress = data.address;

@@ -25,13 +25,7 @@ public class PaymentController {
 
     @PostMapping("/confirm")
     public ResponseEntity<String> confirmPayment(@RequestBody Payment payment, @AuthenticationPrincipal UserDetails userDetails ) {
-        // ⭐️ @RequestBody로 PaymentDTO 객체를 받습니다. ⭐️
-//         String userName = userDetails.getUsername();
-//         long orderId = Long.parseLong(request.getOrderId());
-//
-//        log.info("결제 승인 요청 전체 데이터: {}", request); // @Slf4j의 log 사용
-//        log.info("유저 이름:"+userName);
-//        log.info("Order ID: {}", orderId);
+
         System.out.println(userDetails == null);
         String userId = userDetails.getUsername();
         System.out.println("주문ID : " + payment.getOrder().getId());

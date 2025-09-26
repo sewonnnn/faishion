@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -73,29 +72,32 @@ public class OrderController {
             @AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("로그인한 사용자:"+userDetails.getUsername());
         System.out.println("-----------주문 생성 시작----------------------");
-        // 1. 사용자 및 배송지 엔티티 조회
+        // 1. 사용자 엔티티 조회
         if(userDetails == null) throw new RuntimeException("인증된 사용자 정보가 없습니다.");
-
         User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        Address address = addressRepository.findByUser(user);
+        // 2. DTO에서 받은 주소 정보로 새로운 Address 엔티티 생성
+        Address newAddress = new Address();
+        newAddress.setUser(user);
+        newAddress.setZipcode(request.getZipcode());
+        newAddress.setStreet(request.getStreet());
+        newAddress.setDetail(request.getDetail());
+        newAddress.setRequestMsg(request.getRequestMsg());
 
-        System.out.println("주문자 주소:"+address.getDetail());
+        // 이 주소를 저장할지 여부는 비즈니스 로직에 따라 결정
+        // 예: 별도로 주소록에 저장하는 로직이 없다면, 여기서 저장
+        addressRepository.save(newAddress);
 
-        // 2. 주문 생성
+        // 3. 주문 생성
         String clientOrderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + System.currentTimeMillis();
-
-        System.out.println("주문자 id 생성:"+clientOrderId);
-
         Order order = new Order();
         order.setClientOrderId(clientOrderId);
         order.setUser(user);
-        order.setAddress(address);
+        order.setAddress(newAddress); // 새로 생성한 주소 엔티티 사용
         order.setStatus("PENDING");
         order.setOrderName(request.getOrderName());
         order.setTotalAmount(request.getTotalAmount());
         orderRepository.save(order);
-
         System.out.println("주문 저장 완료:"+order.getStatus());
 
         // 3. 주문 상품 생성 및 재고 차감
@@ -103,7 +105,7 @@ public class OrderController {
             Stock stock = stockRepository.findById(itemDTO.getStockId())
                     .orElseThrow(() -> new IllegalArgumentException("재고를 찾을 수 없습니다: " + itemDTO.getStockId()));
 
-            // ⭐ 재고 확인 및 차감 로직
+            // 재고 확인 및 차감 로직
             if (stock.getQuantity() < itemDTO.getQuantity()) {
                 throw new IllegalArgumentException("상품 " + stock.getProduct().getName() + "의 재고가 부족합니다.");
             }

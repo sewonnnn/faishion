@@ -86,7 +86,7 @@ public class AuthController {
                     .queryParam("redirect_uri", "http://localhost:5173/oauthcallback/naver") //  추가
                     .toUriString();
 
-            // JSON 응답을 Map으로 바로 받습니다.
+            // JSON 응답을 Map으로 바로 받음
             ResponseEntity<Map> tokenResponse = restTemplate.getForEntity(tokenUrl, Map.class);
             Map<String, Object> tokenBody = tokenResponse.getBody();
             System.out.println("네이버 토큰 응답: " + tokenBody);

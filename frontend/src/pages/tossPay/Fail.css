@@ -1,0 +1,89 @@
+.fail-page-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.main-content {
+    padding: 2rem 0;
+}
+
+.fail-message-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.fail-icon svg {
+    color: #e74c3c;
+    stroke-width: 2.5;
+}
+
+.fail-message-title {
+    font-size: 1.8rem;
+    color: #e74c3c;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.fail-reason {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.error-details {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.error-details strong {
+    font-weight: bold;
+}
+
+.retry-action {
+    margin-top: 2rem;
+}
+
+.retry-button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+    background-color: #2980b9;
+}
