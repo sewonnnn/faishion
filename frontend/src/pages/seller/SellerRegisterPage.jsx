@@ -31,7 +31,7 @@ const SellerRegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8080/seller/register", form, {
+            const res = await axios.post("http://localhost:8080/auth/seller/register", form, {
                 headers: { "Content-Type": "application/json" },
             });
             alert(res.data); // "판매자 회원가입 성공"
