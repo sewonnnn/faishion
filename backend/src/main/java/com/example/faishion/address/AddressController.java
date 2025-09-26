@@ -2,10 +2,10 @@ package com.example.faishion.address;
 
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
-import jakarta.transaction.Transactional; // ⭐ 추가
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus; // ⭐ 추가
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -120,11 +120,8 @@ public class AddressController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // 기본 배송지일 경우 삭제를 막거나, 다른 주소를 기본으로 설정하는 로직 필요
         if (addressToDelete.getIsDefault()) {
-            // 🚨 중요: 기본 주소를 삭제할 경우, 다른 주소를 기본 주소로 자동 설정하거나 에러를 반환해야 합니다.
-            // 여기서는 편의상 에러를 반환하겠습니다.
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // "기본 배송지는 삭제할 수 없습니다."
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         addressRepository.delete(addressToDelete);
