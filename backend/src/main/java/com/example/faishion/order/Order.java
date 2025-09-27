@@ -31,9 +31,17 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Address address;
+
+     */
+
+    private String zipcode; //우편번호
+    private String street; //도로명 주소
+    private String detail; //상세주소
+    private String requestMsg; // 요청사항
 
     /*
     @ManyToOne(fetch = FetchType.LAZY)

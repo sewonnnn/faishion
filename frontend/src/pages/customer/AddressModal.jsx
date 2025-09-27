@@ -16,7 +16,7 @@ const initialAddressData = {
     requestMsg: '',
 };
 
-const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
+const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSelectForUse = null}) => {
     const {api} = useAuth();
     const [addresses, setAddresses] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
@@ -122,11 +122,15 @@ const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
 
             await fetchAddresses(); // 모달 내 목록 새로고침
 
-            alert("기본 배송지가 성공적으로 변경되었습니다.");
-
         } catch (error) {
             console.error('기본 배송지 설정 실패:', error);
             alert("기본 배송지 설정에 실패했습니다.");
+        }
+    };
+
+    const handleSelectAddressForUse = (address) => {
+        if (handleAddressSelectForUse) {
+            handleAddressSelectForUse(address);
         }
     };
 
@@ -138,6 +142,8 @@ const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
         handleClose();
     };
 
+    // 리스트 아이템에 동적 클래스 및 클릭 핸들러 적용
+    const isSelectable = !!handleAddressSelectForUse && !isAdding && !editingAddress;
 
     return (
         <Modal show={show} onHide={handleModalClose} size="lg" centered>
@@ -207,7 +213,9 @@ const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
                         addresses.map((address) => (
                             <ListGroup.Item
                                 key={address.id}
+                                action={isSelectable}
                                 className={`d-flex justify-content-between align-items-center ${address.isDefault ? 'border border-primary border-3' : ''}`}
+                                onClick={isSelectable ? () => handleSelectAddressForUse(address) : undefined}
                             >
                                 <div>
                                     <p className="mb-1 fw-bold">
@@ -224,14 +232,20 @@ const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
                                             variant="outline-secondary"
                                             size="sm"
                                             className="me-2"
-                                            onClick={() => setEditingAddress(address)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingAddress(address);
+                                            }}
                                         >
                                             <FaPencilAlt /> 수정
                                         </Button>
                                         <Button
                                             variant="outline-danger"
                                             size="sm"
-                                            onClick={() => handleDeleteAddress(address.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteAddress(address.id);
+                                            }}
                                         >
                                             <FaTrashAlt /> 삭제
                                         </Button>
@@ -240,7 +254,10 @@ const AddressModal = ({show, handleClose, handleAddressUpdated}) => {
                                         <Button
                                             variant="info"
                                             size="sm"
-                                            onClick={() => handleSetDefault(address.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSetDefault(address.id);
+                                            }}
                                         >
                                             기본 배송지로 설정
                                         </Button>
