@@ -86,9 +86,11 @@ public class QnaController {
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<QnaResponseDTO>> getQuestionsByProductId(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
-        List<Qna> questions = qnaService.findByProduct_Id(productId);
+        List<Qna> questions = qnaService.findByProduct_Id(productId); // 얘를 못찾음
         String currentUsername = (userDetails != null) ? userDetails.getUsername() : null; // 현재 로그인된 사용자 ID (username)
-
+        for(Qna q : questions){
+            System.out.println(q.getContent());
+        }
         List<QnaResponseDTO> responseDTOs = questions.stream()
                 .map(qna -> {
                     String userName = (qna.getUser() != null) ? qna.getUser().getId() : "익명";

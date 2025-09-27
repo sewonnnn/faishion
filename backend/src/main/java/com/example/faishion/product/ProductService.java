@@ -240,9 +240,16 @@ public class ProductService {
     // 카테고리 타입에 맞는 상품 불러오기
     public List<Product> findAllByType(String type){
         List<Product> products = new ArrayList<>();
+        LocalDateTime currentDateTime = LocalDateTime.now();
         switch(type){
-            case "sale": // 할인가격이 있는 상품만 불러오기
-                products = productRepository.findByDiscountPriceIsNotNullAndDiscountPriceGreaterThan(0);
+            case "sale":
+                List<Product> saleProducts = productRepository.findByDiscountPriceIsNotNullAndDiscountPriceGreaterThan(0);
+
+                products = saleProducts.stream()
+                        .filter(p -> p.getDiscountStartDate() != null && p.getDiscountEndDate() != null) // 날짜 필드가 null이 아닌지 확인
+                        .filter(p -> currentDateTime.isAfter(p.getDiscountStartDate()) &&
+                                currentDateTime.isBefore(p.getDiscountEndDate()))
+                        .collect(Collectors.toList());
                 break;
             case "new": // 상품등록 3일 이내인 상품
                 LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
