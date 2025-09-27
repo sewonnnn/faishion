@@ -74,4 +74,10 @@ public class ReviewService {
         }
         return false;
     }
+
+    // 관리자용: 리뷰 ID로 리뷰 삭제
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        reviewRepository.deleteById(reviewId);
+    }
 }

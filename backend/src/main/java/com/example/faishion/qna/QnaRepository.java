@@ -1,5 +1,6 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.seller.Seller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,7 +30,7 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
     // 답변, 답변자(판매자) 추가
     @Modifying
     @Query("UPDATE Qna q SET q.answer = :answer, q.answeredBy = :answeredBy WHERE q.id = :id")
-    void updateAnswer(@Param("answer") String answer, @Param("answeredBy") String answeredBy,@Param("id") long id);
+    void updateAnswer(@Param("answer") String answer, @Param("answeredBy") Seller seller, @Param("id") long id);
 
     // 상품 개별 문의 리스트 가져오기
     List<Qna> findByProduct_Id(Long productId);

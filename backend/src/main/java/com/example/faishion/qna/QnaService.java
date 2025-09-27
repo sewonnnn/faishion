@@ -2,6 +2,7 @@ package com.example.faishion.qna;
 
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
+import com.example.faishion.seller.Seller;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,8 +55,8 @@ public class QnaService {
 
     // 답변, 답변자(판매자) 추가하기
     @Transactional
-    public void updateAnswer(long id, String answer, String answeredBy) {
-        qnaRepository.updateAnswer(answer,answeredBy,id);
+    public void updateAnswer(long id, String answer, Seller seller) {
+        qnaRepository.updateAnswer(answer,seller,id);
     }
 
 

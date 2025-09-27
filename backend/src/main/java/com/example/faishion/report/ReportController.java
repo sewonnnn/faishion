@@ -5,6 +5,8 @@ import com.example.faishion.review.ReviewService;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,6 +44,30 @@ public class ReportController {
             reportService.save(report);
             reviewService.reportReview(reportDTO.getReviewId()); // 리뷰 테이블 is_reported 상태값 변경
             return ResponseEntity.ok("신고가 정상적으로 되었습니다.");
+        }
+    }
+
+    // 🚨 1. 관리자: 신고 목록 페이징 조회 API (반환 타입 수정)
+    @GetMapping("/list")
+    public Page<ReportResponseDTO> getReportList(Pageable pageable) { // 🚨 DTO로 변경
+
+        Page<Report> reportPage = reportService.findAllReports(pageable);
+
+        return reportPage.map(ReportResponseDTO::new);
+    }
+
+    // 🚨 2. 관리자: 리뷰 삭제 및 신고 처리 API
+    @DeleteMapping("/delete/{reviewId}")
+    public ResponseEntity<String> deleteReportedReview(@PathVariable Long reviewId) {
+        try {
+            reportService.deleteReportsByReviewId(reviewId);
+
+            reviewService.deleteReview(reviewId);
+
+            return ResponseEntity.ok("리뷰 및 관련 신고 처리가 완료되었습니다.");
+        } catch (Exception e) {
+            System.err.println("리뷰 삭제 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 중 오류가 발생했습니다.");
         }
     }
 }
