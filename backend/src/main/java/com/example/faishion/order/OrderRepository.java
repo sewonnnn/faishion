@@ -14,11 +14,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"orderItemList", "orderItemList.stock", "orderItemList.stock.product", "user"})
     Optional<Order> findByClientOrderId(String clientOrderId);
 
-    @Query("SELECT DISTINCT o FROM Order o " +
+    @Query("SELECT o FROM Order o " +
             "JOIN o.orderItemList oi " +
             "JOIN oi.stock s " +
             "JOIN s.product p " +
-            "JOIN p.seller seller " +
-            "WHERE seller.id = :sellerId")
-    Page<Order> findOrdersBySellerId(@Param("sellerId") String sellerId, Pageable pageable);
+            "LEFT JOIN o.deliveryList dl " +
+            "WHERE p.seller.id = :sellerId " +
+            "AND o.status = 'COMPLETED' " +
+            "AND (dl IS NULL OR dl.seller.id = :sellerId) " +
+            "ORDER BY o.createdAt DESC ")
+    Page<Order> findBySellerId(@Param("sellerId") String sellerId, Pageable pageable);
 }

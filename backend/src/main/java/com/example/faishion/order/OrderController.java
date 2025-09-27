@@ -130,22 +130,10 @@ public class OrderController {
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<Page<Order>> getSellerOrders(
-            @AuthenticationPrincipal String sellerId,
+    public ResponseEntity<Page<SellerOrderDTO>> sellerOrders(
+            @AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable) {
-
-        Page<Order> ordersPage = orderService.getOrdersBySellerId(sellerId, pageable);
-
-
-        return ResponseEntity.ok(ordersPage);
+        Page<SellerOrderDTO> sellerOrders = orderService.getOrdersBySellerId(userDetails.getUsername(), pageable);
+        return ResponseEntity.ok(sellerOrders);
     }
-    /*
-    @GetMapping("/seller")
-    public ResponseEntity<JSONObject> getSellerOrders(@AuthenticationPrincipal String sellerId, Pageable pageable) {
-        Page<Order> ordersPage = orderService.getOrdersBySellerId(sellerId, pageable);
-        JSONObject response = new JSONObject();
-        return ResponseEntity.ok(response);
-    }
-
-     */
 }

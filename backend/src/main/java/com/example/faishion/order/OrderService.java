@@ -8,6 +8,7 @@ import com.example.faishion.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -67,8 +68,14 @@ public class OrderService {
         return payment;
     }
 
-    public Page<Order> getOrdersBySellerId(String sellerId, Pageable pageable) {
-        return orderRepository.findOrdersBySellerId(sellerId, pageable);
+    public Page<SellerOrderDTO> getOrdersBySellerId(String sellerId, Pageable pageable) {
+        Page<Order> orders = orderRepository.findBySellerId(sellerId, pageable);
+        return new PageImpl<>(orders.getContent()
+                .stream()
+                .map(SellerOrderDTO::new).toList(),
+                pageable,
+                orders.getTotalElements()
+        );
     }
 
     public void createOrderFromCartItems(List<Long> cartIds) {
