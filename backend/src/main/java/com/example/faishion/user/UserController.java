@@ -1,5 +1,6 @@
 package com.example.faishion.user;
 
+import com.example.faishion.address.AddressDTO;
 import com.example.faishion.address.AddressService;
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageRepository;
@@ -29,32 +30,37 @@ public class UserController {
         User user = userRepository.findById(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
-        String zipcode = "";
-        String street = "";
-        String detail = "";
-        int height;
-        int weight;
-        if(user.getHeight() != 0){
-            height = user.getHeight();
-            weight = user.getWeight();
-        }else{
-            height = 0;
-            weight = 0;
-        }
+        int height = user.getHeight();
+        int weight = user.getWeight();
 
-        // 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
-        Optional<Address> defaultAddress = user.getAddressList().stream()
+        // ⭐ 주소: 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
+        Address address = user.getAddressList().stream()
                 .filter(Address::getIsDefault)
-                .findFirst();
+                .findFirst()
+                .orElse(null); // 없으면 null 반환
 
-        if (defaultAddress.isPresent()) {
-            Address userAddress = defaultAddress.get();
-            zipcode = userAddress.getZipcode();
-            street = userAddress.getStreet();
-            detail = userAddress.getDetail();
+        AddressDTO addressDTO = null;
+        if (address != null) {
+            addressDTO = new AddressDTO(
+                    address.getId(),
+                    address.getZipcode(),
+                    address.getStreet(),
+                    address.getDetail(),
+                    address.getIsDefault(),
+                    address.getRequestMsg()
+            );
         }
 
-        return ResponseEntity.ok(new UserUpdateDTO(user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber(), user.getImage(),height,weight, zipcode, street, detail));
+        return ResponseEntity.ok(new UserUpdateDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getImage(),
+                height,
+                weight,
+                addressDTO
+        ));
     }
 
     // 유저정보 업데이트
@@ -63,7 +69,7 @@ public class UserController {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
-        // ⭐ 비밀번호 업데이트 로직 추가
+        System.out.println("유저 비밀번호 수정 : "+userUpdateDTO.getPassword());
         // DTO에 비밀번호가 존재하고 비어있지 않은 경우에만 암호화하여 저장
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
@@ -100,14 +106,6 @@ public class UserController {
         }
 
         userRepository.save(existingUser);
-
-        // 주소 업데이트 로직은 AddressService에 위임
-        addressService.updateOrCreateDefaultAddress(
-                id,
-                userUpdateDTO.getZipcode(),
-                userUpdateDTO.getStreet(),
-                userUpdateDTO.getDetail()
-        );
 
         return ResponseEntity.ok("User and address updated successfully!");
     }

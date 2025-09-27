@@ -19,9 +19,10 @@ import java.util.List;
 public class SellerOrderDTO {
     private Long id;
     private List<OrderItemDTO> orderItems;
-    private String address;
-    private String addressDetail;
+    private String street;
+    private String detail;
     private String zipcode;
+    private String requestMsg;
     private DeliveryDTO delivery;
 
     public SellerOrderDTO(Order order) {
@@ -30,10 +31,10 @@ public class SellerOrderDTO {
                 .map(OrderItemDTO::new)
                 .toList();
         this.delivery = !order.getDeliveryList().isEmpty() ? new DeliveryDTO(order.getDeliveryList().get(0)) : null;
-        Address address = order.getAddress();
-        this.address = address.getStreet();
-        this.addressDetail = address.getDetail();
-        this.zipcode = address.getZipcode();
+        this.requestMsg = order.getRequestMsg();
+        this.street = order.getStreet();
+        this.zipcode = order.getZipcode();
+        this.detail = order.getDetail();
     }
 
     @Getter

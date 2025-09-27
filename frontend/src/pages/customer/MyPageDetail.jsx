@@ -1,10 +1,14 @@
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useEffect, useState, useRef} from "react";
 import {Container, Card, Form, Button, Row, Col, Image as BootstrapImage} from 'react-bootstrap';
-import {FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight, FaEye, FaEyeSlash} from 'react-icons/fa';
-import PostcodeSearch from "./PostcodeSearch.jsx";
+import {
+    FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight, FaEye, FaEyeSlash,
+    FaMapMarkerAlt
+} from 'react-icons/fa';
 import defaultImage from "../../assets/user.jpg";
 import "../../pages/MyPage.css";
+import AddressModal from "./AddressModal.jsx";
+
 
 const MyPageDetail = () => {
     const {api} = useAuth();
@@ -17,59 +21,60 @@ const MyPageDetail = () => {
         password: '',
         height: '',
         weight: '',
-        zipcode: '',
-        street: '',
-        detail: '',
     });
-    const [passwordConfirm, setPasswordConfirm] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false);
-    const [isPasswordSaved, setIsPasswordSaved] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const [defaultAddress, setDefaultAddress] = useState(null); // 기본배송지 정보 상태
+    const [showAddressModal, setShowAddressModal] = useState(false); // 모달 관리
+    const [passwordConfirm, setPasswordConfirm] = useState(''); // 비밀번호 작성창
+    const [passwordError, setPasswordError] = useState(''); // 패스워드 에러메시지
+    const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false); // 비밀번호 저장모드 전환
+    const [isPasswordSaved, setIsPasswordSaved] = useState(false); // 비밀번호 저장가능 여부 (정규화)
+    const [showPassword, setShowPassword] = useState(false); // 비밀번호 가시화
 
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+    const [selectedImage, setSelectedImage] = useState(null); // 이미지 선택
+    const [imagePreviewUrl, setImagePreviewUrl] = useState(''); // 이미지 url
 
     const fileInputRef = useRef(null);
+    const fetchUserData = async () => {
+        try {
+            const response = await api.get(`/user/`);
+            const userData = response.data;
+            setCustomer(userData); // 유저정보
+            setDefaultAddress(userData.address); // 주소정보
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await api.get(`/user/`);
-                const userData = response.data;
-                setCustomer(userData);
+            setFormData({
+                id: userData.id,
+                email: userData.email,
+                name: userData.name,
+                phoneNumber: userData.phoneNumber,
+                password: '',
+                height: userData.height || '',
+                weight: userData.weight || '',
+            });
+            setPasswordConfirm('');
+            setPasswordError('');
+            setIsPasswordChangeMode(false);
+            setIsPasswordSaved(false);
 
-                setFormData({
-                    id: userData.id,
-                    email: userData.email,
-                    name: userData.name,
-                    phoneNumber: userData.phoneNumber,
-                    password: '',
-                    height: userData.height || '',
-                    weight: userData.weight || '',
-                    zipcode: userData.zipcode,
-                    street: userData.street,
-                    detail: userData.detail,
-                });
-                setPasswordConfirm('');
-                setPasswordError('');
-                setIsPasswordChangeMode(false);
-                setIsPasswordSaved(false); // 상태 초기화
-
-                if (userData.image && userData.image.id) {
-                    setImagePreviewUrl(`${api.defaults.baseURL}/image/${userData.image.id}`);
-                } else {
-                    setImagePreviewUrl(defaultImage);
-                }
-
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+            if (userData.image && userData.image.id) {
+                setImagePreviewUrl(`${api.defaults.baseURL}/image/${userData.image.id}`);
+            } else {
                 setImagePreviewUrl(defaultImage);
             }
-        };
+
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            setImagePreviewUrl(defaultImage);
+        }
+    };
+    useEffect(() => {
         fetchUserData();
     }, [api]);
-
+    // 주소관리
+    const handleAddressUpdated = (newDefaultAddress) => {
+        setDefaultAddress(newDefaultAddress);
+        // 사용자 정보를 다시 불러와서 최신 상태를 반영할 수도 있습니다.
+        // fetchUserData();
+    };
     const handleInputChange = (e) => {
         const {name, value} = e.target;
 
@@ -84,14 +89,6 @@ const MyPageDetail = () => {
         } else {
             setFormData({...formData, [name]: updatedValue});
         }
-    };
-
-    const handleAddressSelect = (addressData) => {
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            zipcode: addressData.zipcode,
-            street: addressData.street,
-        }));
     };
 
     const handleImageChange = (e) => {
@@ -118,7 +115,6 @@ const MyPageDetail = () => {
         }
     };
 
-    // ⭐ 추가: 비밀번호 저장 버튼 핸들러
     const handlePasswordSave = () => {
         // 정규화: 문자, 숫자, 특수문자(@$!%*#?&) 포함 8자 이상
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -180,10 +176,6 @@ const MyPageDetail = () => {
             } else {
                 updatedUserData = { ...updatedUserData, image: null };
             }
-
-            updatedUserData.zipcode = formData.zipcode;
-            updatedUserData.street = formData.street;
-            updatedUserData.detail = formData.detail;
 
             await api.put(`/user/${updatedUserData.id}`, updatedUserData);
             alert("회원 정보가 성공적으로 수정되었습니다.");
@@ -326,10 +318,17 @@ const MyPageDetail = () => {
                                             <Form.Group className="mb-3">
                                                 <Button
                                                     variant="primary"
-                                                    className="w-100"
+                                                    className="w-50"
                                                     onClick={handlePasswordSave}
                                                 >
                                                     비밀번호 저장
+                                                </Button>
+                                                <Button
+                                                    variant="secondary"
+                                                    className="w-50"
+                                                    onClick={()=>setIsPasswordChangeMode(false)}
+                                                >
+                                                    비밀번호 변경취소
                                                 </Button>
                                             </Form.Group>
                                         </>
@@ -412,21 +411,29 @@ const MyPageDetail = () => {
                                     </Col>
                                 </Row>
 
-                                {/* 주소 검색 */}
-                                <PostcodeSearch
-                                    onAddressSelect={handleAddressSelect}
-                                    postcode={formData.zipcode}
-                                    baseAddress={formData.street}
-                                />
-                                {/* 상세 주소 */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>상세 주소</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="detail"
-                                        value={formData.detail}
-                                        onChange={handleInputChange}
-                                    />
+                                <Form.Group className="mb-4">
+                                    <Form.Label>기본 배송지</Form.Label>
+                                    <Card className="p-3 bg-light border-info">
+                                        {defaultAddress ? (
+                                            <>
+                                                <p className="mb-1 fw-bold">
+                                                    [{defaultAddress.zipcode}] {defaultAddress.street}
+                                                </p>
+                                                <p className="text-muted small mb-0">
+                                                    {defaultAddress.detail}
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <p className="text-muted mb-0">설정된 기본 배송지가 없습니다.</p>
+                                        )}
+                                    </Card>
+                                    <Button
+                                        variant="outline-info"
+                                        className="mt-2 w-100"
+                                        onClick={() => setShowAddressModal(true)}
+                                    >
+                                        <FaMapMarkerAlt className="me-1"/> 배송지 관리 / 기본 배송지 변경
+                                    </Button>
                                 </Form.Group>
                                 <div className="d-grid gap-2">
                                     <Button variant="primary" type="submit" size="lg">
@@ -438,6 +445,13 @@ const MyPageDetail = () => {
                     </Card>
                 </Col>
             </Row>
+            {/* ⭐ 배송지 관리 모달 추가 */}
+            <AddressModal
+                show={showAddressModal}
+                handleClose={() => setShowAddressModal(false)}
+                handleAddressUpdated={handleAddressUpdated} // 기본 주소 변경 시 부모 컴포넌트 업데이트 콜백
+            />
+
         </Container>
     );
 };

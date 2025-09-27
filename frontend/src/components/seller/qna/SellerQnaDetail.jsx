@@ -11,8 +11,7 @@ const SellerQnaDetail = () => {
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { api } = useAuth();
-
+    const { api, user } = useAuth();
     useEffect(() => {
         const fetchQnaDetail = async () => {
             try {
@@ -48,6 +47,7 @@ const SellerQnaDetail = () => {
             // URL과 메소드를 백엔드 API에 맞게 수정
             const response = await api.put(`/qna/answer/${id}`, {
                 answer: answerText,
+                answered_by: user.sub
             });
 
             if (response.status === 200) {

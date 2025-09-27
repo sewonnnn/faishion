@@ -169,7 +169,7 @@ function OrderManagementPage() {
                   <td className="align-middle text-start p-3">
                     <div className="mb-3 p-2 border rounded bg-light">
                         <span className="mb-1 me-2 fw-bold">수령 주소</span>
-                        <span className="mb-0">({order.zipcode || 'N/A'}) {order.address || '주소 정보 없음'} {order.addressDetail || ''}</span>
+                        <span className="mb-0">({order.zipcode || 'N/A'}) {order.street || '주소 정보 없음'} {order.detail || ''} ({order.requestMsg || ''})</span>
                     </div>
 
                     <div className="d-flex flex-column align-items-center justify-content-center">

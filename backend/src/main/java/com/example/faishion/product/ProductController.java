@@ -107,7 +107,8 @@ public class ProductController {
                 p.getDiscountStartDate() != null && p.getDiscountEndDate() != null &&
                         currentDateTime.isAfter(p.getDiscountStartDate()) && currentDateTime.isBefore(p.getDiscountEndDate());
 
-        if (type != null && !type.isEmpty()) { // type 선택시
+        if (type != null && !type.isEmpty()) {
+            // type 선택시 (기존 로직 유지)
             List<Product> products = productService.findAllByType(type);
 
             List<Map<String, Object>> content = products.stream()
@@ -116,19 +117,15 @@ public class ProductController {
                         map.put("productId", p.getId());
                         map.put("brandName", p.getSeller().getBusinessName());
 
-                        // 현재 할인 기간 중인지 확인
                         boolean isDiscounting = isCurrentlyDiscounting.apply(p);
 
                         map.put("isNew", p.getCreatedAt().isAfter(threeDaysAgo));
-                        // [수정] isSale을 isDiscounting과 통일! 뱃지와 가격을 일치시킴.
                         map.put("isSale", isDiscounting);
                         map.put("isBest",productService.findBestProduct(p.getReviewList()));
 
                         map.put("name", p.getName());
-                        // isDiscounting에 따라 finalPrice 설정
                         map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
 
-                        // isDiscounting이 true일 때만 originalPrice, discountRate 포함
                         if(isDiscounting) {
                             map.put("originalPrice", p.getPrice());
                             map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());
@@ -148,12 +145,13 @@ public class ProductController {
 
             return new PageImpl<>(content, pageable, content.size());
         }
-
-        // type 선택x
+        // type 미선택시 결과물
         Page<Object[]> result = productService.findProductsBySearch(searchQuery, categoryId, pageable);
         List<Map<String, Object>> content = result.stream().map(objects -> {
                     Map<String, Object> map = new LinkedHashMap<>();
+
                     Product p = (Product) objects[0];
+
                     map.put("productId", p.getId());
                     map.put("brandName", p.getSeller().getBusinessName());
 
@@ -161,15 +159,12 @@ public class ProductController {
                     boolean isDiscounting = isCurrentlyDiscounting.apply(p);
 
                     map.put("isNew", p.getCreatedAt().isAfter(threeDaysAgo));
-                    // [수정] isSale을 isDiscounting과 통일! 뱃지와 가격을 일치시킴.
                     map.put("isSale", isDiscounting);
                     map.put("isBest",productService.findBestProduct(p.getReviewList()));
 
                     map.put("name", p.getName());
-                    // isDiscounting에 따라 finalPrice 설정
                     map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
 
-                    // isDiscounting이 true일 때만 originalPrice, discountRate 포함
                     if(isDiscounting) {
                         map.put("originalPrice", p.getPrice());
                         map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());
@@ -180,8 +175,9 @@ public class ProductController {
                     map.put("imageUrl", p.getMainImageList().stream().findFirst().map(
                             image -> domain + "/image/" + image.getId()
                     ));
-                    map.put("reviewRating", objects[1]);
-                    map.put("reviewCount", objects[2]);
+                    map.put("reviewRating", objects.length > 1 ? objects[1] : 0.0);
+                    map.put("reviewCount", objects.length > 2 ? objects[2] : 0L);
+
                     return map;
                 })
                 .collect(Collectors.toList());

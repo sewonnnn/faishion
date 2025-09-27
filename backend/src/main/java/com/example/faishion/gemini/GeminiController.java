@@ -161,12 +161,9 @@ public class GeminiController {
             JsonArray base64Images = requestJson.getAsJsonArray("image1");
             String base64ModelImage = requestJson.get("image2").getAsString();
 
-            String prompt = "image1 is a full-body image of a person. All subsequent images (from image2 to imageX, up to six images)" +
-                    " are fashion items, which can include clothing, accessories, footwear, or headwear. Create a single photorealistic " +
-                    "full-body image of the person from image1 wearing and styled with all the fashion items from the other images. " +
-                    "The person should have a height of "+user.getHeight()+"cm and a weight of "+user.getWeight()+"kg, ensuring their body shape and " +
-                    "proportions are consistent with these measurements. Focus on seamless integration of all items, maintaining a realistic fit, " +
-                    "natural proportions, high-quality textures, and appropriate lighting.";
+            String prompt ="**CRITICAL: The face of the person in image1 must be kept identical to the original ID photo, without any modification or alteration whatsoever.** image1 is a full-body image of a person. All subsequent images (from image2 to imageX, up to six images total) are fashion items, which can include one or more complete outfits or individual pieces. Create a single photorealistic full-body image of the person from image1, explicitly showing them wearing and fully styled with all the fashion items from the other images. **Ensure the fit, design, color, and texture of the clothing items are highly accurate to their source images.** The person should have a height of " +
+                    user.getHeight()+"cm and a weight of "+user.getWeight()+"kg, ensuring their body shape and proportions are consistent with these measurements. Focus on seamless integration of all items, maintaining a realistic fit, natural proportions, high-quality textures, and appropriate lighting around the preserved face.";
+
 
             JsonArray partsArray = new JsonArray();
 
