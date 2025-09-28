@@ -53,26 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         naverPhone
                 );
             }
-            case "kakao" -> {
-                Map<String,Object> account = cast(attrs.get("kakao_account"));
-                String kakaoName = null;
-                String kakaoEmail = null;
-                String kakaoPhone = null;
-                if (account != null) {
-                    kakaoEmail = (String) account.get("email");
-                    Map<String,Object> profile = cast(account.get("profile"));
-                    if (profile != null) kakaoName = (String) profile.getOrDefault("nickname", "");
-                    String rawKakaoPhone = (String) account.get("phone_number");
-                    kakaoPhone = normalizeKakaoPhone(rawKakaoPhone);
-                }
-                yield new OAuth2UserInfo(
-                        AuthProvider.KAKAO,
-                        String.valueOf(attrs.get("id")),
-                        kakaoName,
-                        kakaoEmail,
-                        kakaoPhone
-                );
-            }
+
             default -> throw new IllegalArgumentException("Unsupported provider: " + registrationId);
         };
 

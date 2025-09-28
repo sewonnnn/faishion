@@ -44,9 +44,9 @@ const SellerRegisterPage = () => {
         <div>
             <h2>판매자 회원가입</h2>
             <form onSubmit={handleSubmit}>
-                <input name="id" placeholder="아이디" onChange={handleChange} required />
-                <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} required />
-                <input name="email" placeholder="이메일" onChange={handleChange} required />
+                <input name="id" value={form.id} placeholder="아이디" onChange={handleChange} required />
+                <input name="password" value={form.password} type="password" placeholder="비밀번호" onChange={handleChange} required />
+                <input name="email" value={form.email} placeholder="이메일" onChange={handleChange} required />
                 <input
                     name="phoneNumber"
                     placeholder="휴대폰 번호"

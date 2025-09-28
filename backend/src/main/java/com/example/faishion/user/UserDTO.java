@@ -11,8 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-
-    // 수정
     private String id;       // 사용자가 입력한 아이디(로컬) or 소셜 ID
     private String password; // 로컬만
     private String email;
