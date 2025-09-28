@@ -1,6 +1,5 @@
 package com.example.faishion.cart;
 
-import com.example.faishion.product.Product;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.user.User;
 import lombok.RequiredArgsConstructor;
@@ -15,27 +14,16 @@ import java.util.stream.Collectors;
 public class CartService {
     private final CartRepository cartRepository;
 
-    // 장바구니 리스트 출력
-//    public List<CartProductDTO> findAllCartList() {
-//        List<Cart> cartList = cartRepository.findAll();
-//
-//        return cartList.stream()
-//                .map(CartProductDTO::new)
-//                .collect(Collectors.toList());
-//    }
+    // 사용자 ID를 받아 해당 유저의 장바구니만 조회하는 메서드 추가
+    public List<CartProductDTO> findUserCartList(String userId) {
+        // 1. Repository를 통해 특정 User의 Cart 리스트를 조회
+        List<Cart> carts = cartRepository.findByUser_Id(userId);
 
-    // 장바구니 모든 리스트
-    public List<CartProductDTO> findAllCartList() {
-        // Fetch Join을 사용하여 모든 상세 정보를 한 번에 가져옴
-        List<Cart> cartList = cartRepository.findAllWithDetails();
-
-        // 스트림을 이용해 각 Cart 객체를 CartProductDTO로 변환
-        // DTO 생성자에서 필요한 정보를 모두 추출
-        return cartList.stream()
+        // 2. Cart 엔티티 리스트를 CartProductDTO 리스트로 변환하여 반환
+        return carts.stream()
                 .map(CartProductDTO::new)
                 .collect(Collectors.toList());
     }
-
     // 장바구니에서 선택한 상품 리스트
     public List<Cart> findCartsWithDetailsByIds(List<Long> ids) {
         // 리포지토리의 JOIN FETCH 메서드를 호출하여 데이터 조회

@@ -1,0 +1,77 @@
+/* OrderDetailPage.css */
+
+/* 배송 현황 컨테이너 */
+.delivery-steps-container {
+    position: relative;
+    padding: 0 15px; /* 좌우 여백 */
+}
+
+/* 각 개별 단계 (접수, 발송 등) */
+.delivery-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    z-index: 1;
+    font-size: 0.8rem;
+    padding: 0 5px; /* 단계 간 간격 조절 */
+}
+
+/* 원형 아이콘 */
+.step-circle {
+    width: 80px; /* 원 크기 조절 */
+    height: 80px; /* 원 크기 조절 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    line-height: 1.2;
+    z-index: 2; /* 텍스트가 라인 위에 보이도록 */
+    /* 기본 상태 */
+    border: 1px solid #ced4da;
+    color: #6c757d;
+    background-color: #fff;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0); /* 기본 그림자 없음 */
+}
+
+/* 활성화된 상태 */
+.delivery-step.active .step-circle {
+    /* 부트스트랩 primary 색상 사용 (#0d6efd) */
+    border: 2px solid #0d6efd;
+    color: #0d6efd;
+    background-color: #fff;
+    /* 이미지처럼 원형이 강조되는 효과 */
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+}
+
+/* 단계 간의 연결선 */
+.step-line {
+    position: absolute;
+    height: 2px;
+    background-color: #e0e0e0;
+    top: 40px; /* 원의 중앙 높이 (height/2) */
+    left: calc(50% + 40px); /* 원 오른쪽 끝에서 시작 */
+    right: -50%;
+    width: 100%; /* 너비는 부모 요소의 너비에 따라 조절됨 */
+    z-index: 0;
+    margin-right: -10px; /* 라인 겹침 방지 */
+}
+
+/* 활성화된 라인 */
+.delivery-step.active + .delivery-step .step-line {
+    /* 다음 단계로 넘어가는 라인은 기본색 유지 */
+    background-color: #e0e0e0;
+}
+.delivery-step.completed .step-line {
+    /* 완료된 단계의 라인은 primary 색상 */
+    background-color: #0d6efd;
+}
+
+.delivery-steps-container > .delivery-step:last-child .step-line {
+    display: none;
+}

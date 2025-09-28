@@ -59,7 +59,6 @@ const NoticeDetailPage = () => {
 
     // 삭제 버튼 클릭 시 호출될 함수
     const handleDelete = async () => {
-        // isDelete 상태를 통해 중복 클릭을 방지합니다.
         if (confirm("정말 삭제하시겠습니까?")) {
             try {
                 // 삭제 API 호출

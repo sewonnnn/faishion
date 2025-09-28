@@ -26,14 +26,19 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
-    private final ProductService productService;
 
-    // 장바구니 리스트
+    // 회원 장바구니 목록
     @GetMapping("/list")
-    public List<CartProductDTO> getCartProducts() {
-        return cartService.findAllCartList();
+    public List<CartProductDTO> getCartProducts(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+
+        String userId = userDetails.getUsername();
+        return cartService.findUserCartList(userId); // 회원 장바구니 찾기
     }
 
+    // 장바구니 상품 저장
     @PostMapping("/save")
     public boolean cartSave(@AuthenticationPrincipal UserDetails userDetails, @RequestBody List<StockDTO> stockList) {
         if(userDetails == null) throw new RuntimeException("");
