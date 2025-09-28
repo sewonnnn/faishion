@@ -18,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SellerOrderDTO {
     private Long id;
+    private String businessName;
     private List<OrderItemDTO> orderItems;
     private String street;
     private String detail;
@@ -42,16 +43,20 @@ public class SellerOrderDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OrderItemDTO {
+        private Long imageId;
         private String name;
         private String color;
         private String size;
         private int quantity;
         private int price;
+        private int originPrice;
 
         public OrderItemDTO(OrderItem orderItem){
             this.quantity = orderItem.getQuantity();
             this.price = orderItem.getPrice();
             Stock stock = orderItem.getStock();
+            this.originPrice = stock.getProduct().getPrice();
+            this.imageId = stock.getImage().getId();
             this.name = stock.getProduct().getName();
             this.color = stock.getColor();
             this.size = stock.getSize();

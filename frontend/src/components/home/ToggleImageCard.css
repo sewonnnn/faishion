@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+/* 나머지 CSS 코드는 이 아래에 작성 */
+.toggle-card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.two-line-truncate {
+  display: -webkit-box; /* Flexbox 모델을 사용 */
+  -webkit-line-clamp: 2; /* 텍스트를 2줄로 제한 */
+  -webkit-box-orient: vertical; /* 텍스트 방향을 세로로 설정 (box-orient와 함께 사용) */
+  overflow: hidden; /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis; /* 넘치는 텍스트에 말줄임표(...) 표시 */
+  word-break: break-all; /* 긴 단어가 잘리도록 허용 */
+}
+
+.rainbow-btn {
+  position: relative;
+  padding: 12px 28px;
+  font-size: 16px;
+  color: white;
+  background: #111;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 0;
+}
+
+/* 네온 무지개 테두리 */
+.rainbow-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0; /* 버튼 크기와 동일하게 맞춤 */
+  border-radius: inherit;
+
+  background: linear-gradient(
+    90deg,
+    red,
+    orange,
+    yellow,
+    lime,
+    cyan,
+    blue,
+    violet,
+    red
+  );
+  background-size: 300% 100%;
+
+  /* 버튼 내부는 투명하게 빼고 테두리만 보이도록 마스크 */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  padding: 2px; /* 테두리 두께 */
+  animation: flow 6s linear infinite;
+  filter: blur(3px);
+  z-index: -1;
+}
+
+/* 무지개 흐름 */
+@keyframes flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}

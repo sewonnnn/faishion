@@ -4,6 +4,7 @@ import com.example.faishion.address.AddressRepository;
 import com.example.faishion.cart.Cart;
 import com.example.faishion.cart.CartProductDTO;
 import com.example.faishion.cart.CartService;
+import com.example.faishion.delivery.Delivery;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
 import com.example.faishion.user.User;
@@ -179,44 +180,15 @@ public class OrderController {
 
     // 주문 상세 조회
     @GetMapping("/{orderId}")
-    public ResponseEntity<Map<String, Object>> getOrderDetails(
+    public ResponseEntity<OrderDetailDTO> getOrderDetails(
             @PathVariable Long orderId,
             @AuthenticationPrincipal UserDetails userDetails) {
-
         if (userDetails == null) {
             return ResponseEntity.status(401).build(); // 인증되지 않음 처리
         }
-
         try {
-            // 1. Service에서 Order 엔티티 조회 및 보안 검사 (Order 엔티티 반환)
             Order order = orderService.getOrderDetails(orderId, userDetails.getUsername());
-
-            // 2. 주문 항목을 CartProductDTO 리스트로 변환 (기존 DTO 재활용)
-            List<CartProductDTO> orderItems = order.getOrderItemList().stream()
-                    .map(CartProductDTO::new) // CartProductDTO의 OrderItem 생성자 사용
-                    .collect(Collectors.toList());
-
-            // 3. 주문 기본 정보와 항목 리스트를 Map으로 묶어서 반환
-            Map<String, Object> response = new HashMap<>();
-            response.put("userName", order.getUser().getName());
-
-            // 주문 기본 정보 (Order 엔티티에서 직접 추출)
-            response.put("orderId", order.getId());
-            response.put("clientOrderId", order.getClientOrderId());
-            response.put("status", order.getStatus());
-            response.put("totalAmount", order.getTotalAmount());
-            response.put("orderDate", order.getCreatedAt());
-
-            // 배송지 정보 (Order 엔티티에서 직접 추출)
-            response.put("zipcode", order.getZipcode());
-            response.put("street", order.getStreet());
-            response.put("detail", order.getDetail());
-            response.put("requestMsg", order.getRequestMsg());
-
-            // 주문 항목 리스트 (CartProductDTO 리스트)
-            response.put("orderItems", orderItems);
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new OrderDetailDTO(order));
 
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
