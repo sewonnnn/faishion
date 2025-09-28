@@ -91,15 +91,14 @@ const OrderFormPage = () => {
                 const { ids, directItems } = state;
 
                 if (Array.isArray(directItems) && directItems.length > 0) {
-                    // ✅ 바로구매 케이스: 서버에서 이미 CartProductDTO 리스트를 받아왔음
+                    // 바로구매하는 경우
                     setOrderItems(directItems);
                     setIsLoading(false);
                     return;
                 }
-
-                if (Array.isArray(ids) && ids.length > 0) {
-                    // ✅ 장바구니에서 넘어온 케이스
-                    const orderItemsResponse = await api.get(`/order/new?ids=${ids.join(',')}`);
+                // 장바구니에서 넘어온 경우
+                if (ids && typeof ids === 'string' && ids.length > 0) {
+                    const orderItemsResponse = await api.get(`/order/new?ids=${ids}`); // ids.join(',') 제거
                     setOrderItems(orderItemsResponse.data);
                     setIsLoading(false);
                     return;
