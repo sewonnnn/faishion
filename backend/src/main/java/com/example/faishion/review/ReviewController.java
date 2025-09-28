@@ -89,17 +89,18 @@ public class ReviewController {
 
         return reviewsPage.map(review -> {
             // NullPointerException 방지: review.getUser()가 null일 수 있음을 고려
-            String userName = (review.getUser() != null) ? review.getUser().getName() : "익명 사용자";
+            String productName = (review.getProduct() != null) ? review.getProduct().getName() : "상품없음";
 
             return new ReviewResponseDTO(
                     review.getId(),
-                    userName, // 올바르게 수정됨
+                    review.getUser().getName(),
                     review.getContent(),
                     review.getRating(),
                     review.getCreatedAt().format(formatter),
                     review.getImageList().stream()
                             .map(image -> domain + "/image/" + image.getId())
-                            .collect(Collectors.toList())
+                            .collect(Collectors.toList()),
+                    productName
             );
         });
     }
@@ -117,5 +118,77 @@ public class ReviewController {
             System.out.println("신고 실패");
         }
         return true;
+    }
+
+    @GetMapping("/my-reviews")
+    public ResponseEntity<Page<ReviewResponseDTO>> getMyReviews(
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        // 1. 로그인 사용자 확인
+        Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
+        if (!userOptional.isPresent()) {
+            // 사용자 정보를 찾을 수 없으면 401 Unauthorized 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = userOptional.get();
+
+        // 2. 해당 사용자의 리뷰 목록 조회
+        // ⚠️ ReviewService에 findByUser_Id 메서드가 구현되어 있어야 합니다.
+        Page<Review> reviewsPage = reviewService.findByUser(user, pageable);
+
+        // 3. DTO로 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String domain = request.getScheme() + "://" + request.getServerName() +
+                (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
+
+        Page<ReviewResponseDTO> responsePage = reviewsPage.map(review -> {
+            // 상품 이름도 표시할 수 있도록 Product 정보 접근
+            String productName = (review.getProduct() != null) ? review.getProduct().getName() : "알 수 없는 상품";
+
+            return new ReviewResponseDTO(
+                    review.getId(),
+                    user.getName(), // 내 리뷰이므로 사용자 이름은 확실합니다.
+                    review.getContent(),
+                    review.getRating(),
+                    review.getCreatedAt().format(formatter),
+                    review.getImageList().stream()
+                            .map(image -> domain + "/image/" + image.getId())
+                            .collect(Collectors.toList()),
+                    productName, // ReviewResponseDTO에 productName 필드가 추가되어야 합니다.
+                    review.getProduct().getId()
+            );
+        });
+
+        return ResponseEntity.ok(responsePage);
+    }
+    // 🎯 리뷰 삭제 (DELETE)
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(
+            @PathVariable Long reviewId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        try {
+            // 1. 리뷰 ID로 리뷰를 조회합니다.
+            Review review = reviewService.findById(reviewId);
+            if (review == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 리뷰를 찾을 수 없습니다.");
+            }
+            // 2. 현재 로그인된 사용자가 해당 리뷰의 작성자인지 확인합니다. (Username 비교로 안전하게 수정)
+            if (!review.getUser().getId().equals(userDetails.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인이 작성한 리뷰만 삭제할 수 있습니다.");
+            }
+
+            // 3. 리뷰를 삭제합니다.
+            reviewService.deleteReview(reviewId);
+
+            return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("리뷰 삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 }

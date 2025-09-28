@@ -16,4 +16,16 @@ public class ReviewResponseDTO {
     private Integer rating; // 별점
     private String createdAt; // 작성 날짜
     private List<String> imageUrls; // 이미지 경로
+    private String productName; // 리뷰대상 상품이름
+    private Long productId; // 상품아이디
+
+    public ReviewResponseDTO(Long id, String userName, String content, Integer rating, String createdAt, List<String> imageUrls, String productName) {
+        this.id = id;
+        this.userName = userName;
+        this.content = content;
+        this.rating = rating;
+        this.createdAt = createdAt;
+        this.imageUrls = imageUrls;
+        this.productName = productName;
+    }
 }
