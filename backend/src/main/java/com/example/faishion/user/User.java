@@ -8,39 +8,42 @@ import com.example.faishion.notification.Notification;
 import com.example.faishion.order.Order;
 import com.example.faishion.wish.Wish;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(name="uk_users_email", columnNames="email"),
                 @UniqueConstraint(name="uk_users_phone", columnNames="phone_number"),
+                @UniqueConstraint(name="uk_users_loginid", columnNames="login_id"),
                 @UniqueConstraint(name="uk_users_provider_uid", columnNames={"provider","provider_user_id"})
         })
 public class User {
 
-    // 수정
     @Id
     @Column(length = 100)
-    private String id; // 로컬 : 사용자 입력 아이디 , 소셜: provider userId
+    private String id; // 시스템 내부 PK (UUID or PROVIDER_userId)
+
+    @Column(name = "login_id", length = 50, unique = true)
+    private String loginId; // Local 전용 로그인 ID (소셜이면 null) //사용자 입력 id
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private AuthProvider provider; // LOCAL, NAVER
 
     @Column(name="provider_user_id", length=100)
-    private String providerUserId; // LOCAL일 땐 null
+    private String providerUserId; // 소셜 provider 고유 ID, Local은 null
 
     @Column(nullable = false, length = 60)
     private String name;
@@ -54,31 +57,31 @@ public class User {
     private int height;
     private int weight;
 
-    @Column(name="pw_hash", length=100) // LOCAL만 사용 // 소셜은 null
-    private String pwHash; //Spring Security 암호화
+
+    @Column(name = "pw_hash", length=100) // Local만 사용, 소셜은 null
+    private String pwHash;
 
     @OneToOne
     @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Image image;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Address> addressList = new ArrayList<>();
+    private List<Address> addressList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Order> orderList = new ArrayList<>();
+    private List<Order> orderList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Coupon> couponList = new ArrayList<>();
+    private List<Coupon> couponList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Cart> cartList = new ArrayList<>();
+    private List<Cart> cartList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Wish> wishList = new ArrayList<>();
+    private List<Wish> wishList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Notification> notificationList = new ArrayList<>();
-
+    private List<Notification> notificationList = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -87,4 +90,17 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    // 헬퍼 메소드
+    public static User createLocal(String loginId, String email, String pwHash,
+                                   String name, String phoneNumber) {
+        User u = new User();
+        u.setId(UUID.randomUUID().toString());
+        u.setLoginId(loginId);
+        u.setProvider(AuthProvider.LOCAL);
+        u.setEmail(email);
+        u.setPwHash(pwHash);
+        u.setName(name);
+        u.setPhoneNumber(phoneNumber);
+        return u;
+    }
 }
