@@ -42,8 +42,6 @@ const ProductFooter = ({ productId }) => {
             </Nav>
             <Tab.Content className="mt-4">
                 <Tab.Pane eventKey="review" active={activeTab === 'review'}>
-                    <ReviewForm productId={productId} onReviewSubmitted={handleReviewSubmitted} />
-                    <hr className="my-4" />
                     <ReviewList productId={productId} key={refreshReviewList} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="qna" active={activeTab === 'qna'}>

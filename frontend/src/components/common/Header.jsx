@@ -165,8 +165,6 @@ const Header = () => {
                         <Nav.Link href="/product/list?type=best">베스트</Nav.Link>
                         <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
                         <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
-                        <Nav.Link href="#solo">단독</Nav.Link>
-                        <Nav.Link href="#recom">추천</Nav.Link>
                     </Nav>
 
                     {/* 2. 검색창: 모바일에서 별도의 줄로 내려가도록 CSS 조정 */}
