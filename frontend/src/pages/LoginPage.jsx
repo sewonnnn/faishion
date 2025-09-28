@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Tabs, Tab } from "react-bootstrap";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const LoginPage = () => {
     const nav = useNavigate();
     const [key, setKey] = useState("user"); // 'user' | 'seller'
     const [form, setForm] = useState({ id: "", password: "" });
     const [loading, setLoading] = useState(false);
-
+    const { login } = useAuth();
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
@@ -24,7 +25,7 @@ const LoginPage = () => {
 
         const url =
             key === "seller"
-                ? "http://localhost:8080/seller/login"
+                ? "http://localhost:8080/auth/seller/login"
                 : "http://localhost:8080/auth/login";
 
         try {
@@ -32,9 +33,12 @@ const LoginPage = () => {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
+            login(res.data);
+
             alert("로그인 성공!");
             nav("/");
         } catch (err) {
+            console.log(err);
             alert(err?.response?.data || "로그인 실패");
         } finally {
             setLoading(false);

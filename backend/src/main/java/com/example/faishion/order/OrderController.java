@@ -12,6 +12,8 @@ import com.example.faishion.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,10 +45,8 @@ public class OrderController {
 
     // 주문서 생성
     @GetMapping("/new")
-    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, Long productId
-            , @AuthenticationPrincipal UserDetails userDetails) {
+    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, @AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("받은 카트 ID들: " + idsString);
-
 
         // 1. URL 파라미터에서 받은 장바구니의 목록 추출
         List<Long> cartIds = Arrays.stream(idsString.split(","))
@@ -76,24 +76,17 @@ public class OrderController {
         if(userDetails == null) throw new RuntimeException("인증된 사용자 정보가 없습니다.");
         User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 2. DTO에서 받은 주소 정보로 새로운 Address 엔티티 생성
-        Address newAddress = new Address();
-        newAddress.setUser(user);
-        newAddress.setZipcode(request.getZipcode());
-        newAddress.setStreet(request.getStreet());
-        newAddress.setDetail(request.getDetail());
-        newAddress.setRequestMsg(request.getRequestMsg());
-
-        // 이 주소를 저장할지 여부는 비즈니스 로직에 따라 결정
-        // 예: 별도로 주소록에 저장하는 로직이 없다면, 여기서 저장
-        addressRepository.save(newAddress);
-
-        // 3. 주문 생성
+        // 2. 주문 생성
         String clientOrderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + System.currentTimeMillis();
         Order order = new Order();
         order.setClientOrderId(clientOrderId);
         order.setUser(user);
-        order.setAddress(newAddress); // 새로 생성한 주소 엔티티 사용
+
+        order.setZipcode(request.getZipcode());
+        order.setStreet(request.getStreet());
+        order.setDetail(request.getDetail());
+        order.setRequestMsg(request.getRequestMsg());
+
         order.setStatus("PENDING");
         order.setOrderName(request.getOrderName());
         order.setTotalAmount(request.getTotalAmount());
@@ -125,6 +118,14 @@ public class OrderController {
         JSONObject response = new JSONObject();
         response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/seller")
+    public ResponseEntity<Page<SellerOrderDTO>> sellerOrders(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+        Page<SellerOrderDTO> sellerOrders = orderService.getOrdersBySellerId(userDetails.getUsername(), pageable);
+        return ResponseEntity.ok(sellerOrders);
     }
 
     // 바로 구매 요청 처리용 새로운 엔드포인트 추가

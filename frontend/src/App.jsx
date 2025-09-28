@@ -42,6 +42,7 @@ import {SuccessPage} from "./pages/tossPay/Success.jsx";
 import {CheckoutPage} from "./pages/tossPay/Checkout.jsx";
 import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
 import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
+import AdminLoginPage from "./pages/admin/AdminLoginPage.jsx";
 
 function Layout() {
     return (
@@ -95,6 +96,7 @@ function App() {
              <Route element={<Layout/>}>
                  <Route element={<ProtectedRoute requiredRole={""} />}>
                      <Route path="/" element={<HomePage/>}/>   {/*홈페이지*/}
+                     <Route path="/admin/login" element={<AdminLoginPage/>}/>   {/*관리자 로그인*/}
                      <Route path="/oauthcallback/naver" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
                      <Route path="/oauthcallback/kakao" element={<LoginSuccessPage />} />   {/*소셜 로그인 콜백 페이지*/}
                      <Route path="/login" element={<LoginPage />} />   {/*로그인 페이지*/}

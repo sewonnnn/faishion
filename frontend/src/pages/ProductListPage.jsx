@@ -32,7 +32,6 @@ const ProductListPage = () => {
                         size: pageSize
                     }
                 });
-                console.log(response.data);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setLoading(false);

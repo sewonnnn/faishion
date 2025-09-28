@@ -11,6 +11,7 @@ const QuestionList = ({ productId, onQuestionUpdate }) => {
     const fetchQuestions = async () => {
         try {
             const response = await api.get(`/qna/product/${productId}`);
+            console.log("문의내역"+response.data)
             setQuestions(response.data);
         } catch (error) {
             console.error('문의 목록을 불러오는 데 실패했습니다:', error);

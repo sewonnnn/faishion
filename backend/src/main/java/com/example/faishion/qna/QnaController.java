@@ -66,6 +66,7 @@ public class QnaController {
     // 게시물 수정하기
     @PutMapping("/{id}")
     public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
+        System.out.println("답변자 이름"+qnaDTO.getAnswered_by());
         String title = qnaDTO.getTitle();
         String content = qnaDTO.getContent();
         qnaService.updateBoard(title, content, id);
@@ -86,9 +87,8 @@ public class QnaController {
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<QnaResponseDTO>> getQuestionsByProductId(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
-        List<Qna> questions = qnaService.findByProduct_Id(productId);
         String currentUsername = (userDetails != null) ? userDetails.getUsername() : null; // 현재 로그인된 사용자 ID (username)
-
+        List<Qna> questions = qnaService.findByProduct_Id(productId, currentUsername);
         List<QnaResponseDTO> responseDTOs = questions.stream()
                 .map(qna -> {
                     String userName = (qna.getUser() != null) ? qna.getUser().getId() : "익명";

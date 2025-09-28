@@ -1,9 +1,18 @@
 package com.example.faishion.delivery;
 
 public enum DeliveryStatus {
-    READY,            // 발송 전
-    SHIPPED,          // 발송됨
-    IN_TRANSIT,       // 배송 중
-    OUT_FOR_DELIVERY, // 배달 중
-    DELIVERED         // 배송 완료
+    SHIPPED("택배사 집하 완료"),
+    IN_TRANSIT("상품 이동 중"),
+    OUT_FOR_DELIVERY("최종 배달 출발"),
+    DELIVERED("배송 완료");
+
+    private final String koreanName;
+
+    DeliveryStatus(String koreanName) {
+        this.koreanName = koreanName;
+    }
+
+    public String getKoreanName() {
+        return koreanName;
+    }
 }

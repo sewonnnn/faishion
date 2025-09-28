@@ -22,7 +22,7 @@ public class DeliveryDTO {
     public DeliveryDTO(Delivery delivery) {
         this.id = delivery.getId();
         this.orderId = delivery.getOrder().getId();
-        this.status = delivery.getStatus().name();
+        this.status = delivery.getStatus().getKoreanName();
         this.trackingNumber = delivery.getTrackingNumber();
         this.createdAt = delivery.getCreatedAt();
         this.updatedAt = delivery.getUpdatedAt();

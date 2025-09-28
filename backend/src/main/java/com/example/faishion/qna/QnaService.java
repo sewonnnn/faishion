@@ -55,14 +55,12 @@ public class QnaService {
     // 답변, 답변자(판매자) 추가하기
     @Transactional
     public void updateAnswer(long id, String answer, String answeredBy) {
-        System.out.println("답변자 서비스 넘어옴:"+answeredBy);
         qnaRepository.updateAnswer(answer,answeredBy,id);
     }
 
 
     @Transactional
-    public List<Qna> findByProduct_Id(Long productId) {
-        String currentUserId = "sewon"; // 임시 사용자 ID
+    public List<Qna> findByProduct_Id(Long productId, String currentUserId) {
 
         // 상품 정보를 가져와 판매자 ID를 확인
         Product product = productRepository.findById(productId)
