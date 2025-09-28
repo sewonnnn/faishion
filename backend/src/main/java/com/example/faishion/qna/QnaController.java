@@ -2,6 +2,8 @@ package com.example.faishion.qna;
 
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
+import com.example.faishion.seller.Seller;
+import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class QnaController {
     private final QnaService qnaService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final SellerRepository sellerRepository;
 
     // 게시물 목록 조회 (검색 및 페이징 포함)
     @GetMapping("/list")
@@ -58,15 +61,12 @@ public class QnaController {
     // 게시물 상세보기
     @GetMapping("/{id}")
     public QnaDTO findQnaById(@PathVariable long id) {
-        System.out.println(id);
-        System.out.println(qnaService.findQnaById(id));
         return qnaService.findQnaById(id);
     }
     
     // 게시물 수정하기
     @PutMapping("/{id}")
     public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
-        System.out.println("답변자 이름"+qnaDTO.getAnswered_by());
         String title = qnaDTO.getTitle();
         String content = qnaDTO.getContent();
         qnaService.updateBoard(title, content, id);
@@ -82,7 +82,11 @@ public class QnaController {
     @PutMapping("/answer/{id}")
     // JSON에 있는 필드만 DTO에 매핑하고, 나머지는 그냥 비워두는 방식으로 처리
     public void saveAnswer(@PathVariable long id, @RequestBody QnaDTO qnaDto) {
-        qnaService.updateAnswer(id, qnaDto.getAnswer(), qnaDto.getAnswered_by());
+        Optional<Seller> seller = sellerRepository.findById(qnaDto.getAnswered_by());
+        if(!seller.isPresent()) {
+            return;
+        }
+        qnaService.updateAnswer(id, qnaDto.getAnswer(), seller.get());
     }
 
     @GetMapping("/product/{productId}")

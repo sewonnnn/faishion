@@ -16,7 +16,6 @@ const SellerQnaDetail = () => {
         const fetchQnaDetail = async () => {
             try {
                 const response = await api.get(`/qna/${id}`);
-                console.log(response.data);
                 setQna(response.data);
 
                 if (response.data.answer) {
@@ -49,7 +48,6 @@ const SellerQnaDetail = () => {
                 answer: answerText,
                 answered_by: user.sub
             });
-
             if (response.status === 200) {
                 setMessage("답변이 성공적으로 등록되었습니다.");
                 // 답변이 성공하면 Q&A 상세 정보 새로고침
@@ -64,7 +62,6 @@ const SellerQnaDetail = () => {
             setIsSubmitting(false);
         }
     };
-
     if (isLoading) {
         return (
             <Container className="my-5 text-center">
@@ -121,7 +118,7 @@ const SellerQnaDetail = () => {
                                 <div dangerouslySetInnerHTML={{ __html: qna.answer.replace(/\n/g, '<br />') }} />
                             </div>
                             <small className="text-muted">
-                                답변자: {qna.answeredBy?.businessName || "알 수 없음"}
+                                답변자: {qna.answered_by ? qna.answered_by : "알 수 없음"}
                             </small>
                         </>
                     ) : (
