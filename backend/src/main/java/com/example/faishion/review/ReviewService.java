@@ -2,6 +2,7 @@ package com.example.faishion.review;
 
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageService;
+import com.example.faishion.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,10 @@ public class ReviewService {
     public Page<Review> findByProduct_Id(Long productId, Pageable pageable) {
         return reviewRepository.findByProduct_Id(productId, pageable);
     }
-
+    // 마이페이지 리뷰목록 불러오기
+    public Page<Review> findByUser(User user, Pageable pageable) {
+        return reviewRepository.findByUser(user, pageable);
+    }
     // 리뷰 신고하기
     public boolean reportReview(Long reviewId) {
         Optional<Review> optionalReview = reviewRepository.findById(reviewId);

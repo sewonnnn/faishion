@@ -24,6 +24,10 @@ const MyPage = () => {
     const nav = useNavigate();
     const { api } = useAuth();
 
+    // 회원이 쓴 리뷰 보기 페이지 이동
+    const onReviewListForm = () =>{
+        nav("/mypage/review");
+        }
     // API의 기본 URL을 사용하여 이미지 URL을 생성하는 헬퍼 함수
     const getImageUrl = (imageId) => {
         return imageId ? `${api.defaults.baseURL}/image/${imageId}` : defaultImage;
@@ -138,7 +142,7 @@ const MyPage = () => {
                 </section>
 
                 {/* 4. 내가 작성한 후기 링크 */}
-                <section className="d-flex justify-content-between align-items-center py-3 px-3 border-bottom text-dark cursor-pointer" style={{ fontSize: '0.9rem' }}>
+                <section onClick={onReviewListForm} className="d-flex justify-content-between align-items-center py-3 px-3 border-bottom text-dark cursor-pointer" style={{ fontSize: '0.9rem' }}>
                     <p className="mb-0">내가 작성한 후기</p>
                 </section>
 

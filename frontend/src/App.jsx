@@ -44,6 +44,7 @@ import SellerQnaDetail from "./components/seller/qna/SellerQnaDetail.jsx";
 import MyPageDetail from "./pages/customer/MyPageDetail.jsx";
 import AdminLoginPage from "./pages/admin/AdminLoginPage.jsx";
 import AdminReportList from "./pages/admin/AdminReportList.jsx";
+import MyReviewList from "./pages/customer/MyReviewList";
 
 function Layout() {
     return (
@@ -124,6 +125,7 @@ function App() {
                                 <Route path="/fail" element={<FailPage/>}/> {/*토스 실패 페이지*/}
                                 <Route path="/mypage" element={<MyPage/>}/> {/*마이 페이지*/}
                                 <Route path="/mypage/detail" element={<MyPageDetail/>}/> {/* 마이페이지 정보 수정 */}
+                                <Route path="/mypage/review" element={<MyReviewList/>}/> {/* 본인 리뷰 확인 */}
                                 <Route path="/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
                                 <Route path="/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
                                 <Route path="/qna/new" element={<QnaFormPage/>}/> {/*문의사항 작성 페이지*/}
