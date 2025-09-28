@@ -56,14 +56,15 @@ const OrderFormPage = () => {
         }
     }, []);
 
-    // 주문서 로딩 시 사용자 정보와 함께 '현재' 적용된 배송지를 불러오는 로직
+    // 주문서 로딩 시 사용자 정보와 함께 현재 적용된 배송지를 불러오는 로직
     const fetchCurrentDeliveryAddress = async (userData) => {
-        // 1. userData에 저장된 최근 주소 정보를 기반으로 초기 설정
+        // userData에 저장된 최근 주소 정보를 기반으로 초기 설정
+        // userData.address?.zipcode 형태로 옵셔널 체이닝을 적용하여 안전하게 접근
         let currentAddress = {
-            zipcode: userData.address.zipcode || '',
-            street: userData.address.street || '',
-            detail: userData.address.detail || '',
-            requestMsg: userData.address.requestMsg || '',
+            zipcode: userData.address?.zipcode || '',
+            street: userData.address?.street || '',
+            detail: userData.address?.detail || '',
+            requestMsg: userData.address?.requestMsg || '',
         };
 
         setDeliveryAddress(prev => ({
@@ -72,30 +73,40 @@ const OrderFormPage = () => {
         }));
     };
 
-
     useEffect(() => {
         const fetchAllData = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                // 1. 사용자 프로필 로딩
+                // 1) 사용자 프로필
                 const userResponse = await api.get('/user/');
                 const userData = userResponse.data;
                 setUserProfile(userData);
 
-                // 2. 현재 적용할 배송지 상태 설정
+                // 2) 주소 세팅
                 await fetchCurrentDeliveryAddress(userData);
 
-                // 3. 주문 상품 목록 로딩
-                const { ids } = location.state || {};
-                if (!ids || ids.length === 0) {
-                    setError("주문할 상품 ID가 없습니다.");
+                // 3) 주문 아이템 결정
+                const state = location.state || {};
+                const { ids, directItems } = state;
+
+                if (Array.isArray(directItems) && directItems.length > 0) {
+                    // ✅ 바로구매 케이스: 서버에서 이미 CartProductDTO 리스트를 받아왔음
+                    setOrderItems(directItems);
                     setIsLoading(false);
                     return;
                 }
 
-                const orderItemsResponse = await api.get(`/order/new?ids=${ids}`);
-                setOrderItems(orderItemsResponse.data);
+                if (Array.isArray(ids) && ids.length > 0) {
+                    // ✅ 장바구니에서 넘어온 케이스
+                    const orderItemsResponse = await api.get(`/order/new?ids=${ids.join(',')}`);
+                    setOrderItems(orderItemsResponse.data);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 둘 다 없는 경우
+                setError("주문할 상품 정보가 없습니다.");
                 setIsLoading(false);
             } catch (err) {
                 console.error("데이터 로딩 중 오류 발생:", err.response?.data || err.message);
@@ -103,8 +114,10 @@ const OrderFormPage = () => {
                 setIsLoading(false);
             }
         };
+
         fetchAllData();
     }, [location.state, api]);
+
 
 
     // --- 계산된 값 (Totals, Summary) ---

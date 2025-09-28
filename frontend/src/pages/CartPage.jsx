@@ -6,8 +6,6 @@ import { Container, Row, Col, Card, Button, Image, Form, Spinner, Alert } from '
 // 기존 훅 및 CSS 임포트 (확장자 제거 및 경로 조정)
 import useCart from '../hooks/useCart';
 import useCartSelection from '../hooks/useCartSelection';
-// CSS 파일은 존재하지 않으므로 제거하거나, 인라인 스타일링/Tailwind 클래스로 대체합니다.
-// 여기서는 오류를 피하기 위해 CSS import를 제거합니다.
 
 // 헬퍼 함수: 금액을 쉼표 형식으로 포맷
 const formatPrice = (price) => {
@@ -25,9 +23,6 @@ const CartPage = () => {
     const [imageError, setImageError] = useState({});
 
     // 1. 장바구니 데이터 및 전체 목록 가져오기
-    // useCart, useCartSelection 훅이 존재하는 디렉토리 구조라고 가정하고, 
-    // 빌드 오류를 피하기 위해 import 시 확장자를 제거했습니다.
-    // 만약 `hooks` 폴더가 CartPage와 같은 레벨에 있다면 경로는 '../hooks/...'이 적절합니다.
     const { cartList, fetchCartData } = useCart();
 
     // 2. 체크박스 선택 및 삭제 로직 가져오기

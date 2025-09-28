@@ -1,5 +1,6 @@
 package com.example.faishion.cart;
 
+import com.example.faishion.order.OrderItem;
 import lombok.*;
 
 @Getter
@@ -19,6 +20,7 @@ public class CartProductDTO {
     private double productPrice; // 상품 가격 (product에서 가져옴)
     private double discountedProductPrice; // 할인 적용된 상품 가격
     private Long productImageId; // 이미지 링크 (Stock에서 가져옴)
+    private String zipcode; // 우편번호
 
     private String sellerBusinessName; // 판매자 상호명
 
@@ -59,4 +61,32 @@ public class CartProductDTO {
         }
 
           }
+
+    // OrderItem 엔티티를 받아 DTO를 생성하는 생성자 추가 (선택한 상품의 상세내용을 보기 위함)
+    public CartProductDTO(OrderItem orderItem) {
+        this.id = orderItem.getId(); // OrderItem의 ID를 사용
+        this.quantity = orderItem.getQuantity();
+        this.discountedProductPrice = (double) orderItem.getPrice(); // 최종 확정 가격
+
+        if (orderItem.getStock() != null) {
+            this.stockId = orderItem.getStock().getId();
+            this.productColor = orderItem.getStock().getColor();
+            this.productSize = orderItem.getStock().getSize();
+
+            if (orderItem.getStock().getImage() != null) {
+                this.productImageId = orderItem.getStock().getImage().getId();
+            }
+
+            if (orderItem.getStock().getProduct() != null) {
+                this.sellerBusinessName = orderItem.getStock().getProduct().getSeller().getBusinessName();
+                this.productId = orderItem.getStock().getProduct().getId();
+                this.productName = orderItem.getStock().getProduct().getName();
+                this.productPrice = orderItem.getStock().getProduct().getPrice(); // 원가
+            }
+        }
+
+        if (orderItem.getOrder() != null && orderItem.getOrder().getUser() != null) {
+            this.userId = orderItem.getOrder().getUser().getId();
+        }
+    }
         }

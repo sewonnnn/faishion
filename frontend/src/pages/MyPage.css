@@ -1,194 +1,48 @@
-.mypage-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: "Arial", sans-serif;
-    background: #fff;
-    color: #333;
-}
-/* 프로필 이미지 섹션 스타일 추가 */
-.profile-image-wrapper {
-    position: relative; /* 자식 요소(버튼)의 absolute 기준 */
-    display: inline-block; /* 크기를 내부 이미지에 맞춤 */
-}
+/* MyPage.css */
 
-/* 이미지 삭제 버튼 스타일 */
-.profile-image-wrapper .image-delete-btn {
-    position: absolute;
-    top: 5px; /* 이미지 상단으로부터의 거리 */
-    right: 5px; /* 이미지 우측으로부터의 거리 */
-    padding: 0;
-    line-height: 1;
-    z-index: 10; /* 이미지 위에 표시되도록 Z축 올리기 */
-    background: none;
-    border: none;
-    color: #888; /* 회색 X표시 */
-    text-decoration: none; /* 링크 밑줄 제거 */
-    opacity: 0.8; /* 투명도 */
-    transition: opacity 0.2s;
+/* --- 공통 스타일 (부트스트랩 보조) --- */
+
+/* 커스텀 포인터 스타일 */
+.cursor-pointer {
     cursor: pointer;
 }
 
-.profile-image-wrapper .image-delete-btn:hover {
-    opacity: 1;
-    color: #f00; /* 호버 시 빨간색으로 변경 */
+/* --- 주문 내역 스크롤바 영역 스타일 --- */
+
+/* 주문 내역 영역의 높이를 제한하고 스크롤바 스타일링 (이미지와 유사하게) */
+.order-list-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+
+    /* 웹킷 기반 브라우저 (Chrome, Safari) 스크롤바 스타일 */
+    &::-webkit-scrollbar {
+        width: 8px; /* 스크롤바 폭 */
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #ccc; /* 스크롤바 핸들 색상 */
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: #f0f0f0; /* 스크롤바 트랙 색상 */
+    }
 }
 
-/* 파일 선택 입력 필드 숨기기 (Bootstrap의 visually-hidden과 유사) */
-.visually-hidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
+
+/* --- 프로필 영역: 강조 텍스트 색상 커스텀 --- */
+.text-primary-custom {
+    color: #4a90e2 !important; /* 이미지의 파란색 강조색 */
 }
 
-/* 프로필 사진 변경 라벨을 버튼처럼 보이게 */
-#formFile label {
-    cursor: pointer;
+/* --- 상태 섹션: 경계선 간격 조정 --- */
+/* 부트스트랩 border-end 클래스로 구현했지만, 만약 미세 조정이 필요하면 사용 */
+.status-box-divider {
+    border-right: 1px solid #eee;
 }
 
-/* 프로필 */
-.profile-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background: #f9f9f9;
-    margin-bottom: 20px;
-}
-
-.profile-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.profile-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    border: 1px solid #ddd;
-}
-
-.profile-name {
-    font-weight: bold;
-    font-size: 16px;
-    margin: 0;
-}
-
-.profile-desc {
-    font-size: 13px;
-    color: #555;
-}
-
-.profile-desc .highlight {
-    color: #0072ff;
-    font-weight: bold;
-}
-
-.settings-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-/* 상태 박스 */
-.status-section {
-    display: flex;
-    justify-content: space-around;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background: #fff;
-    padding: 15px 0;
-}
-
-.status-box {
-    text-align: center;
-}
-
-.status-label {
-    font-size: 13px;
-    color: #666;
-}
-
-.status-value {
-    font-weight: bold;
-    font-size: 15px;
-    margin-top: 5px;
-}
-
-/* 주문 내역 */
-.order-section {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    background: #fff;
-}
-
-.section-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.order-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.order-item {
-    display: flex;
-    gap: 15px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 10px;
-}
-
-.order-thumb {
-    width: 80px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-.order-info {
-    flex: 1;
-}
-
-.order-brand {
-    font-weight: bold;
-    font-size: 14px;
-    margin: 0;
-}
-
-.order-desc {
-    font-size: 13px;
-    margin: 3px 0;
-    color: #444;
-}
-
-.order-meta {
-    font-size: 12px;
-    color: #777;
-}
-
-.order-price-original {
-    font-size: 12px;
-    color: #aaa;
-    text-decoration: line-through;
-}
-
-.order-price-sale {
-    font-size: 14px;
-    font-weight: bold;
-    color: #0072ff;
+/* --- 아이콘 버튼 간격/크기 조정 --- */
+.icon-btn-custom {
+    /* 부트스트랩 Button variant="link"의 기본 padding을 재정의 */
+    padding: 0.25rem;
 }

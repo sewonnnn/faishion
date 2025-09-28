@@ -5,13 +5,16 @@ import com.example.faishion.cart.CartRepository;
 import com.example.faishion.payment.PaymentRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,6 +83,40 @@ public class OrderService {
 
     public void createOrderFromCartItems(List<Long> cartIds) {
 
+    }
+
+    public List<OrderListResponseDTO> getMyOrderHistory(String userId) {
+        // Repository 메서드를 호출할 때 전달받은 userId를 사용
+        List<OrderItem> orderItems = orderItemRepository.findOrderHistoryByUserId(userId);
+
+        // ... (DTO 변환 후 반환)
+        return orderItems.stream()
+                .map(OrderListResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // 주문 상세 정보를 조회
+    @SneakyThrows
+    @Transactional
+    public Order getOrderDetails(Long orderId, String userId) {
+
+        // 1. Order 엔티티 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문 ID " + orderId + "를 찾을 수 없습니다."));
+
+        // 2. 보안 검사: 현재 로그인된 사용자가 주문의 소유자인지 확인
+        // User 엔티티의 ID 필드가 username과 동일한 역할을 수행한다고 가정합니다.
+        if (!order.getUser().getId().equals(userId)) {
+            // 다른 사용자의 주문이라면 접근 거부 예외 발생
+            throw new AccessDeniedException("이 주문(" + orderId + ")을 조회할 권한이 없습니다.");
+        }
+
+        // 3. 데이터 준비: Lazy Loading된 OrderItem 목록을 미리 로드(초기화)
+        // OrderController에서 OrderItem 목록을 순회할 때 LazyInitializationException을 피하기 위함입니다.
+        order.getOrderItemList().size();
+
+        // 4. Order 엔티티 반환
+        return order;
     }
 
 }

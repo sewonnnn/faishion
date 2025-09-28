@@ -72,7 +72,6 @@ const MyPageDetail = () => {
     // 주소관리
     const handleAddressUpdated = (newDefaultAddress) => {
         setDefaultAddress(newDefaultAddress);
-        // 사용자 정보를 다시 불러와서 최신 상태를 반영할 수도 있습니다.
         // fetchUserData();
     };
     const handleInputChange = (e) => {

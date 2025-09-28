@@ -99,20 +99,36 @@ const ProductRightInfo = ({ productId, product }) => {
         navigate(`/gemini/${productId}`);
     };
 
-    const onOrderForm = () => {
-
-        // 바로 구매' 시, 선택된 옵션이 있는지 확인
+    // 바로가기 클릭 시 주문서 이동
+    const onOrderForm = async () => {
         if (selectedOptions.length === 0) {
             alert("상품 옵션을 선택해 주세요.");
             return;
         }
 
-        navigate(`/order/new`, {
-            state: {
-                productId: productId,
-                items: selectedOptions
-            }
-        });
+        const requestBody = {
+            productId: productId, // 상품 ID (DirectOrderRequestDTO.productId)
+            items: selectedOptions.map(opt => ({ // OrderItemRequestDTO 리스트
+                color: opt.color,
+                size: opt.size,
+                quantity: opt.quantity
+            }))
+        };
+
+        try {
+            const response = await api.post('/order/newdirect', requestBody);
+
+            // ⭐️ 2. 응답으로 받은 주문 상품 목록(CartProductDTO 리스트)을 'directItems' 키로 전달
+            navigate(`/order/new`, {
+                state: {
+                    directItems: response.data // ⭐️ 키 이름을 명확히 변경
+                }
+            });
+
+        } catch (error) {
+            console.error('바로 구매 데이터 준비 실패:', error.response?.data || error.message);
+            alert("바로 구매를 위한 데이터를 불러오는 데 실패했습니다.");
+        }
     };
 
     const onCartSave = async () => {

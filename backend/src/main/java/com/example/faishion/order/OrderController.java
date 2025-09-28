@@ -1,6 +1,5 @@
 package com.example.faishion.order;
 
-import com.example.faishion.address.Address;
 import com.example.faishion.address.AddressRepository;
 import com.example.faishion.cart.Cart;
 import com.example.faishion.cart.CartProductDTO;
@@ -9,6 +8,7 @@ import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
 import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/seller")
     public ResponseEntity<Page<SellerOrderDTO>> sellerOrders(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -129,7 +131,7 @@ public class OrderController {
     }
 
     // 바로 구매 요청 처리용 새로운 엔드포인트 추가
-    @PostMapping("/new-direct")
+    @PostMapping("/newdirect")
     public List<CartProductDTO> getDirectOrderData(@RequestBody DirectOrderRequestDTO request) {
 
         List<CartProductDTO> orderItems = new ArrayList<>();
@@ -161,5 +163,66 @@ public class OrderController {
         }
 
         return orderItems;
+    }
+
+    // OrderController.java (수정 없음, 이미 로그인 사용자 기준으로 구현됨)
+    @GetMapping("/my-history")
+    public ResponseEntity<List<OrderListResponseDTO>> getMyOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build(); // 인증되지 않음 처리
+        }
+
+        //  userDetails.getUsername()을 사용하여 현재 로그인한 사용자의 ID(username)를 전달
+        List<OrderListResponseDTO> orderHistory = orderService.getMyOrderHistory(userDetails.getUsername());
+        return ResponseEntity.ok(orderHistory);
+    }
+
+    // 주문 상세 조회
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Map<String, Object>> getOrderDetails(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build(); // 인증되지 않음 처리
+        }
+
+        try {
+            // 1. Service에서 Order 엔티티 조회 및 보안 검사 (Order 엔티티 반환)
+            Order order = orderService.getOrderDetails(orderId, userDetails.getUsername());
+
+            // 2. 주문 항목을 CartProductDTO 리스트로 변환 (기존 DTO 재활용)
+            List<CartProductDTO> orderItems = order.getOrderItemList().stream()
+                    .map(CartProductDTO::new) // CartProductDTO의 OrderItem 생성자 사용
+                    .collect(Collectors.toList());
+
+            // 3. 주문 기본 정보와 항목 리스트를 Map으로 묶어서 반환
+            Map<String, Object> response = new HashMap<>();
+            response.put("userName", order.getUser().getName());
+
+            // 주문 기본 정보 (Order 엔티티에서 직접 추출)
+            response.put("orderId", order.getId());
+            response.put("clientOrderId", order.getClientOrderId());
+            response.put("status", order.getStatus());
+            response.put("totalAmount", order.getTotalAmount());
+            response.put("orderDate", order.getCreatedAt());
+
+            // 배송지 정보 (Order 엔티티에서 직접 추출)
+            response.put("zipcode", order.getZipcode());
+            response.put("street", order.getStreet());
+            response.put("detail", order.getDetail());
+            response.put("requestMsg", order.getRequestMsg());
+
+            // 주문 항목 리스트 (CartProductDTO 리스트)
+            response.put("orderItems", orderItems);
+
+            return ResponseEntity.ok(response);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            System.err.println("주문 상세 조회 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
