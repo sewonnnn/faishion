@@ -120,14 +120,13 @@ public class WidgetController {
 
             /* 배송/주문자 정보 */
             User user = order.getUser();
-            Address addr = order.getAddress();
 
             String receiverName = (user != null) ? nullToEmpty(user.getName()) : "";
             String phone        = (user != null) ? nullToEmpty(user.getPhoneNumber()) : "";
-            String zipcode      = (addr != null) ? nullToEmpty(addr.getZipcode()) : "";
-            String street       = (addr != null) ? nullToEmpty(addr.getStreet()) : "";
-            String detail       = (addr != null) ? nullToEmpty(addr.getDetail()) : "";
-            String requestMsg   = (addr != null) ? nullToEmpty(addr.getRequestMsg()) : "";
+            String zipcode      = (order != null) ? nullToEmpty(order.getZipcode()) : "";
+            String street       = (order != null) ? nullToEmpty(order.getStreet()) : "";
+            String detail       = (order != null) ? nullToEmpty(order.getDetail()) : "";
+            String requestMsg   = (order != null) ? nullToEmpty(order.getRequestMsg()) : "";
 
             String fullAddress  = joinNonBlank(street, detail, zipcode);
 
