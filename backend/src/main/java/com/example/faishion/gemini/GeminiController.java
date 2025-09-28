@@ -80,20 +80,17 @@ public class GeminiController {
     public String getProductImage(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails) {
         List<Stock> stocks = stockRepository.findByProductId(productId);
         JsonObject responseJson = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
         if (!stocks.isEmpty()) {
-            Stock stock = stocks.get(0);
-            Image image = stock.getImage();
-            if (image != null) {
-                String imageUrl = "/image/" + image.getId();
-                responseJson.addProperty("imageUrl", imageUrl);
-            } else {
-                responseJson.addProperty("error", "해당 상품의 이미지가 없습니다.");
+            for(Stock stock : stocks){
+                String imageUrl = "/image/" + stock.getImage().getId();
+                jsonArray.add(imageUrl);
             }
+            responseJson.add("imageUrls", jsonArray);
         } else {
             responseJson.addProperty("error", "해당 상품의 재고를 찾을 수 없습니다.");
         }
 
-        // ⭐ 사용자 이미지 URL 추가 로직 (수정)
         addUserImageUrl(responseJson, userDetails);
 
         return gson.toJson(responseJson);

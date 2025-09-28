@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
     Navbar,
@@ -69,7 +68,6 @@ const Header = () => {
     };
 
     // 전체 메뉴 렌더링 함수
-    // categories 상태는 이제 CategoryGroupDTO 배열입니다.
     const renderAllMenu = () => {
         return (
             <div className="row g-0 full-menu">
@@ -148,6 +146,7 @@ const Header = () => {
             </Navbar>
             <hr className="header-divider" />
 
+            {/* **수정된 메인 헤더 부분:** Navbar 대신 div와 Container fluid를 사용하여 레이아웃 제어 */}
             <div
                 className="main-header-wrapper"
                 onMouseOver={(e) => {
@@ -161,31 +160,31 @@ const Header = () => {
                     }
                 }}
             >
-                <Navbar expand="lg">
-                    <Container fluid>
-                        <Nav className="main-nav-links me-auto">
-                            <Nav.Link href="/product/list?type=best">베스트</Nav.Link>
-                            <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
-                            <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
-                            <Nav.Link href="#solo">단독</Nav.Link>
-                            <Nav.Link href="#recom">추천</Nav.Link>
-                        </Nav>
-                        <div className={"user-info"}>
-                            <Form className="d-flex seantrch-bar" onSubmit={handleSearch}>
-                                <FormControl
-                                    type="search"
-                                    placeholder="상품을 검색하세요"
-                                    aria-label="Search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <Button variant="outline-success" type="submit">
-                                    <i className="bi bi-search"></i>
-                                </Button>
-                            </Form>
-                        </div>
-                    </Container>
-                </Navbar>
+                <Container fluid className="main-header-content">
+                    <Nav className="main-nav-links">
+                        <Nav.Link href="/product/list?type=best">베스트</Nav.Link>
+                        <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
+                        <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
+                        <Nav.Link href="#solo">단독</Nav.Link>
+                        <Nav.Link href="#recom">추천</Nav.Link>
+                    </Nav>
+
+                    {/* 2. 검색창: 모바일에서 별도의 줄로 내려가도록 CSS 조정 */}
+                    <div className={"user-info search-bar-wrapper"}>
+                        <Form className="d-flex search-bar" onSubmit={handleSearch}>
+                            <FormControl
+                                type="search"
+                                placeholder="상품을 검색하세요"
+                                aria-label="Search"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <Button variant="outline-success" type="submit">
+                                <i className="bi bi-search"></i>
+                            </Button>
+                        </Form>
+                    </div>
+                </Container>
                 {isMenuOpen && (
                     <div
                         className="full-screen-dropdown"

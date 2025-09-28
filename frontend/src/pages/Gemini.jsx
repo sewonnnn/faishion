@@ -17,71 +17,67 @@ const Gemini = () => {
     const {api} = useAuth();
     const nav = useNavigate();
 
-    // ⭐ useRef를 사용하여 첫 실행을 추적
     const isMounted = useRef(false);
 
     useEffect(() => {
-        // Strict Mode에서 두 번 실행되는 것을 방지
-        if (isMounted.current) {
-            return;
-        }
-        isMounted.current = true;
-
-        const fetchImages = async () => {
-            let userImageUrl = null;
-            let imageUrls = [];
-
-            try {
-                const BASE_URL = "http://localhost:8080";
-                const stockIds = searchParams.get("stockIds");
-
-                if (stockIds) {
-                    const apiUrl = `${BASE_URL}/gemini/cart-images?ids=${stockIds}`;
-                    const response = await api.get(apiUrl);
-                    if (response.data) {
-                        if (Array.isArray(response.data.imageUrls)) {
-                            imageUrls = response.data.imageUrls.map(url => `${BASE_URL}${url}`);
-                        }
-                        userImageUrl = response.data.userImageUrl ? `${BASE_URL}${response.data.userImageUrl}` : null;
-                    }
-                } else if (productId) {
-                    const apiUrl = `${BASE_URL}/gemini/${productId}`;
-                    const response = await api.get(apiUrl);
-
-                    if (response.data) {
-                        if (response.data.imageUrl) {
-                            imageUrls.push(`${BASE_URL}${response.data.imageUrl}`);
-                        }
-                        userImageUrl = response.data.userImageUrl ? `${BASE_URL}${response.data.userImageUrl}` : null;
-                    }
-                }
-
-                // ⭐ 사용자 이미지 부재 시 알림/이동 (로직 자체는 유지)
-                if(!userImageUrl){
-                    alert("AI 스타일링을 위해서는 마이페이지에서 본인의 이미지를 등록해야합니다.");
-                    nav("/mypage/detail");
-                    return; // 함수 종료
-                }
-
-                // 정상 상태 업데이트
-                setProductImages(imageUrls);
-                setModelImageUrl(userImageUrl);
-
-                if (imageUrls.length === 0) {
-                    setMessage("이미지 목록을 불러오는 데 실패했거나 이미지가 없습니다.");
-                }
-
-            } catch (error) {
-                console.error("[프런트엔드] 이미지 목록 로드 중 오류 발생:", error);
-                setMessage("이미지 목록을 불러오는 데 실패했습니다.");
+            // Strict Mode에서 두 번 실행되는 것을 방지
+            if (isMounted.current) {
+                return;
             }
-        };
+            isMounted.current = true;
 
-        fetchImages();
-        // 의존성 배열은 그대로 유지하지만, Strict Mode 재실행은 useRef로 제어
-    }, [productId, searchParams, api, nav]);
+            const fetchImages = async () => {
+                const BASE_URL = "http://localhost:8080";
 
-    // ... (나머지 handleImageToggle, getBase64, handleGenerateClick 함수는 동일)
+                let userImageUrl = null;
+                let imageUrls = [];
+
+                try {
+                    const stockIds = searchParams.get("stockIds");
+
+                    if (stockIds) {
+                        // 1. 장바구니 (stockIds) 로직: 기존처럼 배열 처리
+                        const response = await api.get(`/gemini/cart-images?ids=${stockIds}`);
+                        if (response.data) {
+                             if (Array.isArray(response.data.imageUrls)) {
+                                    imageUrls = response.data.imageUrls.map(url => `${BASE_URL}${url}`);
+                             }
+                            userImageUrl = response.data.userImageUrl ? `${BASE_URL}${response.data.userImageUrl}` : null;
+                        }
+                    } else if (productId) {
+                        const response = await api.get(`/gemini/${productId}`);
+                        console.log(response.data.imageUrls)
+                        if (response.data) {
+                            if (Array.isArray(response.data.imageUrls)) {
+                                imageUrls = response.data.imageUrls.map(url => `${BASE_URL}${url}`);
+                            }
+
+                            userImageUrl = response.data.userImageUrl ? `${BASE_URL}${response.data.userImageUrl}` : null;
+                        }
+                    }
+
+                    if(!userImageUrl){
+                        alert("AI 스타일링을 위해서는 마이페이지에서 본인의 이미지를 등록해야합니다.");
+                        nav("/mypage/detail");
+                        return; // 함수 종료
+                    }
+
+                    setProductImages(imageUrls);
+                    setModelImageUrl(userImageUrl);
+
+                    if (imageUrls.length === 0) {
+                        setMessage("이미지 목록을 불러오는 데 실패했거나 이미지가 없습니다.");
+                    }
+
+                } catch (error) {
+                    console.error("[프런트엔드] 이미지 목록 로드 중 오류 발생:", error);
+                    setMessage("이미지 목록을 불러오는 데 실패했습니다.");
+                }
+            };
+
+            fetchImages();
+        }, [productId, searchParams, api, nav]);
+
     const handleImageToggle = (image) => {
         setSelectedImages(prevImages => {
             if (prevImages.includes(image)) {

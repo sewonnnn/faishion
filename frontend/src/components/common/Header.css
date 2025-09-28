@@ -18,20 +18,64 @@
     z-index: 1000; /* 다른 요소 위에 표시되도록 z-index를 높게 설정 */
 }
 
-/* 전체 화면 드롭다운 메뉴 스타일 */
-.full-screen-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100vw;
-    max-width: none;
-    margin: 0;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-top: 1px solid #eee;
-    background-color: white;
-    z-index: 999; /* 메인 메뉴보다 낮게 설정하여 z-index 충돌 방지 */
+/* 메인 헤더 내용을 담는 Container의 Flexbox 설정 */
+.main-header-content {
+    display: flex; /* 내부 요소(Nav와 검색창)를 가로로 배치 */
+    flex-wrap: wrap; /* 공간이 부족하면 자동으로 줄 바꿈 허용 */
+    align-items: center;
+    padding-top: 5px; /* 상단 패딩 추가 */
+    padding-bottom: 5px; /* 하단 패딩 추가 */
 }
+
+/* 메인 링크 그룹: 한 줄에 유지되도록 설정 */
+.main-nav-links {
+    display: flex;
+    flex-wrap: nowrap; /* 링크들이 세로로 줄 바꿈되는 것을 방지 */
+    margin-right: 20px; /* 검색창과의 간격 (데스크톱용) */
+    flex-basis: 100%; /* 모바일에서 전체 너비 차지 */
+    order: 1; /* 링크가 첫 번째 줄에 위치 */
+    overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤 가능 (선택 사항) */
+}
+
+/* 메인 메뉴 스타일 */
+.main-nav-links .nav-link,
+.main-nav .nav-item .nav-link { /* .main-nav는 사용하지 않지만 클래스는 유지 */
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    white-space: nowrap; /* 링크 텍스트 줄 바꿈 방지 */
+    color: #000 !important
+}
+
+/* 검색창 래퍼 */
+.search-bar-wrapper {
+    order: 2; /* 검색창이 두 번째 줄에 위치 */
+    width: 100%; /* 모바일에서 전체 너비 사용 */
+    padding-top: 10px; /* 링크와의 간격 */
+    padding-left: 12px; /* Container fluid의 기본 패딩 맞추기 */
+    padding-right: 12px;
+}
+
+/* 데스크톱 (768px 이상)에서 레이아웃 설정 */
+@media (min-width: 768px) {
+    .main-header-content {
+        flex-wrap: nowrap; /* 데스크톱에서는 줄 바꿈 방지 */
+    }
+
+    .main-nav-links {
+        flex-basis: auto; /* 내용물 너비만큼만 차지 */
+        margin-right: auto; /* 링크와 검색창 사이 간격을 최대한 벌림 */
+        overflow-x: visible;
+    }
+
+    .search-bar-wrapper {
+        width: auto; /* 내용물 너비만큼만 차지 */
+        padding-top: 0; /* 간격 제거 */
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
 
 /* 상단 아이콘 (하트, 사람, 가방) */
 .top-nav .nav-link i {
@@ -43,14 +87,6 @@
 .header-divider {
     margin: 0;
     border-top: 1px solid #e0e0e0;
-}
-
-/* 메인 메뉴 스타일 */
-.main-nav .nav-link,
-.main-nav .nav-item .nav-link {
-    font-size: 0.9rem;
-    font-weight: bold;
-    padding: 0.5rem 1rem;
 }
 
 /* 검색창 스타일 */
