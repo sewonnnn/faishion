@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Spinner, Alert, Image as BootstrapImage, Button } from 'react-bootstrap';
+import { Container, Spinner, Alert, Image as BootstrapImage, Button, Modal } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import defaultImage from "../assets/user.jpg";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './OrderDetailPage.css';
+// ⚠️ ReviewForm의 경로는 실제 파일 위치에 맞게 수정이 필요할 수 있습니다.
+import ReviewForm from '../components/productdetail/ReviewForm.jsx';
 
 // 금액을 쉼표 형식으로 포맷
 const formatPrice = (price) => {
@@ -21,11 +23,52 @@ const OrderDetailPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 💡 리뷰 모달 관련 상태 추가
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [currentReviewTarget, setCurrentReviewTarget] = useState(null); // 리뷰 작성 대상 상품 정보 저장 (productId 등)
+
     const { api } = useAuth();
 
     const getImageUrl = (imageId) => {
+        // api.defaults.baseURL은 보통 'http://localhost:8080' 등을 포함합니다.
         return imageId ? `${api.defaults.baseURL}/image/${imageId}` : defaultImage;
     };
+
+    // 💡 리뷰 작성 버튼 클릭 핸들러
+    const handleReviewButtonClick = (item) => {
+        // 리뷰 작성 대상 상품 정보 저장 (OrderItem DTO에 productId가 있어야 함)
+        setCurrentReviewTarget({
+            productId: item.productId,
+            productName: item.productName
+        });
+        setShowReviewModal(true);
+    };
+
+    // 💡 리뷰 등록 완료 후 처리 (모달 닫기)
+    const handleReviewSubmitted = () => {
+        // 리뷰 등록 후 모달 닫기
+        setShowReviewModal(false);
+        // 필요하다면, 여기에 주문 상세 정보를 다시 불러와서(fetchOrderDetail) '리뷰 작성' 버튼을 '리뷰 완료' 등으로 업데이트하는 로직을 추가할 수 있습니다.
+    };
+
+    // 💡 주문 상세 정보 로딩 함수
+    const fetchOrderDetail = async () => {
+        try {
+            const response = await api.get(`/order/${numericOrderId}`);
+            setOrderDetail(response.data);
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching order detail:", err);
+            const errorMessage = err.response && err.response.status === 403
+                ? "다른 사용자의 주문은 조회할 수 없습니다."
+                : "주문 상세 정보를 불러오는 데 실패했습니다.";
+            setError(errorMessage);
+            setOrderDetail(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     useEffect(() => {
         if (!orderId) {
@@ -34,25 +77,11 @@ const OrderDetailPage = () => {
             return;
         }
 
-        const fetchOrderDetail = async () => {
-            try {
-                const response = await api.get(`/order/${numericOrderId}`);
-                setOrderDetail(response.data);
-                setError(null);
-            } catch (err) {
-                console.error("Error fetching order detail:", err);
-                const errorMessage = err.response && err.response.status === 403
-                    ? "다른 사용자의 주문은 조회할 수 없습니다."
-                    : "주문 상세 정보를 불러오는 데 실패했습니다.";
-                setError(errorMessage);
-                setOrderDetail(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchOrderDetail();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [orderId, api, numericOrderId]);
+    // 💡 의존성 배열에 fetchOrderDetail을 넣지 않기 위해 함수를 밖에 뒀고, eslint 경고를 무시합니다. (api, numericOrderId만 유지)
+
 
     if (isLoading) {
         return (
@@ -89,9 +118,11 @@ const OrderDetailPage = () => {
         'DELIVERED': '배송 완료'
     };
     const currentKoreanStatus = statusMap[orderDetail.status] || '접수'; // 현재 상태
-    const deliverySteps = ['접수', '발송', '배송 준비', '배송 완료'];
+    const deliverySteps = ['접수', '배송 준비', '발송', '배송 완료']; // 💡 '배송 준비'와 '발송' 순서를 논리적으로 변경했습니다.
     const orderDate = orderDetail.orderDate ? new Date(orderDetail.orderDate).toLocaleDateString('ko-KR') : '날짜 정보 없음';
 
+    // 💡 배송 완료 상태 여부
+    const isOrderDelivered = orderDetail.status === 'DELIVERED';
 
     return (
         <div className="bg-light min-vh-100 d-flex justify-content-center">
@@ -126,21 +157,37 @@ const OrderDetailPage = () => {
                                     className="me-3 rounded"
                                     style={{ width: '100px', height: '140px', objectFit: 'cover' }}
                                 />
-                                <div className="d-flex flex-column justify-content-center">
-                                    <p className="text-muted mb-1" style={{ fontSize: '0.85rem' }}>{item.sellerBusinessName}</p>
-                                    <p className="fw-semibold mb-1" style={{ fontSize: '1rem', lineHeight: '1.4' }}>
-                                        {item.productName}
-                                    </p>
-                                    <p className="text-muted mb-1" style={{ fontSize: '0.9rem' }}>
-                                        {item.productSize} / {item.quantity}개
-                                    </p>
-                                    {/* 원가와 할인가 */}
-                                    <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.8rem' }}>
-                                        {formatPrice(item.productPrice)}원
-                                    </p>
-                                    <p className="fw-bold mb-0 text-danger" style={{ fontSize: '1.05rem' }}>
-                                        {formatPrice(item.discountedProductPrice)}원
-                                    </p>
+                                <div className="d-flex flex-column justify-content-center flex-grow-1">
+                                    <div className="d-flex justify-content-between">
+                                        <div>
+                                            <p className="text-muted mb-1" style={{ fontSize: '0.85rem' }}>{item.sellerBusinessName}</p>
+                                            <p className="fw-semibold mb-1" style={{ fontSize: '1rem', lineHeight: '1.4' }}>
+                                                {item.productName}
+                                            </p>
+                                            <p className="text-muted mb-1" style={{ fontSize: '0.9rem' }}>
+                                                {item.productSize} / {item.quantity}개
+                                            </p>
+                                            {/* 원가와 할인가 */}
+                                            <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.8rem' }}>
+                                                {formatPrice(item.productPrice)}원
+                                            </p>
+                                            <p className="fw-bold mb-0 text-danger" style={{ fontSize: '1.05rem' }}>
+                                                {formatPrice(item.discountedProductPrice)}원
+                                            </p>
+                                        </div>
+                                        {/* 💡 리뷰 작성 버튼 */}
+                                        <div className="ms-3 align-self-center">
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                // 💡 배송 완료 상태일 때만 활성화
+                                                disabled={!isOrderDelivered}
+                                                onClick={() => handleReviewButtonClick(item)}
+                                            >
+                                                리뷰 작성하기
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -182,7 +229,7 @@ const OrderDetailPage = () => {
                         </div>
                     </section>
 
-                    {/*  총 결제 정보 섹션 */}
+                    {/* 총 결제 정보 섹션 */}
                     <section className="py-3">
                         <p className="d-flex justify-content-between mb-1">
                             <span>상품 금액 ({orderItems.length}개)</span>
@@ -213,6 +260,27 @@ const OrderDetailPage = () => {
 
                 </div>
             </Container>
+
+            {/* 💡 리뷰 작성 모달 */}
+            <Modal
+                show={showReviewModal}
+                onHide={() => setShowReviewModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        {currentReviewTarget?.productName} 리뷰 작성
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {currentReviewTarget && (
+                        <ReviewForm
+                            productId={currentReviewTarget.productId}
+                            onReviewSubmitted={handleReviewSubmitted}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
         </div>
     );
 }

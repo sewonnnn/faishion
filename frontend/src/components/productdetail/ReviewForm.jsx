@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import axios from 'axios';
@@ -9,13 +9,28 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const {api} = useAuth();
+
+    const { api, user } = useAuth();
+
+    const [currentUserId, setCurrentUserId] = useState(null);
+
+    useEffect(() => {
+        if (user && user.sub) {
+            setCurrentUserId(user.sub);
+        }
+    }, [user]);
+
     const handleFileChange = (e) => {
         setSelectedFiles(Array.from(e.target.files));
     };
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
+
+        if (!currentUserId) { // 💡 사용자 ID가 없는 경우 등록 차단
+            alert('사용자 정보가 없어 리뷰를 등록할 수 없습니다. 다시 로그인해주세요.');
+            return;
+        }
         if (rating === 0) {
             alert('별점을 선택해주세요.');
             return;
@@ -28,7 +43,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
         const formData = new FormData();
         const reviewData = {
             productId,
-            userId: 'sewon',
+            userId: currentUserId,
             content: newReview,
             rating
         };
@@ -40,16 +55,11 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
         });
 
         try {
-            console.log('axios POST 요청을 보냅니다.'); // 콘솔 로그
             const response = await api.post("/review/save", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-
-            console.log('--- 리뷰 등록 성공 ---'); // 콘솔 로그
-            console.log('응답 상태:', response.status);
-            console.log('응답 데이터:', response.data);
 
             if (response.status === 201 || response.status === 200) {
                 alert('리뷰가 성공적으로 등록되었습니다.');
@@ -59,13 +69,11 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
                 onReviewSubmitted();
             }
         } catch (error) {
-            console.log('--- 리뷰 등록 실패 ---'); // 콘솔 로그
             console.error('리뷰 등록에 실패했습니다:', error.response ? error.response.data : error);
             alert('리뷰 등록 중 오류가 발생했습니다. 다시 시도해 주세요.');
         }
     };
 
-    // ... (renderStars 함수 및 return문은 기존과 동일) ...
     const renderStars = (isEditable = false) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
@@ -112,7 +120,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             </Form.Group>
 
             <div className="d-grid">
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" disabled={!currentUserId}>
                     리뷰 등록
                 </Button>
             </div>
