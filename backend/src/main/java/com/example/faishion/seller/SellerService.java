@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,5 +87,34 @@ public class SellerService {
             System.err.println("⚠ 사업자번호 검증 API 호출 실패 → 임시로 true 반환: " + e.getMessage());
             return true; //  개발용 fallback: 실패해도 회원가입 허용 // 배포시 false로 바꿔두기
         }
+    }
+
+    // 판매자 목록을 DTO로 조회
+    public List<SellerListDTO> findAllSellersForAdmin() {
+        return sellerRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteSeller(String sellerId) {
+        // ID 존재 여부 확인 로직 (선택적)
+        if (!sellerRepository.existsById(sellerId)) {
+            throw new IllegalArgumentException("존재하지 않는 판매자 ID입니다: " + sellerId);
+        }
+        sellerRepository.deleteById(sellerId);
+    }
+
+    // seller 엔터티를 sellerListDTO로 변환
+    private SellerListDTO convertToDto(Seller seller) {
+        SellerListDTO dto = new SellerListDTO();
+        dto.setId(seller.getId());
+        dto.setEmail(seller.getEmail());
+        dto.setPhoneNumber(seller.getPhoneNumber());
+        dto.setBusinessName(seller.getBusinessName());
+        dto.setBusinessNumber(seller.getBusinessNumber());
+        dto.setOwnerName(seller.getOwnerName());
+        dto.setCreatedAt(seller.getCreatedAt());
+        return dto;
     }
 }
