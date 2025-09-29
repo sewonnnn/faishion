@@ -1,44 +1,36 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axios from "axios";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 export default function LoginSuccessPage() {
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
+    const { login } = useAuth();
 
     const code = searchParams.get("code");
-    const state = searchParams.get("state"); // 네이버만 필요
-    const provider = searchParams.get("provider"); // 👈 callback URL에서 provider 추출
+    const state = searchParams.get("state");
 
     useEffect(() => {
-        if (!code || !provider) {
-            alert("인가 코드 또는 provider 정보가 없습니다. 다시 로그인해주세요.");
+        if (!code) {
+            alert("인가 코드가 없습니다. 다시 로그인해주세요.");
             nav("/login");
             return;
         }
 
         const sendAuthCodeToBackend = async () => {
             try {
-                let url = "";
-                let body = { code };
-
-                if (provider === "naver") {
-                    url = "http://localhost:8080/auth/login/naver";
-                    body.state = state;
-                } else if (provider === "kakao") {
-                    url = "http://localhost:8080/auth/login/kakao";
-                } else {
-                    alert("지원하지 않는 로그인 제공자입니다.");
-                    nav("/login");
-                    return;
-                }
+                const url = "http://localhost:8080/auth/login/naver";
+                const body = { code, state };
 
                 const response = await axios.post(url, body, {
                     headers: { "Content-Type": "application/json" },
-                    withCredentials: true, // 쿠키 받기
+                    withCredentials: true,
                 });
-
-                alert(`${provider} 로그인 성공! ` +  response.data);
+                // 수정
+                login(response.data.accessToken);
+                alert(`네이버 로그인 성공! ${response.data.name} (${response.data.email})`);
                 nav("/");
             } catch (error) {
                 console.error("소셜 로그인 처리 중 오류:", error);
@@ -48,7 +40,7 @@ export default function LoginSuccessPage() {
         };
 
         sendAuthCodeToBackend();
-    }, [code, state, provider, nav]);
+    }, [code, state, nav, location]);
 
     return <div>소셜 로그인 처리 중...</div>;
 }

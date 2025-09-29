@@ -146,6 +146,8 @@ public class AuthController {
                         "email", u.getEmail(),
                         "name", u.getName()
                 ));
+//        System.out.println("네이버 유저: " + naverUserId + ", email=" + email + ", name=" + name + ", mobile=" + mobile);
+
     }
 
     // 임시 토큰 발급
