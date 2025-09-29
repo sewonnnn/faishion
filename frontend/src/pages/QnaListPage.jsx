@@ -1,8 +1,8 @@
 import React from "react";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import "./QnaListPage.css";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const QnaListPage = () => {
     const [qnaBoardList, setQnaBoardList] = useState([]); // 전체 게시글
@@ -12,13 +12,13 @@ const QnaListPage = () => {
     const [totalPages, setTotalPages] = useState(0); // 총 페이지 수 상태
     const pageSize = 10; // 한 페이지당 고정된 게시물 수
     const navigate = useNavigate();
-
+    const {api, user} = useAuth();
 
     // 게시글 함수
     const fetchQnaData = async (query = "", pageNum = 0) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/qna/list?q=${query}&page=${pageNum}`
+            const response = await api.get(
+                `/qna/list?q=${query}&page=${pageNum}`
             );
 
             setQnaBoardList(response.data.content);
@@ -53,7 +53,11 @@ const QnaListPage = () => {
 
     //상세페이지 이동을 위한 함수
     const handleGoDetail = (id)=>{
-        navigate(`/qna/${id}`);
+        if(user.roles == "ADMIN"){
+            navigate(`/admin/qna/${id}`);
+        }else{
+            navigate(`/qna/${id}`);
+        }
     }
 
     return (
@@ -118,7 +122,9 @@ const QnaListPage = () => {
                             <button className="icon-search" aria-label="검색" type="submit"></button>
                         </div>
                     </form>
-                    <a className="btn-write" href="/qna/new">글쓰기</a>
+                    {user.roles && user.roles.includes('USER') && (
+                        <a className="btn-write" href="/qna/new">글쓰기</a>
+                    )}
                 </div>
                 {/* 페이징 버튼 (기능 유지를 위해 별도로 배치) */}
                 <div className="pagination">

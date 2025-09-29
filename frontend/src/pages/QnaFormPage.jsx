@@ -1,14 +1,18 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../contexts/AuthContext.jsx";
 
 const QnaFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [login, setLogin] = useState("sewon"); // 로그인 유저 관리 (임시)
     const navigate = useNavigate();
-    const {api} = useAuth();
+    const {api, user} = useAuth();
+
+    if (!user.roles || !user.roles.includes('USER')) {
+        // 권한이 없으면 목록으로 리디렉션
+        navigate("/qna/list", { replace: true });
+        return null; // 렌더링 중단
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,7 +39,7 @@ const QnaFormPage = () => {
         <section className="qa-form">
             <div className="qa-inner">
                 <h1>Q&A 작성하기</h1>
-                <div>{login}</div>
+                <div>{user.sub}</div>
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label>제목</label><br/>

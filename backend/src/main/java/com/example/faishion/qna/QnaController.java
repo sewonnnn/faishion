@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/qna")
@@ -63,7 +62,7 @@ public class QnaController {
     public QnaDTO findQnaById(@PathVariable long id) {
         return qnaService.findQnaById(id);
     }
-    
+
     // 게시물 수정하기
     @PutMapping("/{id}")
     public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
@@ -78,15 +77,32 @@ public class QnaController {
         qnaService.deleteQna(id);
     }
 
-    // 답변 추가하기
+    // 💡 답변 추가하기 (수정된 메서드)
     @PutMapping("/answer/{id}")
-    // JSON에 있는 필드만 DTO에 매핑하고, 나머지는 그냥 비워두는 방식으로 처리
-    public void saveAnswer(@PathVariable long id, @RequestBody QnaDTO qnaDto) {
-        Optional<Seller> seller = sellerRepository.findById(qnaDto.getAnswered_by());
-        if(!seller.isPresent()) {
-            return;
+    // 💡 DTO를 QnaAnswerDTO로 변경하고, UserDetails를 사용하여 답변자 정보를 가져옵니다.
+    public ResponseEntity<String> saveAnswer(@PathVariable long id, @RequestBody QnaAnswerDTO answerDTO, @AuthenticationPrincipal UserDetails userDetails) {
+
+        String answerContent = answerDTO.getAnswer();
+        if (answerContent == null || answerContent.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("답변 내용이 누락되었습니다.");
         }
-        qnaService.updateAnswer(id, qnaDto.getAnswer(), seller.get());
+
+        Optional<Seller> sellerOptional = sellerRepository.findById(userDetails.getUsername());
+
+        // 💡 ADMIN 또는 SELLER 역할이 있지만 DB에서 Seller 엔티티를 찾을 수 없는 경우
+        if (!sellerOptional.isPresent()) {
+            // 이 요청은 SecurityConfig에서 이미 ADMIN/SELLER만 허용했지만, 혹시 모를 상황을 대비
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("답변 권한(Seller 계정)이 없습니다.");
+        }
+
+        // 3. 답변 서비스 호출
+        try {
+            qnaService.updateAnswer(id, answerContent, sellerOptional.get());
+            return ResponseEntity.ok("답변이 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            // QnA ID가 잘못되었거나, 기타 DB 오류
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("답변 등록 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     @GetMapping("/product/{productId}")

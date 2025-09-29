@@ -22,6 +22,9 @@ const AdminHeader = () => {
                         <a className="nav-link" href="/admin/report/list">
                             신고 글 관리
                         </a>
+                        <a className="nav-link" href="/admin/qna/list">
+                            문의 글 관리
+                        </a>
                         <NavDropdown title="판매자 관리" id="seller-dropdown">
                             <a className="dropdown-item" href="/admin/seller/list">
                                 판매자 목록
