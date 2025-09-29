@@ -18,6 +18,7 @@ const OrderDetailPage = () => {
     const { orderId } = useParams();
     const numericOrderId = Number(orderId);
     const nav = useNavigate();
+    const [orderItems, setOrderItems] =useState([]);
 
     const [orderDetail, setOrderDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -213,7 +214,7 @@ const OrderDetailPage = () => {
                             <section key={groupIndex} className={`py-3 ${groupIndex < sellerOrders.length - 1 ? 'border-bottom' : ''}`}>
 
                     {/* 주문 상품 섹션 */}
-                    <section className="py-3 border-bottom">
+                 {/*   <section className="py-3 border-bottom">
                         {orderItems.map((item) => (
                             <div key={item.id} className="d-flex align-items-start mb-3">
                                 <BootstrapImage
@@ -232,7 +233,7 @@ const OrderDetailPage = () => {
                                             <p className="text-muted mb-1" style={{ fontSize: '0.9rem' }}>
                                                 {item.productSize} / {item.quantity}개
                                             </p>
-                                            {/* 원가와 할인가 */}
+                                             원가와 할인가
                                             <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.8rem' }}>
                                                 {formatPrice(item.productPrice)}원
                                             </p>
@@ -240,7 +241,7 @@ const OrderDetailPage = () => {
                                                 {formatPrice(item.discountedProductPrice)}원
                                             </p>
                                         </div>
-                                        {/* 💡 리뷰 작성 버튼 */}
+                                         💡 리뷰 작성 버튼
                                         <div className="ms-3 align-self-center">
                                             <Button
                                                 variant="outline-primary"
@@ -256,7 +257,7 @@ const OrderDetailPage = () => {
                                 </div>
                             </div>
                         ))}
-                    </section>
+                    </section>*/}
 
                                 {/* 판매자 이름 및 배송 상태 */}
                                 <h2 className="fs-5 fw-bold mb-3 text-start d-flex justify-content-between align-items-center">
