@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { BsStar, BsStarFill } from 'react-icons/bs';
-import axios from 'axios';
 import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const ReviewForm = ({ productId, onReviewSubmitted }) => {
@@ -9,7 +8,6 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [selectedFiles, setSelectedFiles] = useState([]);
-
     const { api, user } = useAuth();
 
     const [currentUserId, setCurrentUserId] = useState(null);

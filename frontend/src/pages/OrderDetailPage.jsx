@@ -18,7 +18,6 @@ const OrderDetailPage = () => {
     const { orderId } = useParams();
     const numericOrderId = Number(orderId);
     const nav = useNavigate();
-    const [orderItems, setOrderItems] =useState([]);
 
     const [orderDetail, setOrderDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +36,7 @@ const OrderDetailPage = () => {
     // 💡 리뷰 작성 버튼 클릭 핸들러
     const handleReviewButtonClick = (item) => {
         // 리뷰 작성 대상 상품 정보 저장 (OrderItem DTO에 productId가 있어야 함)
+        console.log(item);
         setCurrentReviewTarget({
             productId: item.productId,
             productName: item.productName
@@ -50,25 +50,6 @@ const OrderDetailPage = () => {
         setShowReviewModal(false);
         // 필요하다면, 여기에 주문 상세 정보를 다시 불러와서(fetchOrderDetail) '리뷰 작성' 버튼을 '리뷰 완료' 등으로 업데이트하는 로직을 추가할 수 있습니다.
     };
-
-    // 💡 주문 상세 정보 로딩 함수
-    const fetchOrderDetail = async () => {
-        try {
-            const response = await api.get(`/order/${numericOrderId}`);
-            setOrderDetail(response.data);
-            setError(null);
-        } catch (err) {
-            console.error("Error fetching order detail:", err);
-            const errorMessage = err.response && err.response.status === 403
-                ? "다른 사용자의 주문은 조회할 수 없습니다."
-                : "주문 상세 정보를 불러오는 데 실패했습니다.";
-            setError(errorMessage);
-            setOrderDetail(null);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
 
     useEffect(() => {
         if (!orderId) {
@@ -177,8 +158,9 @@ const OrderDetailPage = () => {
     };
     
     // 💡 배송 완료 상태 여부
-    const isOrderDelivered = orderDetail.status === 'DELIVERED';
-
+    const isOrderDelivered = sellerOrders.length > 0 && sellerOrders.every(group =>
+        group.delivery?.status === 'DELIVERED'
+    );
     return (
         <div className="bg-light min-vh-100 d-flex justify-content-center">
             <Container className="p-0 bg-white" style={{ maxWidth: '768px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.05)' }}>
@@ -212,53 +194,6 @@ const OrderDetailPage = () => {
                         const isDeliveryInfoAvailable = delivery && delivery.trackingNumber;
                         return (
                             <section key={groupIndex} className={`py-3 ${groupIndex < sellerOrders.length - 1 ? 'border-bottom' : ''}`}>
-
-                    {/* 주문 상품 섹션 */}
-                 {/*   <section className="py-3 border-bottom">
-                        {orderItems.map((item) => (
-                            <div key={item.id} className="d-flex align-items-start mb-3">
-                                <BootstrapImage
-                                    alt={item.productName}
-                                    src={getImageUrl(item.productImageId)}
-                                    className="me-3 rounded"
-                                    style={{ width: '100px', height: '140px', objectFit: 'cover' }}
-                                />
-                                <div className="d-flex flex-column justify-content-center flex-grow-1">
-                                    <div className="d-flex justify-content-between">
-                                        <div>
-                                            <p className="text-muted mb-1" style={{ fontSize: '0.85rem' }}>{item.sellerBusinessName}</p>
-                                            <p className="fw-semibold mb-1" style={{ fontSize: '1rem', lineHeight: '1.4' }}>
-                                                {item.productName}
-                                            </p>
-                                            <p className="text-muted mb-1" style={{ fontSize: '0.9rem' }}>
-                                                {item.productSize} / {item.quantity}개
-                                            </p>
-                                             원가와 할인가
-                                            <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.8rem' }}>
-                                                {formatPrice(item.productPrice)}원
-                                            </p>
-                                            <p className="fw-bold mb-0 text-danger" style={{ fontSize: '1.05rem' }}>
-                                                {formatPrice(item.discountedProductPrice)}원
-                                            </p>
-                                        </div>
-                                         💡 리뷰 작성 버튼
-                                        <div className="ms-3 align-self-center">
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                // 💡 배송 완료 상태일 때만 활성화
-                                                disabled={!isOrderDelivered}
-                                                onClick={() => handleReviewButtonClick(item)}
-                                            >
-                                                리뷰 작성하기
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </section>*/}
-
                                 {/* 판매자 이름 및 배송 상태 */}
                                 <h2 className="fs-5 fw-bold mb-3 text-start d-flex justify-content-between align-items-center">
                                     {group.sellerBusinessName}
@@ -281,7 +216,7 @@ const OrderDetailPage = () => {
                                 {/* 그룹 내 상품 목록 */}
                                 <div className="mt-3">
                                     {group.orderItems.map((item, itemIndex) => (
-                                        <div key={itemIndex} className="d-flex align-items-start mb-3">
+                                        <div key={itemIndex} className="d-flex align-items-start justify-content-around mb-3">
                                             <BootstrapImage
                                                 alt={item.name}
                                                 src={getImageUrl(item.imageId)}
@@ -302,6 +237,16 @@ const OrderDetailPage = () => {
                                                 <p className="fw-bold mb-0 text-danger" style={{ fontSize: '1.05rem' }}>
                                                     {formatPrice(item.price)}원
                                                 </p>
+                                            </div>
+                                            <div className="ms-3 align-self-center">
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    disabled={!isOrderDelivered}
+                                                    onClick={() => handleReviewButtonClick(item)}
+                                                >
+                                                    리뷰 작성하기
+                                                </Button>
                                             </div>
                                         </div>
                                     ))}
