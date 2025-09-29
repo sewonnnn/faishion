@@ -1,22 +1,22 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const NoticeFormPage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const navigate = useNavigate();
-
+    const { api, user } = useAuth();
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8080/notice", {
+            await api.post(`${api.defaults.baseURL}/notice`, {
                 title,
                 content
             });
             alert("게시글이 등록되었습니다.");
             // 등록 성공 시 QnA 목록 페이지로 이동
-            navigate("/notice/list");
+            navigate("/admin/notice/list");
         } catch (error) {
             console.error("Error posting notice", error);
             alert("등록 중 오류가 발생했습니다.");
