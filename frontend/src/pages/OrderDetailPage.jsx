@@ -4,7 +4,7 @@ import { Container, Spinner, Alert, Image as BootstrapImage, Button, Modal } fro
 import { useAuth } from '../contexts/AuthContext.jsx';
 import defaultImage from "../assets/user.jpg";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './OrderDetailPage.css';
+import SellerReportModal from "../pages/customer/SellerReportModal";
 // ⚠️ ReviewForm의 경로는 실제 파일 위치에 맞게 수정이 필요할 수 있습니다.
 import ReviewForm from '../components/productdetail/ReviewForm.jsx';
 
@@ -27,6 +27,9 @@ const OrderDetailPage = () => {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [currentReviewTarget, setCurrentReviewTarget] = useState(null); // 리뷰 작성 대상 상품 정보 저장 (productId 등)
 
+    // 리폿 모달 관련 추가
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [currentReportTarget, setCurrentReportTarget] = useState(null) // 리폿 작성 대상 정보 저장
     const { api } = useAuth();
 
     const getImageUrl = (imageId) => {
@@ -36,14 +39,20 @@ const OrderDetailPage = () => {
     // 💡 리뷰 작성 버튼 클릭 핸들러
     const handleReviewButtonClick = (item) => {
         // 리뷰 작성 대상 상품 정보 저장 (OrderItem DTO에 productId가 있어야 함)
-        console.log(item);
         setCurrentReviewTarget({
             productId: item.productId,
-            productName: item.productName
+            productName: item.name
         });
         setShowReviewModal(true);
     };
+    // 판매자 신고 버튼 클릭 핸들러
+    const handleReportButtonClick = (item) =>{
+        setCurrentReportTarget({
+            productId : item.productId
+            })
+        setShowReportModal(true);
 
+        }
     // 💡 리뷰 등록 완료 후 처리 (모달 닫기)
     const handleReviewSubmitted = () => {
         // 리뷰 등록 후 모달 닫기
@@ -238,7 +247,7 @@ const OrderDetailPage = () => {
                                                     {formatPrice(item.price)}원
                                                 </p>
                                             </div>
-                                            <div className="ms-3 align-self-center">
+                                            <div className="d-flex ms-3 align-self-center">
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
@@ -246,6 +255,14 @@ const OrderDetailPage = () => {
                                                     onClick={() => handleReviewButtonClick(item)}
                                                 >
                                                     리뷰 작성하기
+                                                </Button>
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    disabled={!isOrderDelivered}
+                                                    onClick={() => handleReportButtonClick(item)}
+                                                >
+                                                    신고하기
                                                 </Button>
                                             </div>
                                         </div>
@@ -314,6 +331,12 @@ const OrderDetailPage = () => {
                     )}
                 </Modal.Body>
             </Modal>
+
+            <SellerReportModal /* 신고 모달 */
+            show={showReportModal}
+            setShow ={setShowReportModal}
+            item = {currentReportTarget}
+            />
         </div>
     );
 }

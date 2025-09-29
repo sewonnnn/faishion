@@ -22,16 +22,20 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
     // id로 게시물 찾기
     Optional<Qna> findById(Long id); // JPA가 자동으로 생성하는 메서드
 
-    // 게시물 수정
+    // 게시물 수정 (질문 작성자만 가능)
     @Modifying
     @Query("UPDATE Qna q SET q.title = :title, q.content = :content WHERE q.id = :id")
     void updateBoard(@Param("title") String title, @Param("content") String content, @Param("id") long id);
 
-    // 답변, 답변자(판매자) 추가
-    @Modifying
-    @Query("UPDATE Qna q SET q.answer = :answer, q.answeredBy = :answeredBy WHERE q.id = :id")
-    void updateAnswer(@Param("answer") String answer, @Param("answeredBy") Seller seller, @Param("id") long id);
-
     // 상품 개별 문의 리스트 가져오기
     List<Qna> findByProduct_Id(Long productId);
+
+    Page<Qna> findByQnaType(String qnaType, Pageable pageable);
+
+    Page<Qna> findByQnaTypeAndTitleContaining(String qnaType, String title, Pageable pageable);
+
+    Page<Qna> findByQnaTypeAndAnswerIsNull(String qnaType, Pageable pageable);
+
+    @Query("SELECT q FROM Qna q WHERE q.qnaType = :qnaType AND (q.answer IS NULL OR q.answer = '')")
+    Page<Qna> findPendingQnaByQnaType(@Param("qnaType") String qnaType, Pageable pageable);
 }

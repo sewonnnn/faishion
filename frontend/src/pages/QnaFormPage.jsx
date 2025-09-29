@@ -19,12 +19,11 @@ const QnaFormPage = () => {
 
         try {
             await api.post("/qna", {
-                user: { id: "test-user" }, // 로그인된 사용자 ID (임시)
-                product: { id: 1 },        // 질문할 상품 ID (임시)
                 title,
                 content,
                 answer: null,
-                answeredBy: null
+                answeredBySeller: null,
+                answeredByAdmin: null
             });
             alert("게시글이 등록되었습니다.");
             // 등록 성공 시 QnA 목록 페이지로 이동

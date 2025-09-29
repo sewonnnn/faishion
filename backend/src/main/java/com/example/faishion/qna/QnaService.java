@@ -1,5 +1,6 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.admin.Admin;
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
 import com.example.faishion.seller.Seller;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 public class QnaService {
     private final QnaRepository qnaRepository;
     private final ProductRepository productRepository;
+
+
     public Page<QnaDTO> getQnaList(String searchQuery, Pageable pageable) {
         Page<Qna> qnaPage;
 
@@ -49,14 +52,32 @@ public class QnaService {
     }
 
     // 게시물 삭제
+    @Transactional
     public void deleteQna(long id) {
         qnaRepository.deleteById(id);
     }
 
-    // 답변, 답변자(판매자) 추가하기
     @Transactional
-    public void updateAnswer(long id, String answer, Seller seller) {
-        qnaRepository.updateAnswer(answer,seller,id);
+    public void updateAnswerBySeller(long id, String answer, Seller seller) {
+        Qna qna = qnaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
+
+        qna.setAnswer(answer);
+        qna.setAnsweredBySeller(seller);
+        qna.setAnsweredByAdmin(null); // 💡 ADMIN 필드는 null로 설정
+        qnaRepository.save(qna);
+    }
+
+    // 2. 답변, 답변자(ADMIN) 추가하기 - ADMIN 전용 메서드 추가
+    @Transactional
+    public void updateAnswerByAdmin(long id, String answer, Admin admin) {
+        Qna qna = qnaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
+
+        qna.setAnswer(answer);
+        qna.setAnsweredByAdmin(admin);
+        qna.setAnsweredBySeller(null); // 💡 SELLER 필드는 null로 설정
+        qnaRepository.save(qna);
     }
 
 
@@ -77,5 +98,31 @@ public class QnaService {
                         sellerId.equals(currentUserId) // 3. 현재 사용자가 판매자일 경우
                 )
                 .collect(Collectors.toList());
+    }
+
+    public Qna getQnaEntityById(long id) {
+        return qnaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 QnA를 찾을 수 없습니다."));
+    }
+
+    public Page<QnaDTO> getFilteredQnaList(String requiredType, String searchQuery, boolean isPending, Pageable pageable) {
+        Page<Qna> qnaPage;
+
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            // 검색어가 있을 경우 (답변 상태 무시하고 제목 검색)
+            // isPending 조건까지 포함한 복합 쿼리가 필요할 수 있으나, 일단 현재 TitleContaining 유지
+            qnaPage = qnaRepository.findByQnaTypeAndTitleContaining(requiredType, searchQuery, pageable);
+
+        } else if (isPending) {
+            // ⭐ 수정: 새로운 Repository 메서드 사용
+            // 답변 내용이 NULL이거나 빈 문자열('')인 경우만 조회
+            qnaPage = qnaRepository.findPendingQnaByQnaType(requiredType, pageable);
+
+        } else {
+            // 💡 검색어가 없고, 전체 조회(isPending=false)인 경우
+            qnaPage = qnaRepository.findByQnaType(requiredType, pageable);
+        }
+
+        return qnaPage.map(QnaDTO::new);
     }
 }
