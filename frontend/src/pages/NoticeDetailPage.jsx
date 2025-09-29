@@ -1,12 +1,12 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import "./NoticeDetailPage.css";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const NoticeDetailPage = () => {
     const { noticeId } = useParams(); // id 받음
     const navigate = useNavigate();
-
+    const { api, user } = useAuth();
     const [notice, setNotice] = useState(null); // 사용자가 보고 있는 게시물 데이터
     const [loading, setLoading] = useState(true); // 로딩 관리
     const [error, setError] = useState(null); // 에러 관리
@@ -15,11 +15,13 @@ const NoticeDetailPage = () => {
     const [editedContent, setEditedContent] = useState(""); // 수정될 내용
     const [login, setLogin] = useState("admin"); // 관리자 관리 (임시)
 
+    const canWrite = user && user.roles && user.roles.includes('ADMIN');
+
     useEffect(() => {
         let ignore = false; // 작업 끝나기 전 컴포넌트가 살아있는지 확인을 위함
         (async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/notice/${noticeId}`);
+                const res = await api.get(`${api.defaults.baseURL}/notice/${noticeId}`);
                 if (!ignore) {
                     setNotice(res.data);
                     // 상세보기 데이터 불러온 후 useState에 저장
@@ -43,13 +45,13 @@ const NoticeDetailPage = () => {
     const handleUpdate = async () => {
         try {
             //put: 전체 리소스 갱신
-            await axios.put(`http://localhost:8080/notice/${noticeId}`, {
+            await api.put(`${api.defaults.baseURL}/notice/${noticeId}`, {
                 title: editedTitle,
                 content: editedContent,
             });
             alert("게시글이 수정되었습니다.");
             setIsEditing(false); // 수정 상태
-            const res = await axios.get(`http://localhost:8080/notice/${noticeId}`); // 현재 qnaId를 가져옴
+            const res = await api.get(`${api.defaults.baseURL}/notice/${noticeId}`);
             setNotice(res.data);
         } catch (e) {
             setError(e);
@@ -62,23 +64,21 @@ const NoticeDetailPage = () => {
         if (confirm("정말 삭제하시겠습니까?")) {
             try {
                 // 삭제 API 호출
-                await axios.delete(`http://localhost:8080/notice/${noticeId}`);
+                await api.delete(`${api.defaults.baseURL}/notice/${noticeId}`);
                 alert("삭제가 완료되었습니다.");
 
                 // 삭제 성공 후, 목록 페이지로 이동
-                navigate("/notice/list");
+                navigate(`/admin/notice/list`);
 
             } catch (e) {
                 setError(e);
                 alert("삭제 실패");
-                navigate("/notice/list");
             }
         }
     };
     if (loading) return <section className="notice-form"><div className="notice-inner">불러오는 중…</div></section>;
     if (error) return <section className="notice-form"><div className="notice-inner">불러오기 실패</div></section>;
     if (!notice) return <section className="notice-form"><div className="notice-inner">데이터 없음</div></section>;
-
 
     return (
         <>
@@ -116,15 +116,15 @@ const NoticeDetailPage = () => {
                         )}
                     </div>
                     {login === "admin" ? (
-                        isEditing ? (
+                        isEditing && canWrite ? (
                             <>
                                 <button onClick={handleUpdate}>수정 완료</button>
                                 <button onClick={() => setIsEditing(false)}>취소</button>
                             </>
-                        ) : (
+                        ) : canWrite && (
                             <>  <button onClick={handleDelete}>삭제</button>
                                 <button onClick={() => setIsEditing(true)}>수정</button>
-                                <button onClick={() => navigate("/notice/list")}>목록</button>
+                                <button onClick={() => navigate("/admin/notice/list")}>목록</button>
                             </>
                         )
                     ) : (

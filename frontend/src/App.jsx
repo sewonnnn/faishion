@@ -1,5 +1,6 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container } from 'react-bootstrap';
 import {BrowserRouter, Routes, Route, Outlet, Navigate, useLocation} from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -49,9 +50,11 @@ import MyReviewList from "./pages/customer/MyReviewList";
 function Layout() {
     return (
         <>
-            <Header/>
-            <Outlet/>
-            <Footer/>
+            <Container style={{ maxWidth: '1370px', width: '100%' }}>
+                <Header/>
+                <Outlet/>
+                <Footer/>
+            </Container>
         </>
     );
 }
@@ -109,7 +112,6 @@ function App() {
                                 <Route path="/product/:productId" element={<ProductDetailPage/>}/> {/*상품 상세 페이지*/}
                                 <Route path="/notice/list" element={<NoticeListPage/>}/> {/* 공지사항 페이지 */}
                                 <Route path="/notice/:noticeId" element={<NoticeDetailPage/>}/> {/* 공지사항 상세,수정 페이지 */}
-                                <Route path="/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
                                 <Route path="/seller/register" element={<SellerRegisterPage/>}/> {/*판매자 회원가입 페이지*/}
                                 <Route path="/seller/login" element={<SellerLoginPage/>}/> {/*판매자 로그인 페이지*/}
                             </Route>
@@ -152,7 +154,9 @@ function App() {
              <Route element={<ProtectedRoute requiredRole={"ADMIN"} />}>
                 <Route element={<AdminLayout/>}>
                    {/*관리자 권한이 있는 사용자만 접근 가능한 페이지들*/}
-                     <Route path="/admin/notice/list" element={<AdminNoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
+                   <Route path="/admin/notice/:noticeId" element={<NoticeDetailPage/>}/> {/*공지사항 작성 페이지*/}
+                   <Route path="/admin/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
+                   <Route path="/admin/notice/list" element={<NoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
                    <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
                    <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
                    <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}

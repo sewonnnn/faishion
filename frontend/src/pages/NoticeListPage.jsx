@@ -1,24 +1,22 @@
 import React, {useEffect, useState} from "react";
-import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import "./NoticeListPage.css";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const NoticeListPage = () => {
     const [noticeBoardList, setNoticeBoardList] = useState([]); // 전체 게시글
     const [searchText, setSearchText] = useState(""); // 검색어 상태 관리
-
+    const { api, user } = useAuth();
     const [page, setPage] = useState(0); // 현재 페이지 번호 상태
     const [totalPages, setTotalPages] = useState(0); // 총 페이지 수 상태
     const pageSize = 10; // 한 페이지당 고정된 게시물 수
-
-    const [login, setLogin] = useState("admin"); // 관리자 관리 (임시)
     const navigate = useNavigate();
-
+    const canWrite = user && user.roles && user.roles.includes('ADMIN');
     // 게시글 함수
     const fetchNoticeData = async (query = "", pageNum = 0) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/notice/list?q=${query}&page=${pageNum}`
+            const response = await api.get(
+                `${api.defaults.baseURL}/notice/list?q=${query}&page=${pageNum}`
             );
             setNoticeBoardList(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -52,7 +50,7 @@ const NoticeListPage = () => {
 
     //상세페이지 이동을 위한 함수
     const handleGoDetail = (id)=>{
-        navigate(`/notice/${id}`);
+        navigate(`${canWrite ? "/admin" : ""}/notice/${id}`);
     }
     return (
         <section className="notice">
@@ -111,7 +109,13 @@ const NoticeListPage = () => {
                         </div>
                     </form>
                     {/*관리자만 가능하게*/}
-                 <div>{login === "admin" ? (<a className="btn-write" href="/notice/new">글쓰기</a>):("")}</div>
+                 <div>
+                    {canWrite ? (
+                         <a className="btn-write" href="/admin/notice/new">글쓰기</a>
+                     ) : (
+                         ""
+                     )}
+                 </div>
                 </div>
                 {/* 페이징 버튼 */}
                 <div className="pagination">
