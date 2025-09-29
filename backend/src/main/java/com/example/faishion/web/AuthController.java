@@ -69,8 +69,8 @@ public class AuthController {
     @PostMapping("/seller/login")
     public ResponseEntity<?> loginSeller(@RequestBody SellerDTO dto) {
         Seller seller = sellerService.loginSeller(dto.getId(), dto.getPassword());
-        String accessToken = jwt.generateAccess(seller.getId(), List.of("ROLE_SELLER"));
-        String refreshToken = jwt.generateRefresh(seller.getId(), List.of("ROLE_SELLER"));
+        String accessToken = jwt.generateAccess(seller.getId(), List.of("SELLER"));
+        String refreshToken = jwt.generateRefresh(seller.getId(), List.of("SELLER"));
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
