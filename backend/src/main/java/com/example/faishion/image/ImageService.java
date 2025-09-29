@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 @Service
 public class ImageService {
@@ -110,5 +111,16 @@ public class ImageService {
         existingImage.setOriginName(newOriginName);
         existingImage.setSavedName(newSavedName);
         return imageRepository.save(existingImage);
+    }
+
+    public String getImageBase64(Long id) throws IOException {
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("이미지 없음: " + id));
+        //파일 시스템의 전체 경로를 Path 객체로 가져옵니다.
+        Path path = Paths.get(uploadDir + image.getSavedName());
+        //파일을 바이트 배열로 읽어옵니다.
+        byte[] fileContent = Files.readAllBytes(path);
+        // 바이트 배열을 Base64 문자열로 인코딩하여 반환합니다.
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 }

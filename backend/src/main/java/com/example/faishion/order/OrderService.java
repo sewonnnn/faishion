@@ -109,6 +109,8 @@ public class OrderService {
         if (!order.getUser().getId().equals(userId)) {
             // 다른 사용자의 주문이라면 접근 거부 예외 발생
             throw new AccessDeniedException("이 주문(" + orderId + ")을 조회할 권한이 없습니다.");
+        }else if(order.getStatus().equals("PENDING")){
+            throw new IllegalStateException("결제가 완료되지 않은 주문입니다.");
         }
 
         // 3. 데이터 준비: Lazy Loading된 OrderItem 목록을 미리 로드(초기화)
