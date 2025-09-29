@@ -101,7 +101,7 @@ public class OrderDetailDTO {
         private int quantity;
         private int price;
         private int originPrice;
-
+        private Long productId;
         public OrderItemDTO(OrderItem orderItem){
             this.quantity = orderItem.getQuantity();
             this.price = orderItem.getPrice();
@@ -111,6 +111,7 @@ public class OrderDetailDTO {
             this.name = stock.getProduct().getName();
             this.color = stock.getColor();
             this.size = stock.getSize();
+            this.productId = stock.getProduct().getId();
         }
     }
 }

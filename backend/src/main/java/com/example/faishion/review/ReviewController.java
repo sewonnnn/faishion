@@ -41,7 +41,6 @@ public class ReviewController {
         try {
             // 1. 로그인한 사용자의 username으로 Optional<User> 객체 찾음
             Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
-
             // 2. 만약 userOptional이 비어있다면, 인증 오류를 반환
             //    (user가 존재하지 않는 경우)
             if (!userOptional.isPresent()) {
@@ -50,7 +49,6 @@ public class ReviewController {
 
             // 3. Optional에서 실제 User 객체를 추출합니다.
             User user = userOptional.get();
-
             // 4. reviewDto에서 상품 ID를 가져와 Product를 찾습니다.
             Product product = productRepository.findById(reviewDto.getProductId())
                     .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));

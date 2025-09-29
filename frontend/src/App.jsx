@@ -157,6 +157,8 @@ function App() {
                    <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
                    <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}
                    <Route path="/admin/report/list" element={<AdminReportList />} />   {/*관리자 신고글 확인 페이지 */}
+                    <Route path="/admin/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}
+                    <Route path="/admin/qna/:qnaId" element={<QnaDetailPage/>}/> {/*문의사항 상세, 수정 페이지*/}
                  </Route>
              </Route>
          </Routes>
