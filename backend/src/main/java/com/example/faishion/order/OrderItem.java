@@ -30,4 +30,6 @@ public class OrderItem {
     private Integer quantity; // 주문 수량
     private Integer price;    // 주문 시점 가격
 
+    private Long cartId; //  장바구니 ID 필드 추가 (주문 완료한 상품 제거를 위함)
+
 }

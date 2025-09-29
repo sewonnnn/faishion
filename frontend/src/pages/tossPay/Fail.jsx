@@ -1,8 +1,17 @@
-import { useSearchParams } from "react-router-dom";
+
 import './Fail.css';
+import {useNavigate} from "react-router-dom";
 
 export function FailPage() {
-    const [searchParams] = useSearchParams();
+
+    // 👈 2. useNavigate 훅 사용
+    const navigate = useNavigate();
+
+    // 이 함수가 window.history.back() 역할을 합니다.
+    const handleGoBack = () => {
+        navigate(-1); // 👈 3. navigate(-1)을 호출하여 이전 페이지로 돌아갑니다.
+    };
+
 
     return (
         <div className="fail-page-container">
@@ -24,7 +33,7 @@ export function FailPage() {
                     </p>
                 </div>
                 <div className="retry-action">
-                    <button onClick={() => window.history.back()} className="retry-button">
+                    <button onClick={handleGoBack} className="retry-button">
                         이전 페이지로 돌아가기
                     </button>
                 </div>

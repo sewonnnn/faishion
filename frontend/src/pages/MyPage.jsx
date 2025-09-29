@@ -61,7 +61,6 @@ const MyPage = () => {
     // 주문 내역 데이터 불러오는 함수
     const fetchOrderData = async () => {
         try {
-            // /order/my-history 엔드포인트 호출
             const response = await api.get(`/order/my-history`);
             setOrderList(response.data);
         } catch (error) {
@@ -105,7 +104,6 @@ const MyPage = () => {
         );
     }
 
-    // ⭐️ 로딩 완료 후 profile 데이터를 안전하게 사용
     const profile = userProfile || {};
     const userName = profile.name || '이름 없음';
 

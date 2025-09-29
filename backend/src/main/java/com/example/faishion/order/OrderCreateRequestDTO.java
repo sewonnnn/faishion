@@ -31,5 +31,6 @@ public class OrderCreateRequestDTO {
         private Long stockId;
         private int quantity;
         private int price; // 할인이 적용된 최종 가격
+        private Long cartId; // ✅ 장바구니 ID를 받도록 수정
     }
 }

@@ -9,10 +9,6 @@ export function CheckoutPage() {
     const location = useLocation();
     const { totalAmount, orderName, clientOrderId } = location.state || {};
 
-    console.log("넘어온 총합:", totalAmount);
-    console.log("넘어온 상품명:", orderName);
-    console.log("넘어온 주문 id:", clientOrderId);
-
     const [amount, setAmount] = useState({
         currency: "KRW",
         value: totalAmount ?? 0,
