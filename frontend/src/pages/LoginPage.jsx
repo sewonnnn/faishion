@@ -19,19 +19,16 @@ const LoginPage = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        // 조건 분기
         if (key === "user" && (!form.loginId || !form.password)) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
-
         if (key === "seller" && (!form.id || !form.password)) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
 
         setLoading(true);
-
         const url =
             key === "seller"
                 ? "http://localhost:8080/auth/seller/login"
@@ -54,29 +51,15 @@ const LoginPage = () => {
         }
     };
 
-    // 소셜 로그인 핸들러 (일반회원만 사용)
-    const handleSocialLogin = (provider) => {
-        let socialAuthUrl = "";
+    // 네이버 로그인 핸들러만 유지
+    const handleNaverLogin = () => {
+        const naverClientId = "UbIrUTt9yAJ42TARcJC5";
+        const naverRedirectUri = encodeURIComponent(
+            "http://localhost:5173/oauthcallback/naver"
+        );
+        const state = Math.random().toString(36).substring(2);
 
-        if (provider === "naver") {
-            const naverClientId = "7e54dc8103249a34b8a7ecc4392498d1";
-            const naverRedirectUri = encodeURIComponent(
-                "http://localhost:5173/oauthcallback/naver?provider=naver"
-            );
-            socialAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${Math.random()
-                .toString(36)
-                .substring(2)}`;
-        } else if (provider === "kakao") {
-            const kakaoClientId = "8812c02a41849df87cbe44e3dc84a15d";
-            const kakaoRedirectUri = encodeURIComponent(
-                "http://localhost:5173/oauthcallback/kakao?provider=kakao"
-            );
-            socialAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}&response_type=code&scope=profile_nickname,account_email,phone_number`;
-        } else {
-            alert("지원하지 않는 소셜 로그인 제공자입니다.");
-            return;
-        }
-
+        const socialAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${state}`;
         window.location.href = socialAuthUrl;
     };
 
@@ -123,20 +106,14 @@ const LoginPage = () => {
                         </button>
                     </form>
 
-                    {/* 소셜 로그인 버튼 */}
+                    {/* 네이버 로그인 버튼만 유지 */}
                     <hr />
                     <div className="d-grid gap-2">
                         <button
                             className="btn btn-naverlogin"
-                            onClick={() => handleSocialLogin("naver")}
+                            onClick={handleNaverLogin}
                         >
                             네이버로 로그인
-                        </button>
-                        <button
-                            className="btn btn-kakaologin"
-                            onClick={() => handleSocialLogin("kakao")}
-                        >
-                            카카오로 로그인
                         </button>
                     </div>
                 </Tab>

@@ -42,7 +42,8 @@ public class User {
     @Column(length = 20, nullable = false)
     private AuthProvider provider; // LOCAL, NAVER
 
-    @Column(name="provider_user_id", length=100)
+    // 수정
+    @Column(name="provider_user_id", length=200)
     private String providerUserId; // 소셜 provider 고유 ID, Local은 null
 
     @Column(nullable = false, length = 60)
