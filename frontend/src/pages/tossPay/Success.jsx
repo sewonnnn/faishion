@@ -26,7 +26,7 @@ export function SuccessPage() {
             try {
                 const response = await api.post("/confirm", requestData);
                 setOrderInfo(response.data);
-                console.log("서버 응답 성공:", response.data);
+                console.log("서버 응답 성공 (장바구니 삭제 완료):", response.data);
             } catch (err) {
                 console.error("결제 검증 오류:", err.response?.data || err.message);
                 setError("결제 검증 중 오류가 발생했습니다.");

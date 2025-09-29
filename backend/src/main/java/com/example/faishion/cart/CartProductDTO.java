@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor // 기본 생성자 추가
 @AllArgsConstructor // 모든 필드를 포함하는 생성자 추가
 public class CartProductDTO {
-    private Long id;
+    private Long id; // cartId
     private String userId;   // User 객체 대신 userId만
     private Long stockId;
     private Integer quantity;

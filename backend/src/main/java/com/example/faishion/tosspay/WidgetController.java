@@ -1,6 +1,6 @@
 package com.example.faishion.tosspay;
 
-import com.example.faishion.address.Address;
+import com.example.faishion.cart.CartService;
 import com.example.faishion.order.Order;
 import com.example.faishion.order.OrderItem;
 import com.example.faishion.order.OrderService;
@@ -12,8 +12,6 @@ import net.minidev.json.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,15 +23,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 public class WidgetController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final OrderService orderService;
+    private final CartService cartService; // ⭐ CartService 필드 추가
 
-    public WidgetController(OrderService orderService) {
+    public WidgetController(OrderService orderService, CartService cartService) {
         this.orderService = orderService;
+        this.cartService = cartService;
+
     }
 
     @PostMapping("/confirm")
@@ -117,6 +120,17 @@ public class WidgetController {
             result.put("paymentKey", paymentKey);
             result.put("paymentType", paymentType);
             result.put("paidAmount", saved.getAmount());
+
+            // 장바구니 ID 추출 및 삭제
+            List<Long> cartIdsToDelete = order.getOrderItemList().stream()
+                    .map(OrderItem::getCartId)
+                    .filter(Objects::nonNull) // cartId가 null이 아닌 경우(장바구니 구매)만 선택
+                    .collect(Collectors.toList());
+
+            if (!cartIdsToDelete.isEmpty()) {
+                cartService.deleteCartsByIds(cartIdsToDelete); // CartService를 사용하여 삭제
+                log.info("결제 성공으로 장바구니 항목 삭제 완료: {}", cartIdsToDelete);
+            }
 
             /* 배송/주문자 정보 */
             User user = order.getUser();

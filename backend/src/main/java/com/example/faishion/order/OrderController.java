@@ -48,7 +48,6 @@ public class OrderController {
     // 주문서 생성
     @GetMapping("/new")
     public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, @AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("받은 카트 ID들: " + idsString);
 
         // 1. URL 파라미터에서 받은 장바구니의 목록 추출
         List<Long> cartIds = Arrays.stream(idsString.split(","))
@@ -66,22 +65,21 @@ public class OrderController {
     }
 
 
-    // order DB 저장
+    // 주문 저장
     @Transactional
     @PostMapping("/create")
     public ResponseEntity<JSONObject> createPendingOrder(
             @RequestBody OrderCreateRequestDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("로그인한 사용자:"+userDetails.getUsername());
-        System.out.println("-----------주문 생성 시작----------------------");
-        // 1. 사용자 엔티티 조회
+        //  사용자 엔티티 조회
         if(userDetails == null) throw new RuntimeException("인증된 사용자 정보가 없습니다.");
         User user = userRepository.findById(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 2. 주문 생성
+        //  주문 엔티티 초기화
         String clientOrderId = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + System.currentTimeMillis();
         Order order = new Order();
         order.setClientOrderId(clientOrderId);
+
         order.setUser(user);
 
         order.setZipcode(request.getZipcode());
@@ -89,14 +87,23 @@ public class OrderController {
         order.setDetail(request.getDetail());
         order.setRequestMsg(request.getRequestMsg());
 
+
+        //orderName null 오류 방지 및 값 설정
+        String orderName = request.getOrderName();
+        if (orderName == null || orderName.trim().isEmpty()) {
+            orderName = "확인되지 않은 주문 상품";
+        }
+        order.setOrderName(orderName);
+
         order.setStatus("PENDING");
-        order.setOrderName(request.getOrderName());
         order.setTotalAmount(request.getTotalAmount());
         orderRepository.save(order);
         System.out.println("주문 저장 완료:"+order.getStatus());
 
-        // 3. 주문 상품 생성 및 재고 차감
+        //  주문 상품 생성 및 재고 차감
         for (OrderCreateRequestDTO.OrderItemDTO itemDTO : request.getItems()) {
+
+            // Stock 조회 (이 부분이 이전의 "stock이 안 잡혀" 오류를 해결합니다.)
             Stock stock = stockRepository.findById(itemDTO.getStockId())
                     .orElseThrow(() -> new IllegalArgumentException("재고를 찾을 수 없습니다: " + itemDTO.getStockId()));
 
@@ -107,16 +114,24 @@ public class OrderController {
             stock.setQuantity(stock.getQuantity() - itemDTO.getQuantity());
             stockRepository.save(stock); // 재고 업데이트
 
-            // 4. OrderItem 엔티티 생성
+            // OrderItem 엔티티 생성
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setStock(stock);
             orderItem.setQuantity(itemDTO.getQuantity());
             orderItem.setPrice(itemDTO.getPrice());
+            orderItem.setCartId(itemDTO.getCartId()); //장바구니 아이디 넣기
+
+            System.out.println("삭제 장바구니 id:"+itemDTO.getCartId());
+            
+            // 결제 성공 시 장바구니 상품 삭제를 위함
+            if (itemDTO.getCartId() != null) {
+                orderItem.setCartId(itemDTO.getCartId());
+            }
+
             orderItemRepository.save(orderItem);
         }
 
-        // 5. 응답 반환
         JSONObject response = new JSONObject();
         response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
@@ -150,7 +165,7 @@ public class OrderController {
                 dto.setProductImageId(stock.getImage().getId());
                 dto.setProductName(stock.getProduct().getName());
                 dto.setProductPrice(stock.getProduct().getPrice());
-                 dto.setDiscountedProductPrice(stock.getProduct().getPrice());
+                dto.setDiscountedProductPrice(stock.getProduct().getPrice());
                 dto.setProductColor(stock.getColor());
                 dto.setProductSize(stock.getSize());
                 dto.setQuantity(itemDTO.getQuantity());
@@ -166,14 +181,12 @@ public class OrderController {
         return orderItems;
     }
 
-    // OrderController.java (수정 없음, 이미 로그인 사용자 기준으로 구현됨)
+    // 주문 내역 가져오기
     @GetMapping("/my-history")
     public ResponseEntity<List<OrderListResponseDTO>> getMyOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(401).build(); // 인증되지 않음 처리
         }
-
-        //  userDetails.getUsername()을 사용하여 현재 로그인한 사용자의 ID(username)를 전달
         List<OrderListResponseDTO> orderHistory = orderService.getMyOrderHistory(userDetails.getUsername());
         return ResponseEntity.ok(orderHistory);
     }

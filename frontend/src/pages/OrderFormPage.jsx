@@ -33,8 +33,6 @@ const OrderFormPage = () => {
     const [showAddressModal, setShowAddressModal] = useState(false);
 
 
-    // 기존 주소 관련 핸들러 제거 (handleAddressSelect, handleDetailChange, handleEditToggle, handleAddressSave)
-
     // 배송 요청사항 변경 핸들러 (유지)
     const handleRequestMsgChange = (e) => {
         setDeliveryAddress(prev => ({
@@ -59,7 +57,6 @@ const OrderFormPage = () => {
     // 주문서 로딩 시 사용자 정보와 함께 현재 적용된 배송지를 불러오는 로직
     const fetchCurrentDeliveryAddress = async (userData) => {
         // userData에 저장된 최근 주소 정보를 기반으로 초기 설정
-        // userData.address?.zipcode 형태로 옵셔널 체이닝을 적용하여 안전하게 접근
         let currentAddress = {
             zipcode: userData.address?.zipcode || '',
             street: userData.address?.street || '',
@@ -173,6 +170,7 @@ const OrderFormPage = () => {
                     stockId: item.stockId,
                     quantity: item.quantity,
                     price: item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice,
+                    cartId: item.id, // 결제 후 장바구니 상품 삭제를 위함
                 })),
                 requestMsg: deliveryAddress.requestMsg === '요청사항을 선택하세요' ? '' : deliveryAddress.requestMsg,
             };
