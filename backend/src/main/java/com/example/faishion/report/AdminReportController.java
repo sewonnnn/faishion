@@ -4,56 +4,71 @@ import com.example.faishion.seller.report.SellerReportService;
 import com.example.faishion.seller.report.SellerReportRepository;
 import com.example.faishion.seller.report.SellerReport;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*; // Page, Pageable, Sort
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/reports") // 💡 관리자 전용 통합 API 경로
+@RequestMapping("/admin/reports")
 public class AdminReportController {
+    // ReportService는 findAllReports(Pageable)을 가지고 있다고 가정
     private final ReportService reportService;
     private final SellerReportService sellerReportService;
-    private final SellerReportRepository sellerReportRepository; // SellerReport의 목록 조회를 위해 필요하다고 가정
+    // SellerReportRepository는 findAll()을 제공한다고 가정
+    private final SellerReportRepository sellerReportRepository;
 
-    // 1. 통합 신고 목록 조회 API
+    // 1. 통합 신고 목록 조회 API (수정)
     @GetMapping("/list")
-    public Page<AdminReportUnifiedDTO> getUnifiedReportList(Pageable pageable) {
-
-        // 🚨 실제로는 성능을 위해 Repository 계층에서 통합 조회 쿼리를 작성하는 것이 최적이지만,
-        // 현재 구조에서는 Service를 통해 모든 데이터를 불러와 통합 처리합니다.
-
+    public Page<AdminReportUnifiedDTO> getUnifiedReportList(
+            Pageable pageable,
+            @RequestParam(required = false) String type, // REVIEW 또는 SELLER
+            @RequestParam(required = false) String search // 검색어
+    ) {
         // 1. 리뷰 신고 데이터 조회 및 DTO 변환
-        List<AdminReportUnifiedDTO> reviewReports = reportService.findAllReports(PageRequest.of(0, 1000)).stream()
+        // Pageable은 현재 무시하고 일단 전체 데이터를 가져와 메모리에서 필터링합니다. (성능 최적화 필요)
+        List<AdminReportUnifiedDTO> reviewReports = reportService.findAllReports(PageRequest.of(0, 2000)).getContent().stream()
                 .map(reportService::convertToUnifiedDTO)
+                .filter(dto -> type == null || type.equalsIgnoreCase("ALL") || dto.getType().equalsIgnoreCase(type)) // 1차 필터링
+                .filter(dto -> search == null || search.isEmpty() ||
+                        dto.getReason().contains(search) ||
+                        dto.getReporterId().contains(search) ||
+                        dto.getDescription().contains(search)) // 검색 필터링
                 .collect(Collectors.toList());
 
         // 2. 판매자 신고 데이터 조회 및 DTO 변환
         List<AdminReportUnifiedDTO> sellerReports = sellerReportRepository.findAll().stream()
                 .map(sellerReportService::convertToUnifiedDTO)
+                .filter(dto -> type == null || type.equalsIgnoreCase("ALL") || dto.getType().equalsIgnoreCase(type)) // 1차 필터링
+                .filter(dto -> search == null || search.isEmpty() ||
+                        dto.getReason().contains(search) ||
+                        dto.getReporterId().contains(search) ||
+                        dto.getDescription().contains(search)) // 검색 필터링
                 .collect(Collectors.toList());
 
-        // 3. 두 리스트 통합
-        List<AdminReportUnifiedDTO> unifiedReports = Stream.concat(reviewReports.stream(), sellerReports.stream())
+        // 3. 두 리스트 통합 및 정렬
+        List<AdminReportUnifiedDTO> unifiedAndFilteredReports = Stream.concat(reviewReports.stream(), sellerReports.stream())
                 .sorted(Comparator.comparing(AdminReportUnifiedDTO::getCreatedAt).reversed()) // 최신순 정렬
                 .collect(Collectors.toList());
 
-        // 4. 통합된 리스트를 Page 객체로 변환하여 페이징 처리
+        // 4. PageImpl로 페이징 처리
+        int total = unifiedAndFilteredReports.size();
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), unifiedReports.size());
-        List<AdminReportUnifiedDTO> pageContent = (start <= end) ? unifiedReports.subList(start, end) : List.of();
+        int end = Math.min((start + pageable.getPageSize()), total);
 
-        return new PageImpl<>(pageContent, pageable, unifiedReports.size());
+        List<AdminReportUnifiedDTO> pageContent = (start < total) ? unifiedAndFilteredReports.subList(start, end) : List.of();
+
+        // 🚨 프론트엔드가 요구하는 totalElements와 totalPages 정보를 담아 반환
+        return new PageImpl<>(pageContent, pageable, total);
     }
 
-    // 2. 판매자 신고 처리 완료 API (프론트엔드의 '신고 처리 완료' 버튼에 연결)
-    // 💡 리뷰 신고는 기존 /report/delete/{reviewId} 엔드포인트를 그대로 사용합니다.
+    // 2. 판매자 신고 처리 완료 API (기존 유지)
     @PutMapping("/seller/{reportId}/process")
     public ResponseEntity<String> processSellerReport(@PathVariable Long reportId) {
         try {
