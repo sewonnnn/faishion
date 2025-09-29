@@ -1,5 +1,6 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.admin.Admin;
 import com.example.faishion.product.Product;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.user.User;
@@ -29,7 +30,7 @@ public class Qna {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY) //상품 아이디
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "product_id", nullable = true, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Product product;
 
     private String title; //질문제목
@@ -40,9 +41,15 @@ public class Qna {
     @Column(length = 2000)
     private String answer; //답변내용
 
+    private String qnaType; // "PRODUCT" (상품문의) 또는 "GENERAL" (일반문의)
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answered_by", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Seller answeredBy; //답변한 판매자
+    @JoinColumn(name = "answered_by_seller", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Seller answeredBySeller; //답변한 판매자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answered_by_admin", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Admin answeredByAdmin; //답변한 관리자
 
     private boolean isSecret;
     @CreationTimestamp

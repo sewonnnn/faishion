@@ -1,5 +1,7 @@
 package com.example.faishion.qna;
 
+import com.example.faishion.admin.Admin;
+import com.example.faishion.admin.AdminRepository;
 import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
 import com.example.faishion.seller.Seller;
@@ -30,29 +32,25 @@ public class QnaController {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
+    private final AdminRepository adminRepository;
 
     // 게시물 목록 조회 (검색 및 페이징 포함)
     @GetMapping("/list")
     public Page<QnaDTO> getQnaList(@RequestParam(value = "q", required = false) String searchQuery,
                                    @PageableDefault(size = 10,
                                            direction = Sort.Direction.DESC) Pageable pageable) {
-        System.out.println("컨트롤러 검색어: " + searchQuery);
         return qnaService.getQnaList(searchQuery, pageable);
     }
 
-    // 게시물 추가
-    @PostMapping
+    @PostMapping // 관리자에게 문의
     public void addQna(@RequestBody Qna qna, @AuthenticationPrincipal UserDetails userDetails) {
-
         Optional<User> userOptional = userRepository.findById(userDetails.getUsername());
         if (!userOptional.isPresent()) {
             return;
         }
         User user = userOptional.get();
-        Product product = productRepository.getReferenceById(1L); //임시 상품
-
-        qna.setUser(user); //임시 아이디 qna에 설정
-        qna.setProduct(product); //임시 상품 qna에 설정
+        qna.setUser(user);
+        qna.setQnaType("GENERAL"); // 💡 유형을 "GENERAL"로 설정 (Admin 확인)
 
         qnaService.addQna(qna);
     }
@@ -63,44 +61,128 @@ public class QnaController {
         return qnaService.findQnaById(id);
     }
 
-    // 게시물 수정하기
+    // 게시물 수정하기 (⭐ 권한 체크 추가)
     @PutMapping("/{id}")
-    public void updateQna(@PathVariable long id, @RequestBody QnaDTO qnaDTO) {
-        String title = qnaDTO.getTitle();
-        String content = qnaDTO.getContent();
-        qnaService.updateBoard(title, content, id);
+    public ResponseEntity<String> updateQna(@PathVariable long id,
+                                            @RequestBody QnaDTO qnaDTO,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            Qna qna = qnaService.getQnaEntityById(id);
+            // 💡 1. 작성자 본인인지 확인
+            if (!qna.getUser().getId().equals(userDetails.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다. (작성자만 수정 가능)");
+            }
+            // 💡 2. 관리자/판매자는 수정 불가
+            boolean isAdminOrSeller = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_SELLER"));
+
+            // 관리자/판매자 계정은 수정 기능을 사용하지 못하게 하려면 아래 로직 사용
+            if (isAdminOrSeller) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자/판매자 계정은 문의글 수정 권한이 없습니다.");
+            }
+
+            String title = qnaDTO.getTitle();
+            String content = qnaDTO.getContent();
+            qnaService.updateBoard(title, content, id);
+            return ResponseEntity.ok("게시물이 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("수정 실패: " + e.getMessage());
+        }
     }
 
-    // 게시물 삭제하기
+    // 게시물 삭제하기 (⭐ 권한 체크 추가)
     @DeleteMapping("/{id}")
-    public void deleteQna(@PathVariable long id) {
-        qnaService.deleteQna(id);
+    public ResponseEntity<String> deleteQna(@PathVariable long id,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Qna qna = qnaService.getQnaEntityById(id);
+            String loggedInUsername = userDetails.getUsername();
+
+            // 💡 1. 작성자 본인 또는 ADMIN인지 확인
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            if (!qna.getUser().getId().equals(loggedInUsername) && !isAdmin) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다. (작성자 또는 관리자만 삭제 가능)");
+            }
+
+            qnaService.deleteQna(id);
+            return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제 실패: " + e.getMessage());
+        }
     }
 
-    // 💡 답변 추가하기 (수정된 메서드)
+
+    // 답변 추가하기
     @PutMapping("/answer/{id}")
-    // 💡 DTO를 QnaAnswerDTO로 변경하고, UserDetails를 사용하여 답변자 정보를 가져옵니다.
-    public ResponseEntity<String> saveAnswer(@PathVariable long id, @RequestBody QnaAnswerDTO answerDTO, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> saveAnswer(@PathVariable long id,
+                                             @RequestBody QnaAnswerDTO answerDTO,
+                                             @AuthenticationPrincipal UserDetails userDetails) {
 
         String answerContent = answerDTO.getAnswer();
+
         if (answerContent == null || answerContent.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("답변 내용이 누락되었습니다.");
         }
 
-        Optional<Seller> sellerOptional = sellerRepository.findById(userDetails.getUsername());
+        String loggedInUsername = userDetails.getUsername();
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isSeller = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_SELLER"));
 
-        // 💡 ADMIN 또는 SELLER 역할이 있지만 DB에서 Seller 엔티티를 찾을 수 없는 경우
-        if (!sellerOptional.isPresent()) {
-            // 이 요청은 SecurityConfig에서 이미 ADMIN/SELLER만 허용했지만, 혹시 모를 상황을 대비
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("답변 권한(Seller 계정)이 없습니다.");
-        }
-
-        // 3. 답변 서비스 호출
         try {
-            qnaService.updateAnswer(id, answerContent, sellerOptional.get());
-            return ResponseEntity.ok("답변이 성공적으로 등록되었습니다.");
+            // 💡 1. 답변하려는 QnA 객체를 먼저 가져옵니다.
+            Qna qna = qnaService.getQnaEntityById(id); // QnaService에 이 메서드가 있다고 가정
+            String requiredType = qna.getQnaType();
+
+            // 💡 2. 권한 및 유형 검증
+            if (isAdmin) {
+                // ADMIN은 GENERAL 문의만 답변 가능
+                if (!"GENERAL".equals(requiredType)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자는 일반 문의(GENERAL)만 답변할 수 있습니다.");
+                }
+
+                Admin admin = adminRepository.findById(loggedInUsername)
+                        .orElseThrow(() -> new RuntimeException("등록된 관리자 정보가 없습니다."));
+
+                qnaService.updateAnswerByAdmin(id, answerContent, admin);
+                return ResponseEntity.ok("답변이 성공적으로 등록되었습니다. (ADMIN)");
+
+            } else if (isSeller) {
+                // SELLER는 PRODUCT 문의만 답변 가능
+                if (!"PRODUCT".equals(requiredType)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("판매자는 상품 문의(PRODUCT)만 답변할 수 있습니다.");
+                }
+
+                Seller seller = sellerRepository.findById(loggedInUsername)
+                        .orElseThrow(() -> new RuntimeException("등록된 판매자 정보가 없습니다."));
+
+                // 💡 추가 로직: 해당 상품의 판매자인지 확인
+                Product product = qna.getProduct();
+                if (product == null) {
+                    // QnaType이 PRODUCT인데 Product가 null이면 데이터 오류이므로 차단
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("상품 문의이나 상품 정보가 누락되었습니다.");
+                }
+
+                // 💡 로그인한 판매자와 상품을 등록한 판매자가 일치하는지 확인
+                if (!product.getSeller().getId().equals(loggedInUsername)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 상품 문의에 답변할 권한이 없습니다. (상품 등록 판매자가 아님)");
+                }
+
+                // 권한 검증 통과 후 답변 등록
+                qnaService.updateAnswerBySeller(id, answerContent, seller);
+                return ResponseEntity.ok("답변이 성공적으로 등록되었습니다. (SELLER)");
+
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("답변 권한이 없습니다.");
+            }
+        } catch (RuntimeException e) {
+            // QnA를 찾지 못했거나 관리자/판매자 정보가 없을 때의 예외 처리
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            // QnA ID가 잘못되었거나, 기타 DB 오류
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("답변 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
@@ -160,25 +242,26 @@ public class QnaController {
         return ResponseEntity.ok(responseDTOs);
     }
 
-    @PostMapping("/save")
+    @PostMapping("/save") // 기존
     public ResponseEntity<String> addQuestion(@RequestBody QnaSaveDTO qnaSaveDTO, @AuthenticationPrincipal UserDetails userDetails) {
         try {
             Product product = productRepository.findById(qnaSaveDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
-            // 임시 사용자
+            // ... (유저 정보 가져오는 로직 유지) ...
             Optional<User> userOptional =  userRepository.findById(userDetails.getUsername());
             if (!userOptional.isPresent()) {
                 return ResponseEntity.ok("로그인된 유저가 없습니다.");
             }
-            System.out.println(qnaSaveDTO.isSecret()); // < 여기가 false로 나와 체크해서 보내도
             User user = userOptional.get();
+
             Qna qna = new Qna();
             qna.setTitle(qnaSaveDTO.getTitle());
             qna.setContent(qnaSaveDTO.getContent());
-            qna.setSecret(qnaSaveDTO.isSecret()); // DTO에서 받은 isSecret 값을 엔티티에 설정
+            qna.setSecret(qnaSaveDTO.isSecret());
             qna.setUser(user);
             qna.setProduct(product);
+            qna.setQnaType("PRODUCT"); // 💡 유형을 "PRODUCT"로 설정 (Seller 확인)
 
             qnaService.addQna(qna);
             return ResponseEntity.status(HttpStatus.CREATED).body("문의가 성공적으로 등록되었습니다.");
@@ -186,6 +269,36 @@ public class QnaController {
             System.err.println("문의 등록 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("문의 등록 중 오류가 발생했습니다.");
         }
+    }
+
+    // 관리자/판매자 대시보드 전용 목록 조회
+    @GetMapping("/dashboard/list")
+    public ResponseEntity<Page<QnaDTO>> getDashboardQnaList(
+            @RequestParam(value = "q", required = false) String searchQuery,
+            @RequestParam(value = "pending", required = false, defaultValue = "false") boolean isPending, // 💡 isPending 파라미터 추가
+            @PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String requiredType = null;
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isSeller = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_SELLER"));
+
+        if (isAdmin) {
+            requiredType = "GENERAL";
+        } else if (isSeller) {
+            requiredType = "PRODUCT";
+        }
+
+        if (requiredType == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // 💡 Service 메서드에 isPending을 전달
+        Page<QnaDTO> qnaList = qnaService.getFilteredQnaList(requiredType, searchQuery, isPending, pageable);
+
+        return ResponseEntity.ok(qnaList);
     }
 }
 

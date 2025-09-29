@@ -20,11 +20,41 @@ const QnaDetailPage = () => {
     // --- 답글 기능 ---
     const [answer, setAnswer] = useState(""); // 답변 내용 상태
 
+
     // 💡 권한 체크 편의 변수
-    // roles는 배열이므로 includes 사용
-    const hasAnswerPermission = user.roles && (user.roles.includes('ADMIN') || user.roles.includes('SELLER'));
+    const isAdmin = user.roles && user.roles.includes('ADMIN');
+    const isSeller = user.roles && user.roles.includes('SELLER');
     const isAuthor = qna && user.sub === qna.user_id; // 작성자 ID와 로그인 ID 일치 여부 확인
 
+    // 💡 답변 폼 표시 조건 함수 추가
+    const shouldShowAnswerForm = () => {
+        if (!qna) return false;
+        if (qna.answer) return false; // 이미 답변이 있으면 무조건 숨김
+
+        const qnaType = qna.qnaType;
+
+        if (qnaType === 'GENERAL') {
+            // GENERAL 문의는 ADMIN만 답변 가능
+            return isAdmin;
+        }
+
+        if (qnaType === 'PRODUCT') {
+            // PRODUCT 문의는 SELLER 중 해당 상품을 등록한 판매자만 답변 가능
+            if (!isSeller || !qna.productName) return false;
+
+            // ⚠️ 백엔드에서 답변 시 상품 판매자 검증을 하지만, 프론트엔드에서
+            //    답변 폼을 보여줄지 결정하기 위해 Product ID를 통해 판매자 ID를 가져오는 추가 로직이 필요합니다.
+            //    하지만 현재 qna 객체에 상품 판매자 ID가 직접 포함되어 있지 않으므로
+            //    **현재는 로그인한 사용자가 SELLER 역할인지 여부까지만 체크합니다.** //    (백엔드가 최종 검증하므로 임시적으로 이렇게 처리합니다. 실제 구현에서는 QnaDTO에 productSellerId가 필요합니다.)
+
+            // 💡 임시 방편으로, 일단 SELLER 역할만 체크하여 폼을 보여줍니다. (백엔드가 권한이 없는 다른 SELLER의 답변을 막을 것임)
+            return isSeller;
+        }
+
+        return false;
+    };
+
+    const showAnswerForm = shouldShowAnswerForm(); // 답변 폼 표시 여부 결정
     useEffect(() => {
         let ignore = false;
 
@@ -197,12 +227,12 @@ const QnaDetailPage = () => {
                             <div className="answer-box">
                                 <p>{qna.answer}</p>
                                 <small className="answered-by">
-                                    답변자: {qna.answered_by || '관리자/판매자'} {/* DTO에서 answered_by를 내려줘야 합니다. */}
+                                    답변자: {qna.answered_by ? qna.answered_by : '미확인'}
                                 </small>
                             </div>
                         ) : (
-                            // 💡 답변이 없을 경우: ADMIN 또는 SELLER 권한이 있는 경우에만 답변 폼 표시
-                            hasAnswerPermission ? (
+                            // 💡 답변이 없을 경우: shouldShowAnswerForm 결과에 따라 폼 표시
+                            showAnswerForm ? (
                                 <div className="answer-form">
                                     <textarea
                                         className="form-control"
