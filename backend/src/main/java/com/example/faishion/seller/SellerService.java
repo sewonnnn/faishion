@@ -65,39 +65,26 @@ public class SellerService {
 
     // 사업자등록번호 검증 API
     private boolean verifyBusinessNumber(String businessNumber) {
-        String url = "https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=" + bizApiKey;
+        try {
+            String url = "https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=" + bizApiKey;
+            Map<String, Object> body = Map.of("b_no", List.of(businessNumber));
 
-        // 요청 바디
-        Map<String, Object> body = new HashMap<>();
-        body.put("b_no", List.of(businessNumber)); // 사업자번호 배열
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        // 요청 헤더
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            RestTemplate restTemplate = new RestTemplate();
+            Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            if (response == null || !response.containsKey("data")) return false;
+            List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
+            if (data.isEmpty()) return false;
 
-        // RestTemplate 호출
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, Object> response = restTemplate.postForObject(url, request, Map.class);
-
-        // 응답 로그 확인
-        System.out.println("사업자 검증 API 응답: " + response);
-
-        if (response == null || !response.containsKey("data")) {
-            return false;
+            String code = String.valueOf(data.get(0).get("b_stt_cd"));
+            return "01".equals(code); // 정상 사업자
+        } catch (Exception e) {
+            System.err.println("⚠ 사업자번호 검증 API 호출 실패 → 임시로 true 반환: " + e.getMessage());
+            return true; //  개발용 fallback: 실패해도 회원가입 허용 // 배포시 false로 바꿔두기
         }
-
-        // "data" 배열 꺼내기
-        List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
-        if (data.isEmpty()) return false;
-
-        // b_stt_cd 사용 (01 = 계속사업자, 정상)
-        Object statusCode = data.get(0).get("b_stt_cd");
-        String code = String.valueOf(statusCode);
-        System.out.println("검증 결과 b_stt_cd = " + code);
-
-
-        return "01".equals(code); // 01: 정상 사업자
     }
 }

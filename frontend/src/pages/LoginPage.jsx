@@ -7,9 +7,10 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 const LoginPage = () => {
     const nav = useNavigate();
     const [key, setKey] = useState("user"); // 'user' | 'seller'
-    const [form, setForm] = useState({ id: "", password: "" });
+    const [form, setForm] = useState({ loginId: "", password: "", id: "" });
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
+
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
@@ -17,10 +18,18 @@ const LoginPage = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        if (!form.id || !form.password) {
+
+        // 조건 분기
+        if (key === "user" && (!form.loginId || !form.password)) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
         }
+
+        if (key === "seller" && (!form.id || !form.password)) {
+            alert("아이디와 비밀번호를 입력해주세요.");
+            return;
+        }
+
         setLoading(true);
 
         const url =
@@ -33,7 +42,7 @@ const LoginPage = () => {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
-            login(res.data);
+            login(res.data.accessToken);
 
             alert("로그인 성공!");
             nav("/");
@@ -83,8 +92,8 @@ const LoginPage = () => {
                             <label className="form-label">아이디</label>
                             <input
                                 className="form-control"
-                                name="id"
-                                value={form.id}
+                                name="loginId"
+                                value={form.loginId}
                                 onChange={onChange}
                                 placeholder="아이디 입력"
                                 autoComplete="username"
@@ -114,7 +123,7 @@ const LoginPage = () => {
                         </button>
                     </form>
 
-                    {/* 소셜 로그인 버튼 (일반회원 전용) */}
+                    {/* 소셜 로그인 버튼 */}
                     <hr />
                     <div className="d-grid gap-2">
                         <button

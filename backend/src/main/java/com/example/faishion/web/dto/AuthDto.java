@@ -44,7 +44,7 @@ public class AuthDto {
     @AllArgsConstructor
     public static class LoginReq {
         @NotBlank
-        private String id; // ID로만 로그인 가능
+        private String loginId; // 수정
 
         @NotBlank
         private String password;

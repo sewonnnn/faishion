@@ -12,7 +12,8 @@ const SellerLoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8080/seller/login", form, {
+            //엔드포인트 수정
+            const res = await axios.post("http://localhost:8080/auth/seller/login", form, {
                 headers: { "Content-Type": "application/json" },
             });
 
