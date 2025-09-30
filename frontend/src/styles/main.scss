@@ -1,0 +1,8 @@
+// 1. 변수 override (내가 만든 파일)
+@import "./variables";
+
+// 2. Bootstrap (변수 적용됨)
+@import "bootstrap/scss/bootstrap";
+
+// 3. 커스텀 스타일
+@import "./custom";

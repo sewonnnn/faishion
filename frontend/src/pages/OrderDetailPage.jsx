@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert, Image as BootstrapImage, Button, Modal } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import defaultImage from "../assets/user.jpg";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import SellerReportModal from "../pages/customer/SellerReportModal";
 import "./OrderDetailPage.css";
 import ReviewForm from '../components/productdetail/ReviewForm.jsx';
