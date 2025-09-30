@@ -28,7 +28,7 @@ public class ProductService {
     private final ImageService imageService;
 
     public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
-        return productRepository.sellerProducts(pageable);
+        return productRepository.sellerProducts(sellerId, pageable);
     }
 
     // 상품목록 전체 불러오기 ho
