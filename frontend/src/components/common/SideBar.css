@@ -1,0 +1,102 @@
+/* 컨테이너 */
+.sidebar-container {
+  width: 300px;
+  background: linear-gradient(180deg, #1c1c1c 0%, #111111 100%);
+  box-shadow: 6px 0 15px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 네비게이션 스크롤 영역 */
+.sidebar-nav-scroll {
+  overflow-y: auto;
+  flex-grow: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* NavLink 공통 스타일 */
+.nav-link-style {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  margin: 4px 0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #dcdcdc;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s; /* 부드러운 전환 효과 추가 */
+}
+
+/* NavLink hover */
+.nav-link-style:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* NavLink active (활성화 메뉴) */
+.nav-link-style.active {
+  background-color: #3b3b3b;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+}
+
+/* 활성화 시 아이콘 색상 변경 (아이콘 사용 시) */
+.nav-link-style.active > span {
+    color: #0d6efd;
+}
+
+/* 로그아웃 버튼 컨테이너 */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn{
+    background-color: #3b3b3b;
+}
+
+.logout-btn:hover{
+    background-color: #4b4b4b;
+}
+
+/* Offcanvas (모바일 메뉴) */
+.offcanvas-sidebar {
+  background: linear-gradient(180deg, #1c1c1c 0%, #111111 100%);
+  color: #ffffff;
+}
+
+/* -------------------------------------- */
+/* 1. 스크롤바 트랙(Track)을 숨기고 Y축 스크롤만 유지 */
+/* -------------------------------------- */
+.sidebar-nav-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* -------------------------------------- */
+/* 2. WebKit 기반 브라우저 스크롤바 커스텀 */
+/* -------------------------------------- */
+
+/* 스크롤바 전체 너비 정의 */
+.sidebar-nav-scroll::-webkit-scrollbar {
+    width: 8px; /* 스크롤바의 너비 */
+}
+
+/* 스크롤바 트랙(빈 공간) 스타일 정의 */
+.sidebar-nav-scroll::-webkit-scrollbar-track {
+    background: #212529; /* 배경색 (사이드바 배경색과 유사하게 설정) */
+}
+
+/* 스크롤바 핸들(Thumb, 움직이는 막대) 스타일 정의 */
+.sidebar-nav-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2); /* 핸들 색상 (약간 투명한 흰색) */
+    border-radius: 10px; /* 핸들 모서리를 둥글게 */
+}
+
+/* 스크롤바 핸들 호버 시 스타일 정의 */
+.sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4); /* 호버 시 색상을 더 밝게 */
+}

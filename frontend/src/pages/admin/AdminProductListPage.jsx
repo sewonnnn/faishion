@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Container, Table, Button, Pagination } from "react-bootstrap";
+import { Container, Table, Button, Pagination, Form } from "react-bootstrap";
 import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
 
-const SellerProductListPage = () => {
+const AdminProductListPage = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -15,7 +15,7 @@ const SellerProductListPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await api.get(`/product/seller/list?page=${page}&size=${pageSize}`);
+                const response = await api.get(`/product/admin/list?page=${page}&size=${pageSize}`);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setTotalElements(response.data.totalElements);
@@ -30,9 +30,24 @@ const SellerProductListPage = () => {
         setPage(pageNumber);
     };
 
-    const handleAddProduct = () => {
-        navigate("/seller/product/new");
+    const handlePickToggle = async (productId, currentStatus) => {
+        try {
+            const newStatus = !currentStatus;
+            const response = await api.put(`/product/admin/pick/${productId}`, {
+                pick: newStatus,
+            });
+            setProducts(prevProducts =>
+                prevProducts.map(product =>
+                    product.id === productId ? { ...product, pick: response.data } : product
+                )
+            );
+        } catch (error) {
+            console.error(`상품 ID ${productId} 추천 상태 변경 실패:`, error);
+            // 사용자에게 실패를 알리는 알림을 추가할 수 있습니다.
+            alert("상품 추천 상태 변경에 실패했습니다.");
+        }
     };
+
 
     const renderPaginationItems = () => {
         let items = [];
@@ -52,7 +67,7 @@ const SellerProductListPage = () => {
 
     return (
         <Container className="my-5">
-            <h1 className="mb-4">Seller Product List</h1>
+            <h1 className="mb-4">Admin Product List</h1>
             {totalElements === 0 ? (
                 <p>상품이 없습니다.</p>
             ) : (
@@ -61,17 +76,21 @@ const SellerProductListPage = () => {
                     <Table bordered hover responsive>
                         <thead>
                             <tr className="text-center">
+                                <th>브랜드명</th>
                                 <th>상품명</th>
                                 <th>판매가</th>
                                 <th>카테고리</th>
                                 <th>상태</th>
                                 <th>재고</th>
-                                <th></th>
+                                <th>추천</th>
                             </tr>
                         </thead>
                         <tbody>
                             {products.map((product, index) => (
                                 <tr key={`product-${product.id}`} className="align-middle">
+                                    <td>
+                                        {product.businessName}
+                                    </td>
                                     <td className="d-flex align-items-center">
                                         <img
                                             src={`http://localhost:8080/image/${product.mainImageList[0]}`}
@@ -112,8 +131,12 @@ const SellerProductListPage = () => {
                                             ))}
                                         </ul>
                                     </td>
-                                    <td>
-                                        <Button variant="light" onClick={() => navigate(`/seller/product/edit`, {state : {product}})}>수정</Button>
+                                    <td className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            checked={product.pick || false}
+                                            onChange={() => handlePickToggle(product.id, product.pick)}
+                                        />
                                     </td>
                                 </tr>
                             ))}
@@ -128,13 +151,8 @@ const SellerProductListPage = () => {
                     </div>
                 </>
             )}
-            <div className="d-flex justify-content-end mb-3">
-                <Button variant="primary" onClick={handleAddProduct}>
-                    상품 등록
-                </Button>
-            </div>
         </Container>
     );
 };
 
-export default SellerProductListPage;
+export default AdminProductListPage;
