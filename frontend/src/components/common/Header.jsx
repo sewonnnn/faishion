@@ -7,7 +7,6 @@ import {
     FormControl,
     Button,
 } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useNavigate } from 'react-router-dom';

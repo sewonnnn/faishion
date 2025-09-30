@@ -1,71 +1,121 @@
-/* ProductCard.css */
-
+/* 상품 카드 전체 스타일 */
 .product-card {
-    /* 기존 스타일 유지 */
-    /* height: 100%; */
-
-    /* 1. 기본 입체감 부여 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약한 그림자 */
-
-    /* 2. 호버 효과를 위한 부드러운 전환 설정 */
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-
-    /* 카드 클릭 커서 표시 */
     cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    /* 테두리 없음 */
 }
 
-/* 3. 마우스 호버 시 효과 추가 */
-.product-card:hover {
-    /* 카드를 살짝 위로 들어 올리는 효과 */
-    transform: translateY(-5px);
-
-    /* 그림자를 더 진하게 하여 입체감 강조 */
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-}
-
-
+/* 이미지 컨테이너 */
 .card-img-wrapper {
     position: relative;
-    height: 300px; /* 고정 높이 설정 */
     overflow: hidden;
+    /* 이미지 비율을 1:1로 맞추기 위한 패딩 */
+    padding-top: 100%;
+    height: 0;
 }
 
-/* React-Bootstrap의 Card.Img 컴포넌트에 적용되는 클래스 */
-.card-img-wrapper .card-img-top {
+/* 이미지 자체의 스타일 */
+.product-card .card-img-top {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* 이미지 모서리 둥글게 처리 (선택 사항) */
+    border-radius: 0.25rem;
 }
 
-/* 배지 관련 스타일 (변경 없음) */
+/* 뱃지 오버레이 (신상품, 할인중 등) */
 .badge-overlay {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 10;
     display: flex;
-    gap: 5px;
 }
 
-.badge-overlay > div {
-    /* 공통 배지 스타일 */
-    padding: 3px 8px;
-    font-size: 12px;
-    font-weight: bold;
+.badge-new, .badge-sale, .badge-best {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.2rem;
     color: white;
-    border-radius: 3px;
-    white-space: nowrap;
 }
 
 .badge-new {
-    background-color: #007bff;
+    background-color: #333; /* 신상품은 검은색 계열 */
 }
-
 .badge-sale {
-    background-color: #dc3545;
+    background-color: #E74C3C; /* 할인중은 빨간색 계열 */
+}
+.badge-best {
+    background-color: #3498DB; /* 추천은 파란색 계열 */
 }
 
-.badge-best {
-    background-color: #ffc107;
-    color: #343a40;
+/* 상품 정보 (Card Body) */
+.product-card .card-body {
+    padding: 0.5rem 0 !important;
+}
+
+/* 브랜드 이름 */
+.product-brand {
+    font-size: 0.75rem; /* 12px */
+    color: #888;
+    font-weight: 500;
+}
+
+/* 상품 이름 */
+.product-name {
+    font-size: 0.875rem; /* 14px */
+    color: #333;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 두 줄로 제한 */
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    max-height: 2.8em; /* 1.4 * 2 */
+}
+
+/* 가격 정보 */
+.price-info {
+    display: flex;
+    align-items: baseline; /* 텍스트 베이스라인 정렬 */
+}
+
+/* 할인율 스타일 (빨간색, 굵게) */
+.discount-rate {
+    font-size: 1rem; /* 16px */
+    font-weight: 700;
+    color: #E74C3C; /* 빨간색 */
+    margin-right: 8px; /* 오른쪽 여백 */
+}
+
+/* 최종 가격 스타일 (굵게, 검정) */
+.final-price {
+    font-size: 1rem; /* 16px */
+    font-weight: 700;
+    color: #333;
+    margin-right: 8px; /* 오른쪽 여백 */
+}
+
+/* 원래 가격 스타일 (취소선, 회색) */
+.original-price {
+    font-size: 0.875rem; /* 14px */
+    text-decoration: line-through;
+    color: #999 !important;
+    margin-left: auto; /* 오른쪽 끝으로 보내기 */
+}
+
+/* 리뷰/별점 정보 */
+.rating-info {
+    font-size: 0.75rem; /* 12px */
+    color: #999;
+}
+
+.star-icon {
+    color: #FFC107; /* 노란 별 아이콘 */
+    font-size: 0.85rem;
 }

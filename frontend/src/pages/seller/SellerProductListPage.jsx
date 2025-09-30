@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Container, Table, Button, Pagination } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";

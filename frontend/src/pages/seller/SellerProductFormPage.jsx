@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useLocation, useNavigate } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import CategorySelector from "../../components/seller/productform/CategorySelector.jsx";
 import MultipleImageUploader from "../../components/seller/productform/MultipleImageUploader.jsx";
 import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";

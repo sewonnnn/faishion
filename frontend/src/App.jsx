@@ -1,5 +1,5 @@
 import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./styles/main.scss";
 import { Container } from 'react-bootstrap';
 import {BrowserRouter, Routes, Route, Outlet, Navigate, useLocation} from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
