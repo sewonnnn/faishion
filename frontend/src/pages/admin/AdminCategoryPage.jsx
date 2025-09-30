@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 
-const SellerCategoryPage = () => {
+const AdminCategoryPage = () => {
     const [groups, setGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [newGroupName, setNewGroupName] = useState("");
@@ -155,4 +155,4 @@ const SellerCategoryPage = () => {
     );
 }
 
-export default SellerCategoryPage;
+export default AdminCategoryPage;

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/product")
 public class ProductController {
     private final ProductService productService;
+    private final ProductRepository productRepository;
     private final ReviewService reviewService;
 
     @PostMapping
@@ -32,6 +33,15 @@ public class ProductController {
                        @RequestPart("stocks") List<Stock> stocks,
                        @RequestPart("stockImages") List<MultipartFile> stockImages) throws IOException {
         productService.createProduct(userDetails.getUsername(), product, mainImages, detailImages, stocks, stockImages);
+    }
+
+    @PutMapping("/admin/pick/{productId}")
+    boolean adminPick(@PathVariable Long productId, @RequestBody Map<String, Object> requestBody){
+        Product product = productRepository.findById(productId).orElseThrow();
+        boolean pick = (boolean)requestBody.get("pick");
+        product.setPick(pick);
+        productRepository.save(product);
+        return pick;
     }
 
     @PutMapping
@@ -48,6 +58,52 @@ public class ProductController {
                        @RequestPart(value = "deletedDetailImageIds", required = false) List<Long> deletedDetailImageIds,
                        @RequestPart(value = "deletedStockIds", required = false) List<Long> deletedStockIds) throws IOException {
         productService.updateProduct(userDetails.getUsername(), product, mainInfos, mainImages, detailInfos, detailImages, stocks, stockInfos, stockImages, deletedMainImageIds, deletedDetailImageIds, deletedStockIds);
+    }
+
+    @GetMapping("/admin/list")
+    public Page<Map<String, Object>> adminProducts(Pageable pageable){
+        Page<Product> products = productService.sellerProducts(null, pageable);
+        List<Map<String, Object>> content = products.stream()
+                .map(p -> {
+                    Map<String, Object> map = new LinkedHashMap<>(); // Use LinkedHashMap for predictable order
+                    map.put("id", p.getId());
+                    map.put("businessName", p.getSeller().getBusinessName());
+                    map.put("pick", p.isPick());
+                    map.put("name", p.getName());
+                    map.put("description", p.getDescription());
+                    map.put("price", p.getPrice());
+                    map.put("status", p.getStatus());
+                    map.put("discountPrice", p.getDiscountPrice());
+                    map.put("discountStartDate", p.getDiscountStartDate());
+                    map.put("discountEndDate", p.getDiscountEndDate());
+                    map.put("categoryName", p.getCategory().getName());
+                    map.put("categoryGroupName", p.getCategory().getCategoryGroup().getName());
+                    map.put("type", p.getType());
+                    Map<String, Object> categoryMap =Map.of(
+                            "categoryGroup", Map.of(
+                                    "id", p.getCategory().getCategoryGroup().getId()
+                            ),
+                            "id", p.getCategory().getId()
+                    );
+                    map.put("category", categoryMap);
+                    map.put("mainImageList", p.getMainImageList().stream().map(Image::getId).toList());
+                    map.put("detailImageList", p.getDetailImageList().stream().map(Image::getId).toList());
+                    List<Map<String, Object>> stockData = p.getStockList().stream()
+                            .map(s -> {
+                                Map<String, Object> stockMap = new LinkedHashMap<>(); // Use LinkedHashMap here as well
+                                stockMap.put("id", s.getId());
+                                stockMap.put("size", s.getSize());
+                                stockMap.put("color", s.getColor());
+                                stockMap.put("quantity", s.getQuantity());
+                                stockMap.put("image", s.getImage().getId());
+                                return stockMap;
+                            })
+                            .collect(Collectors.toList());
+                    map.put("stockList", stockData);
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(content, pageable, products.getTotalElements());
     }
 
     @GetMapping("/seller/list")
