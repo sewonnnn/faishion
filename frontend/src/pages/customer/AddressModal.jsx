@@ -25,7 +25,7 @@ const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSel
 
     const fetchAddresses = async () => {
         try {
-            // ✅ GET /address/list 적용 완료 (이전 단계에서 이미 수정됨)
+            // GET /address/list 적용 완료 (이전 단계에서 이미 수정됨)
             const response = await api.get('/address/list');
             setAddresses(response.data);
         } catch (error) {

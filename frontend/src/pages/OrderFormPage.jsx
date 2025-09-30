@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import '../pages/OrderFormPage.css'; // 새로 생성할 CSS 파일 임포트
 
+
 // 헬퍼 함수: 금액을 쉼표 형식으로 포맷
 const formatPrice = (price) => {
     const validPrice = typeof price === 'number' && !isNaN(price) ? price : 0;
@@ -203,7 +204,7 @@ const OrderFormPage = () => {
                     price: item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice,
                     cartId: item.id, // 결제 후 장바구니 상품 삭제를 위함
                 })),
-                requestMsg: deliveryAddress.requestMsg === '직접 입력' ? '' : deliveryAddress.requestMsg,
+                requestMsg: deliveryAddress.requestMsg,
             };
             const response = await api.post("/order/create", requestData);
 
@@ -255,8 +256,7 @@ const OrderFormPage = () => {
             <Row>
                 {/* A. 주문/배송 정보 (좌측, 큰 영역) */}
                 <Col lg={8} className="mb-4">
-                    <h2 className="text-xl font-bold mb-4 border-bottom pb-2 order-section-title">주문서</h2>
-
+                    <h2 className="text-xl font-bold mb-4 border-bottom pb-2 order-section-title" >주문서</h2>
                     {/* 1. 배송지 정보 */}
                     <Card className="shadow-none border-0 mb-5 p-0">
                         <Card.Body className="p-0">
@@ -286,19 +286,11 @@ const OrderFormPage = () => {
                                 연락처: {userProfile?.phoneNumber || "연락처 정보"}
                             </p>
 
-                            {/* 배송 요청사항 드롭다운 */}
-                            <Form.Group className="mt-2">
-                                <Form.Select
-                                    value={isCustomRequestMode ? '직접 입력' : deliveryAddress.requestMsg}
-                                    onChange={handleRequestSelect}
-                                    className="request-select"
-                                >
-                                    <option value="문 앞에 놔주세요">문 앞에 놔주세요</option>
-                                    <option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
-                                    <option value="배송 전에 전화 부탁드립니다.">배송 전에 전화 부탁드립니다.</option>
-                                    <option value="직접 입력">직접 입력</option>
-                                </Form.Select>
-                                {/* 직접 입력 필드 */}
+                            {/* 배송 요청사항 */}
+                            <Form.Group as={Row} className="mt-4 align-items-center">
+
+                                <Form.Label column sm="3" className="font-medium text-sm">배송 요청 (선택)</Form.Label>
+
                                 <Col sm="9">
                                     <Form.Control
                                         as="textarea" // 여러 줄 입력을 위해 textarea 사용
@@ -309,7 +301,6 @@ const OrderFormPage = () => {
                                         placeholder="예: 문 앞에 놔주세요, 경비실에 맡겨주세요, 배송 전에 전화 부탁드립니다."
 
                                     />
-
                                 </Col>
                             </Form.Group>
                         </Card.Body>
@@ -321,50 +312,61 @@ const OrderFormPage = () => {
                     <h3 className="text-xl font-bold mb-4 order-section-title">주문 상품 {orderItems.length}개</h3>
                     <Card className="shadow-none border-0 p-0">
                         <Card.Body className="p-0">
-                            {orderItems.map((item) => (
-                                <div
-                                    key={item.stockId}
-                                    className="p-0 mb-4 border-bottom pb-4 order-item-card"
-                                >
-                                    <Row className="align-items-start">
-                                        {/* 이미지 */}
-                                        <Col xs={4} md={3}>
-                                            <Image
-                                                src={`http://localhost:8080/image/${item.productImageId}`}
-                                                alt={item.productName}
-                                                fluid
-                                                rounded
-                                                className="w-full h-auto object-cover item-image"
-                                                style={{ aspectRatio: '1/1' }}
-                                            />
-                                        </Col>
+                            {orderItems.map((item) => {
+                                const originalPrice = item.productPrice * item.quantity;
+                                const discountedPrice = (item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice) * item.quantity;
+                                // 할인 여부 판단 (할인 가격이 존재하고, 원래 가격보다 낮은 경우)
+                                const isDiscounted = item.discountedProductPrice != null && item.productPrice > item.discountedProductPrice;
 
-                                        {/* 상품 정보 */}
-                                        <Col xs={8} md={9}>
-                                            <div className="text-sm text-gray-600 mb-1"><b>{item.sellerBusinessName || "점포명"}</b></div>
-                                            <div className="font-semibold text-base mb-1">{item.productName}</div>
-                                            <p className="mb-1 text-sm text-gray-500">
-                                                옵션: {item.productSize || "105"} / 수량: {item.quantity}개
-                                            </p>
-                                            <div className="font-bold text-xl text-black mt-2">
-                                                <span className="text-black">{formatPrice((item.discountedProductPrice || item.productPrice) * item.quantity)}원</span>
-                                            </div>
+                                return (
+                                    <div
+                                        key={item.stockId}
+                                        className="p-0 mb-4 border-bottom pb-4 order-item-card"
+                                    >
+                                        <Row className="align-items-start">
+                                            {/* 이미지 */}
+                                            <Col xs={4} md={3}>
+                                                <Image
+                                                    src={`http://localhost:8080/image/${item.productImageId}`}
+                                                    alt={item.productName}
+                                                    fluid
+                                                    rounded
+                                                    className="w-full h-auto object-cover item-image"
+                                                    style={{ aspectRatio: '1/1' }}
+                                                />
+                                            </Col>
 
-                                            {/* '쿠폰 사용' 버튼 (이미지 요소) */}
-                                            <Button variant="outline-secondary" size="sm" className="mt-3 coupon-apply-btn">
-                                                쿠폰 사용
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            ))}
+                                            {/* 상품 정보 */}
+                                            <Col xs={8} md={9}>
+                                                <div className="text-sm text-gray-600 mb-1"><b>{item.sellerBusinessName || "점포명"}</b></div>
+                                                <div className="font-semibold text-base mb-1">{item.productName}</div>
+                                                <p className="mb-1 text-sm text-gray-500">
+                                                    옵션: {item.productSize || "105"} / 수량: {item.quantity}개
+                                                </p>
+
+                                                {/* 할인 전 가격 (취소선) - 할인 적용 시에만 표시 */}
+                                                {isDiscounted && (
+                                                    <div className="original-price-strikethrough">
+                                                        {formatPrice(originalPrice)}원
+                                                    </div>
+                                                )}
+
+                                                {/* 최종 가격 (할인 적용 가격) */}
+                                                <div className="discounted-price-final">
+                                                    {formatPrice(discountedPrice)}원
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                );
+                            })}
                         </Card.Body>
                     </Card>
                 </Col>
 
                 {/* B. 결제 정보 요약 (우측, 작은 영역) */}
                 <Col lg={4}>
-                    <Card className="shadow-none border-0 sticky-card">
+                    <Card className="shadow-none border-1 sticky-card">
                         <Card.Body className="p-4">
                             <h3 className="text-xl font-bold mb-4 pb-2"><b>결제 정보</b></h3>
 

@@ -1,13 +1,11 @@
-/* 주문서 페이지 전체 컨테이너 */
-.order-form-page {
-    /* 전체적인 디자인 통일성 유지 */
-}
 
 /* 섹션 타이틀 스타일 */
 .order-section-title {
-    font-size: 1.25rem; /* 20px */
+    font-size: 1rem; /* 20px */
     font-weight: 700;
+    padding: 20px;
     color: #333;
+    background-color: #F5F5F5;
 }
 
 /* 배송지 기본 정보 태그 */
@@ -24,33 +22,11 @@
     font-size: 0.875rem; /* 14px */
     padding: 0.25rem 0.75rem;
     border-radius: 0.25rem;
-    line-height: 1.5; /* 버튼 높이 조정 */
+    line-height: 1.5;
 }
 .delivery-change-btn:hover {
     background-color: #f8f8f8;
     border-color: #aaa;
-}
-
-/* 배송 요청사항 드롭다운 */
-.request-select {
-    border-radius: 0 !important; /* 이미지처럼 각진 형태 */
-    border: 1px solid #ccc;
-    box-shadow: none !important;
-    font-size: 1rem;
-    padding: 0.5rem 0.75rem;
-    height: auto;
-    /* 드롭다운 아래쪽에만 테두리가 있는 이미지 디테일 구현 */
-    border-top: none !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: 1px solid #ddd !important;
-}
-
-/* 직접 입력 필드 */
-.custom-request-input {
-    border: 1px solid #ddd !important;
-    border-radius: 0.25rem !important;
-    box-shadow: none !important;
 }
 
 /* 주문 상품 목록 이미지 크기 및 스타일 */
@@ -60,6 +36,22 @@
     height: 100px; /* 고정 높이 설정 */
     object-fit: cover;
     border-radius: 4px;
+}
+
+/* 상품 가격 취소선 스타일 */
+.original-price-strikethrough {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin-bottom: 0.2rem;
+}
+
+/* 할인 적용 가격 스타일 */
+.discounted-price-final {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 800;
+    color: #333;
 }
 
 /* 쿠폰 사용 버튼 */
@@ -72,25 +64,11 @@
     border-radius: 4px;
 }
 
-/* 쿠폰 드롭다운 스타일 */
-.coupon-select {
-    border: 1px solid #ccc;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-size: 1rem;
-    padding: 0.5rem 0.75rem;
-}
-
-/* 할인 금액 텍스트 (빨간색) */
-.text-discount {
-    color: #e53e3e;
-}
-
 /* 결제 정보 카드 (우측) 고정 스타일 */
 .sticky-card {
     position: sticky;
-    top: 20px; /* 상단 여백 설정 */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); /* 부드러운 그림자 */
+    top: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
     border-radius: 0.5rem;
 }
 
@@ -102,19 +80,19 @@
 
 /* 총 결제 금액 */
 .total-amount-row {
-    font-size: 1.125rem; /* 18px */
+    font-size: 1.125rem;
 }
 .total-price {
-    color: #1850DB; /* 요청하신 파란색 적용 */
-    font-weight: 800; /* Extra bold */
+    color: #1850DB; /* 파란색 적용 */
+    font-weight: 800;
 }
 
 /* 결제 버튼 스타일 */
 .order-pay-btn {
-    background-color: #1850DB !important; /* 요청하신 파란색 적용 */
+    background-color: #1850DB !important; /* 파란색 적용 */
     border-color: #1850DB !important;
     font-weight: 700;
-    font-size: 1.25rem; /* 20px */
+    font-size: 1.25rem;
     padding: 0.75rem 1.5rem;
     border-radius: 0.3rem !important;
 }

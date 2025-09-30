@@ -322,19 +322,6 @@ const CartPage = () => {
                                 <span>할인금액</span>
                                 <span>{formatPrice(totalDiscount)}원</span>
                             </div>
-
-                            {/* 상품 할인 */}
-                            <div className="d-flex justify-content-between mb-2 text-gray-700">
-                                <span>상품 할인</span>
-                                <span>0원</span> {/* 이미지와 동일하게 '0원'으로 표시 */}
-                            </div>
-
-                            {/* 즉시 할인 */}
-                            <div className="d-flex justify-content-between mb-3 text-gray-700">
-                                <span>즉시 할인</span>
-                                <span>0원</span> {/* 이미지와 동일하게 '0원'으로 표시 */}
-                            </div>
-
                             {/* 총 구매 금액 */}
                             <div className="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
                                 <span className="text-lg font-bold">총 구매 금액</span>
