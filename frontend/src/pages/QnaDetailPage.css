@@ -38,9 +38,6 @@ body { margin: 0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, 
     background-color: #f9f9f9;
 }
 
-.qa-form .mb-4 p{
-    height: 300px;
-}
 .qa-form textarea.form-control {
     min-height: 50px;
 }

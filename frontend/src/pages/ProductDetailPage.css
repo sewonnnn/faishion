@@ -1,3 +1,84 @@
+/* -------------------------------------------------------------------------- */
+/* 상품 상세 페이지 (ProductDetailPage.jsx) 및 우측 정보 (ProductRightInfo.jsx) 스타일 */
+/* -------------------------------------------------------------------------- */
+
+/* ProductRightInfo 컴포넌트 전체 컨테이너 스타일 */
+.ProductRightInfo {
+}
+
+/* 상품명과 브랜드 이름 */
+.ProductRightInfo .product-header .brand-name {
+    color: #333; /* 브랜드 이름 색상 */
+}
+
+.ProductRightInfo .product-header .product-name {
+    /* 기본 굵기를 fw-normal로 설정했으므로 추가적인 CSS는 필요 없습니다. */
+    line-height: 1.4;
+}
+
+/* 가격 정보 영역 */
+.ProductRightInfo .price-info {
+    /* 가격 정보가 깔끔하게 정렬되도록 조정 */
+}
+
+/* 부가 정보 영역 (카드 혜택, 배송 등) */
+.ProductRightInfo .additional-info {
+    line-height: 1.5; /* 가독성을 위한 행간 */
+}
+
+.ProductRightInfo .additional-info .row {
+    margin-bottom: 0.5rem !important;
+}
+
+/* 색상 및 사이즈 선택 영역 */
+
+.ProductRightInfo .d-flex.flex-wrap.gap-2 button {
+    /* 선택되지 않은 상태의 버튼 텍스트 색상 및 테두리 색상이 명확하도록 조정 */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* 선택된 상품 목록 (Selected Items) */
+.ProductRightInfo .selected-items-container {
+}
+
+/* 개별 옵션 아이템 */
+.ProductRightInfo .selected-items-container > div {
+    /* 각 옵션 아이템의 하단 경계선과 여백은 JSX에서 border-bottom, pb-2, mb-2 클래스로 처리 */
+}
+
+/* 수량 조절 버튼 */
+.ProductRightInfo .input-group .btn-outline-dark {
+    border-color: #ced4da !important; /* 부트스트랩 기본 색상보다 연하게 */
+    color: #495057 !important; /* 버튼 내부 아이콘/텍스트 색상 */
+}
+.ProductRightInfo .input-group .form-control {
+    border-color: #ced4da !important;
+}
+
+/* 총 금액 영역 */
+.ProductRightInfo .d-flex.justify-content-between.align-items-center.mt-3.p-3 {
+    /* 총 금액 영역에 별도의 테두리나 배경색이 필요하다면 여기에 추가 */
+}
+
+
+/* 하단 버튼 영역 */
+.ProductRightInfo .d-grid.gap-2 button {
+    /* 버튼 높이 56px는 인라인 스타일로 적용됨 */
+    font-weight: 549 !important; /* 폰트 굵기 */
+}
+
+/* 위시리스트 (좋아요) 버튼 */
+.ProductRightInfo .col-3 .btn-light {
+    border: 1px solid #343a40 !important; /* 검정색 테두리 */
+}
+
+/* 리뷰 버튼 */
+.ProductRightInfo .w-100.text-dark.fw-bold.border-dark {
+    border-color: #343a40 !important; /* 검정색 테두리 */
+    color: #343a40 !important;
+}
+
+/* 사용자가 추가한 CSS */
 .productInfo{
     display: flex;
 }
