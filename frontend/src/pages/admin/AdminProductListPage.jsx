@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Table, Button, Pagination } from "react-bootstrap";
+import { Container, Table, Button, Pagination, Form } from "react-bootstrap";
 import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
@@ -15,7 +15,7 @@ const AdminProductListPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await api.get(`/product/seller/list?page=${page}&size=${pageSize}`);
+                const response = await api.get(`/product/admin/list?page=${page}&size=${pageSize}`);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setTotalElements(response.data.totalElements);
@@ -29,6 +29,25 @@ const AdminProductListPage = () => {
     const handlePageChange = (pageNumber) => {
         setPage(pageNumber);
     };
+
+    const handlePickToggle = async (productId, currentStatus) => {
+        try {
+            const newStatus = !currentStatus;
+            const response = await api.put(`/product/admin/pick/${productId}`, {
+                pick: newStatus,
+            });
+            setProducts(prevProducts =>
+                prevProducts.map(product =>
+                    product.id === productId ? { ...product, pick: response.data } : product
+                )
+            );
+        } catch (error) {
+            console.error(`상품 ID ${productId} 추천 상태 변경 실패:`, error);
+            // 사용자에게 실패를 알리는 알림을 추가할 수 있습니다.
+            alert("상품 추천 상태 변경에 실패했습니다.");
+        }
+    };
+
 
     const renderPaginationItems = () => {
         let items = [];
@@ -62,15 +81,15 @@ const AdminProductListPage = () => {
                                 <th>판매가</th>
                                 <th>카테고리</th>
                                 <th>상태</th>
-                                <th>재고 (옵션별)</th>
-                                <th></th>
+                                <th>재고</th>
+                                <th>추천</th>
                             </tr>
                         </thead>
                         <tbody>
                             {products.map((product, index) => (
                                 <tr key={`product-${product.id}`} className="align-middle">
                                     <td>
-                                        {product.}
+                                        {product.businessName}
                                     </td>
                                     <td className="d-flex align-items-center">
                                         <img
@@ -112,8 +131,12 @@ const AdminProductListPage = () => {
                                             ))}
                                         </ul>
                                     </td>
-                                    <td>
-                                        <Button variant="light" onClick={() => navigate(`/seller/product/edit`, {state : {product}})}>수정</Button>
+                                    <td className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            checked={product.pick || false}
+                                            onChange={() => handlePickToggle(product.id, product.pick)}
+                                        />
                                     </td>
                                 </tr>
                             ))}

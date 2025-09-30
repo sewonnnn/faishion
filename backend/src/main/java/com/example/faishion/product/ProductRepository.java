@@ -19,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "JOIN FETCH c.categoryGroup " +
             "JOIN FETCH p.stockList " +
             "JOIN FETCH p.mainImageList " +
-            "WHERE p.seller.id = :sellerId " +
+            "WHERE (:sellerId IS NULL OR p.seller.id = :sellerId) " +
             "ORDER BY p.createdAt DESC")
     Page<Product> sellerProducts(@Param("sellerId")String sellerId, Pageable pageable);
 

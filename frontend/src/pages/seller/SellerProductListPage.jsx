@@ -61,19 +61,17 @@ const SellerProductListPage = () => {
                     <Table bordered hover responsive>
                         <thead>
                             <tr className="text-center">
-                                <th>NO</th>
                                 <th>상품명</th>
                                 <th>판매가</th>
                                 <th>카테고리</th>
                                 <th>상태</th>
-                                <th>재고 (옵션별)</th>
+                                <th>재고</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {products.map((product, index) => (
                                 <tr key={`product-${product.id}`} className="align-middle">
-                                    <td className="text-center">{product.id}</td>
                                     <td className="d-flex align-items-center">
                                         <img
                                             src={`http://localhost:8080/image/${product.mainImageList[0]}`}
@@ -121,11 +119,6 @@ const SellerProductListPage = () => {
                             ))}
                         </tbody>
                     </Table>
-                    <div className="d-flex justify-content-end mb-3">
-                        <Button variant="primary" onClick={handleAddProduct}>
-                            상품 등록
-                        </Button>
-                    </div>
                     <div className="d-flex justify-content-center">
                         <Pagination>
                             <Pagination.Prev onClick={() => handlePageChange(page - 1)} disabled={page === 0} />
@@ -135,6 +128,11 @@ const SellerProductListPage = () => {
                     </div>
                 </>
             )}
+            <div className="d-flex justify-content-end mb-3">
+                <Button variant="primary" onClick={handleAddProduct}>
+                    상품 등록
+                </Button>
+            </div>
         </Container>
     );
 };
