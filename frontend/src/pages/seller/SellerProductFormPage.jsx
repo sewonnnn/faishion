@@ -482,7 +482,7 @@ const SellerProductFormPage = () => {
 
                 <Row className="mt-4">
                     <Col className="text-center">
-                        <Button variant="secondary" onClick={() => navigate('/seller/list')} className="me-3">
+                        <Button variant="secondary" onClick={() => navigate('/seller/product/list')} className="me-3">
                             메인으로 가기
                         </Button>
                         <Button variant="success" type="submit">

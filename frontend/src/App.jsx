@@ -29,7 +29,8 @@ import AdminNoticeListPage from "./pages/admin/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
-import SellerCategoryPage from "./pages/seller/SellerCategoryPage.jsx";
+import AdminCategoryPage from "./pages/admin/AdminCategoryPage.jsx";
+import AdminProductListPage from "./pages/admin/AdminProductListPage.jsx";
 import SellerOrderListPage from "./pages/seller/SellerOrderListPage.jsx";
 import SellerRegisterPage from "./pages/seller/SellerRegisterPage.jsx";
 import SellerLoginPage from "./pages/seller/SellerLoginPage.jsx";
@@ -61,14 +62,24 @@ function Layout() {
   );
 }
 
-function SellerLayout() {
-    const sellerMenuItems = [
-        {name : "판매자 대시보드", href : "/seller"},
-        {name : "상품 관리", href : "/seller/product/list"},
-        {name : "주문 관리", href : "/seller/order/list"},
-        {name : "문의/Q&A", href : "/seller/qna/list"},
-    ];
+const adminMenuItems = [
+    {name : "대시보드", href : "/admin"},
+    {name : "카테고리 관리", href : "/admin/category"},
+    {name : "추천 상품 관리", href : "/admin/product/list"},
+    {name : "판매자 관리", href : "/admin/seller/list"},
+    {name : "문의 글 관리", href : "/admin/qna/list"},
+    {name : "신고 관리", href : "/admin/report/list"},
+    {name : "공지사항 관리", href : "/admin/notice/list"},
+];
 
+const sellerMenuItems = [
+    {name : "대시보드", href : "/seller"},
+    {name : "상품 관리", href : "/seller/product/list"},
+    {name : "주문 현황 관리", href : "/seller/order/list"},
+    {name : "문의 글 관리", href : "/seller/qna/list"},
+];
+
+function SellerLayout() {
     return (
         <div className="d-md-flex w-100 min-vh-100">
             <SideBar menuItems={sellerMenuItems}/>
@@ -79,12 +90,15 @@ function SellerLayout() {
     );
 }
 
+
 function AdminLayout() {
   return (
-    <>
-      <AdminHeader />
-      <Outlet />
-    </>
+        <div className="d-md-flex w-100 min-vh-100">
+            <SideBar menuItems={adminMenuItems}/>
+            <div className="flex-grow-1 w-100 overflow-auto p-4">
+                <Outlet />
+            </div>
+        </div>
   );
 }
 
@@ -150,7 +164,6 @@ function App() {
                 <Route path="/seller/order/list" element={<SellerOrderListPage />}/>
                 <Route path="/seller/qna/list" element={<SellerQnaListPage />}/>
                 <Route path="/seller" element={<SellerPage />} /> {/*판매자 대시보드*/}
-                <Route path="/seller/category" element={<SellerCategoryPage />}/> {/*판매자 카테고리 페이지*/}
                 <Route path="/seller/product/list" element={<SellerProductListPage />}/> {/*판매자 상품 목록 페이지*/}
                 <Route path="/seller/product/:productId" element={<SellerProductDetailPage />}/> {/*판매자 상품 상세 조회 페이지*/}
                 <Route path="/seller/product/new" element={<SellerProductFormPage />}/> {/*판매자 상품 등록 폼 페이지*/}
@@ -166,7 +179,9 @@ function App() {
                    <Route path="/admin/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
                    <Route path="/admin/notice/list" element={<NoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
                    <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
+                   <Route path="/admin/category" element={<AdminCategoryPage />}/> {/*판매자 카테고리 페이지*/}
                    <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
+                   <Route path="/admin/product/list" element={<AdminProductListPage />} />
                    <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}
                    <Route path="/admin/report/list" element={<AdminReportList />} />   {/*관리자 신고글 확인 페이지 */}
                     <Route path="/admin/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}

@@ -4,7 +4,7 @@ import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
 
-const SellerProductListPage = () => {
+const AdminProductListPage = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -30,10 +30,6 @@ const SellerProductListPage = () => {
         setPage(pageNumber);
     };
 
-    const handleAddProduct = () => {
-        navigate("/seller/product/new");
-    };
-
     const renderPaginationItems = () => {
         let items = [];
         for (let number = 0; number < totalPages; number++) {
@@ -52,7 +48,7 @@ const SellerProductListPage = () => {
 
     return (
         <Container className="my-5">
-            <h1 className="mb-4">Seller Product List</h1>
+            <h1 className="mb-4">Admin Product List</h1>
             {totalElements === 0 ? (
                 <p>상품이 없습니다.</p>
             ) : (
@@ -61,7 +57,7 @@ const SellerProductListPage = () => {
                     <Table bordered hover responsive>
                         <thead>
                             <tr className="text-center">
-                                <th>NO</th>
+                                <th>브랜드명</th>
                                 <th>상품명</th>
                                 <th>판매가</th>
                                 <th>카테고리</th>
@@ -73,7 +69,9 @@ const SellerProductListPage = () => {
                         <tbody>
                             {products.map((product, index) => (
                                 <tr key={`product-${product.id}`} className="align-middle">
-                                    <td className="text-center">{product.id}</td>
+                                    <td>
+                                        {product.}
+                                    </td>
                                     <td className="d-flex align-items-center">
                                         <img
                                             src={`http://localhost:8080/image/${product.mainImageList[0]}`}
@@ -121,11 +119,6 @@ const SellerProductListPage = () => {
                             ))}
                         </tbody>
                     </Table>
-                    <div className="d-flex justify-content-end mb-3">
-                        <Button variant="primary" onClick={handleAddProduct}>
-                            상품 등록
-                        </Button>
-                    </div>
                     <div className="d-flex justify-content-center">
                         <Pagination>
                             <Pagination.Prev onClick={() => handlePageChange(page - 1)} disabled={page === 0} />
@@ -139,4 +132,4 @@ const SellerProductListPage = () => {
     );
 };
 
-export default SellerProductListPage;
+export default AdminProductListPage;
