@@ -24,7 +24,6 @@ const SellerProductFormPage = () => {
 
     // 백엔드에서 받은 데이터 구조에 맞춰 product, imageList, stockList를 가져옵니다.
     const { product: initialProduct } = location.state || {};
-
     // 1. 초기 상태 설정: 객체 구조를 통일합니다.
     const [product, setProduct] = useState({
         id: initialProduct?.id || null,
@@ -36,6 +35,7 @@ const SellerProductFormPage = () => {
         discountPrice: initialProduct?.discountPrice || '',
         discountStartDate: initialProduct?.discountStartDate || '',
         discountEndDate: initialProduct?.discountEndDate || '',
+        type: initialProduct?.type || '',
         // 이미지 목록 초기화: 기존 URL/ID를 객체 형태로 변환
         mainImages: (initialProduct?.mainImageList || []).map(img => createUrlImageObj(img)),
         detailImages: (initialProduct?.detailImageList || []).map(img => createUrlImageObj(img)),
@@ -81,7 +81,12 @@ const SellerProductFormPage = () => {
                 ...prevProduct,
                 status: parseInt(value, 10),
             }));
-        } else {
+        } else if(name === "type"){
+            setProduct((prevProduct) => ({
+                ...prevProduct,
+                type: value,
+            }));
+        }else {
             setProduct((prevProduct) => ({
                 ...prevProduct,
                 [name]: value,
@@ -308,6 +313,7 @@ const SellerProductFormPage = () => {
             discountPrice: product.discountPrice,
             discountStartDate: product.discountStartDate,
             discountEndDate: product.discountEndDate,
+            type: product.type
         };
         formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
 
@@ -399,6 +405,17 @@ const SellerProductFormPage = () => {
                     <Form.Label column sm="2">상품 설명 :</Form.Label>
                     <Col sm="10">
                         <Form.Control as="textarea" name="description" value={product.description} onChange={handleChange} placeholder="상품 설명 입력" rows={5} required/>
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3" controlId="formProductStatus">
+                    <Form.Label column sm="2">성별 :</Form.Label>
+                    <Col sm="10">
+                        <Form.Select name="type" value={product.type} onChange={handleChange}>
+                            <option value={"man"}>남성</option>
+                            <option value={"woman"}>여성</option>
+                            <option value={"common"}>공용</option>
+                        </Form.Select>
                     </Col>
                 </Form.Group>
 

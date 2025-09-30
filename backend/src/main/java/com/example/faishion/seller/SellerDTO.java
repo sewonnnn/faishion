@@ -13,16 +13,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SellerDTO {
 
-    @NotBlank
-    @Size(min = 6, max = 20, message = "아이디는 최소 6자 이상 20자 이하로 입력해야 합니다.")
-    private String id;  // 사용자 입력 아이디 (PK)
+    @NotBlank(message = "아이디는 필수 입력값입니다.")
+    @Pattern(
+            regexp = "^[a-z0-9]{8,16}$",
+            message = "아이디는 영소문자와 숫자 조합, 8~16자여야 합니다."
+    )
+    private String id;
 
-    @Email
-    @NotBlank
+    @NotBlank(message = "이메일은 필수 입력값입니다.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
-    @NotBlank
-    @Size(min = 8, max = 64, message = "비밀번호는 최소 8자 이상 64자 이하로 입력해야 합니다.")
+    @NotBlank(message = "비밀번호는 필수 입력값입니다.")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,16}$",
+            message = "비밀번호는 영소문자, 숫자, 특수문자를 최소 1개 이상 포함한 8~16자여야 합니다."
+    )
     private String password;
 
     @NotBlank
@@ -32,12 +38,16 @@ public class SellerDTO {
     )
     private String phoneNumber;
 
-    @NotBlank
+    @NotBlank(message = "상호명은 필수 입력값입니다.")
     private String businessName;
 
-    @NotBlank
+    @NotBlank(message = "사업자 등록번호는 필수 입력값입니다.")
+    @Pattern(
+            regexp = "^\\d{3}-\\d{2}-\\d{5}$",
+            message = "사업자 등록번호는 123-45-67890 형식으로 입력해야 합니다."
+    )
     private String businessNumber;
 
-    @NotBlank
+    @NotBlank(message = "대표자 이름은 필수 입력값입니다.")
     private String ownerName;
 }
