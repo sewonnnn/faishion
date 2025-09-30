@@ -1,6 +1,5 @@
 import React from "react";
 import { Card } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './ProductCard.css';
 import { BsStarFill } from 'react-icons/bs';
 import { useNavigate } from "react-router-dom";

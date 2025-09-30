@@ -1,7 +1,6 @@
 // src/components/seller/productform/CategorySelector.jsx
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CategorySelector = ({
                               categoryGroups,

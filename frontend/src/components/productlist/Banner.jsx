@@ -2,7 +2,6 @@ import "./Banner.css";
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 import { Carousel } from 'react-bootstrap'; // Bootstrap Carousel 컴포넌트 import
-import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS import
 import ban from "../../assets/ban.jpg";
 const Banner = () => {
     // const [bannerItems, setBannerItems] = useState([]); // 이름 변경: banner -> bannerItems

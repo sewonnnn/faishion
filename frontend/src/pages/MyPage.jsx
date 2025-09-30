@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./MyPage.css";
 // 부트스트랩 컴포넌트 임포트
 import { Container, Row, Col, Button, Image as BootstrapImage, Spinner } from "react-bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import defaultImage from "../assets/user.jpg";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { FaRegBell, FaCog } from "react-icons/fa";
