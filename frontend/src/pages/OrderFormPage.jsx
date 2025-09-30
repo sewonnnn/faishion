@@ -270,7 +270,6 @@ const OrderFormPage = () => {
                                     variant="outline-secondary"
                                     size="sm"
                                     onClick={() => setShowAddressModal(true)}
-                                    className="delivery-change-btn"
                                 >
                                     배송지 변경
                                 </Button>
