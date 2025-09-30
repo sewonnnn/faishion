@@ -54,4 +54,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 별점높은 상품 찾기
     @Query("SELECT p FROM Product p LEFT JOIN p.reviewList r GROUP BY p HAVING AVG(r.rating) >= 4.0")
     List<Product> findBestProducts();
+
+    // 남성 여성 공용 등 타입에 맞는 상품 찾기
+    List<Product> findByType(String type);
+
+    // 관리자가 추천상품 등록 한 상품 찾기
+    List<Product> findByPickTrue();
 }

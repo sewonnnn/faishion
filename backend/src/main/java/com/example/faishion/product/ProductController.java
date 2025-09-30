@@ -66,6 +66,7 @@ public class ProductController {
                     map.put("discountEndDate", p.getDiscountEndDate());
                     map.put("categoryName", p.getCategory().getName());
                     map.put("categoryGroupName", p.getCategory().getCategoryGroup().getName());
+                    map.put("type", p.getType());
                     Map<String, Object> categoryMap =Map.of(
                         "categoryGroup", Map.of(
                                 "id", p.getCategory().getCategoryGroup().getId()
@@ -125,7 +126,8 @@ public class ProductController {
 
                         map.put("name", p.getName());
                         map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
-
+                        map.put("type", p.getType());
+                        System.out.println("상품 타입?"+p.getType());
                         if(isDiscounting) {
                             map.put("originalPrice", p.getPrice());
                             map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());

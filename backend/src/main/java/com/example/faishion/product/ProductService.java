@@ -101,6 +101,7 @@ public class ProductService {
         existingProduct.setDiscountStartDate(updatedProduct.getDiscountStartDate());
         existingProduct.setDiscountEndDate(updatedProduct.getDiscountEndDate());
         existingProduct.setCategory(updatedProduct.getCategory());
+        existingProduct.setType(updatedProduct.getType());
         if (deletedMainImageIds != null && !deletedMainImageIds.isEmpty()) {
             List<Image> imagesToRemove = existingProduct.getMainImageList().stream()
                     .filter(image -> deletedMainImageIds.contains(image.getId()))
@@ -257,6 +258,18 @@ public class ProductService {
                 break;
             case "best": // 리뷰점수가 4점 이상인 상품
                 products = productRepository.findBestProducts();
+                break;
+            case "man": // 남성 카테고리
+                products = productRepository.findByType(type);
+                break;
+            case "woman": // 여성 카테고리
+                products = productRepository.findByType(type);
+                break;
+            case "common": // 공용 카테고리
+                products = productRepository.findByType(type);
+                break;
+            case "pick": // 추천 카테고리
+                products = productRepository.findByPickTrue();
                 break;
             default:
                 break;
