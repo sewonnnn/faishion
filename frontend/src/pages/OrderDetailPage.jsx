@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext.jsx';
 import defaultImage from "../assets/user.jpg";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import SellerReportModal from "../pages/customer/SellerReportModal";
-// ⚠️ ReviewForm의 경로는 실제 파일 위치에 맞게 수정이 필요할 수 있습니다.
+import "./OrderDetailPage.css";
 import ReviewForm from '../components/productdetail/ReviewForm.jsx';
 
 // 금액을 쉼표 형식으로 포맷
