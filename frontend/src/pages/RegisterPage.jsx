@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
     const nav = useNavigate();
@@ -13,7 +13,7 @@ export default function RegisterPage() {
         emailDomain: "naver.com",
         customDomain: "",
         name: "",
-        phoneNumber: ""
+        phoneNumber: "",
     });
 
     const [showPw, setShowPw] = useState(false);
@@ -35,7 +35,6 @@ export default function RegisterPage() {
     const onChange = (e) => {
         const { name, value } = e.target;
 
-        // 전화번호 입력 시 자동 하이픈 적용
         if (name === "phoneNumber") {
             setForm((f) => ({ ...f, [name]: formatPhoneNumber(value) }));
             return;
@@ -45,7 +44,7 @@ export default function RegisterPage() {
 
         if (name === "password") {
             validatePassword(value);
-            validateConfirmPw(form.confirmPassword, value); // 비번 바뀌면 확인칸도 재검사
+            validateConfirmPw(form.confirmPassword, value);
         }
         if (name === "confirmPassword") {
             validateConfirmPw(value, form.password);
@@ -56,7 +55,7 @@ export default function RegisterPage() {
     const validateId = () => {
         const regex = /^[a-z0-9]{8,16}$/;
         if (!regex.test(form.id)) {
-            setIdMessage("아이디는 영소문자와 숫자 조합, 8~16자여야 합니다.");
+            setIdMessage({ text: "아이디는 영소문자와 숫자 조합, 8~16자여야 합니다.", color: "red" });
             return false;
         }
         return true;
@@ -67,12 +66,9 @@ export default function RegisterPage() {
         if (!validateId()) return;
         try {
             const res = await axios.post("http://localhost:8080/auth/check-id", { id: form.id });
-            setIdMessage({ text: res.data, color: "green" }); // 사용 가능
+            setIdMessage({ text: res.data, color: "green" });
         } catch (err) {
-            setIdMessage({
-                text: err.response?.data || "중복검사 실패",
-                color: "red",
-            });
+            setIdMessage({ text: err.response?.data || "중복검사 실패", color: "red" });
         }
     };
 
@@ -85,17 +81,14 @@ export default function RegisterPage() {
                 color: "red",
             });
         } else {
-            setPwMessage({
-                text: "사용 가능한 비밀번호입니다.",
-                color: "green",
-            });
+            setPwMessage({ text: "사용 가능한 비밀번호입니다.", color: "green" });
         }
     };
 
-// 비밀번호 확인 검사
+    // 비밀번호 확인 검사
     const validateConfirmPw = (confirmPw, pw) => {
         if (!pw) {
-            setConfirmPwMessage({ text: "", color: "red" }); // 비밀번호 없으면 메시지 안띄움
+            setConfirmPwMessage({ text: "", color: "red" });
             return;
         }
         if (!confirmPw) {
@@ -111,25 +104,19 @@ export default function RegisterPage() {
     const checkEmail = async () => {
         const email =
             form.emailLocal + "@" + (form.emailDomain === "custom" ? form.customDomain : form.emailDomain);
-
         try {
             const res = await axios.post("http://localhost:8080/auth/check-email", { email });
             setEmailMessage({ text: res.data, color: "green" });
         } catch (err) {
-            setEmailMessage({
-                text: err.response?.data || "중복검사 실패",
-                color: "red",
-            });
+            setEmailMessage({ text: err.response?.data || "중복검사 실패", color: "red" });
         }
     };
 
     // 회원가입 제출
     const onSubmit = async (e) => {
         e.preventDefault();
-
         const email =
             form.emailLocal + "@" + (form.emailDomain === "custom" ? form.customDomain : form.emailDomain);
-
         try {
             await axios.post("http://localhost:8080/auth/register", {
                 id: form.id,
@@ -138,8 +125,6 @@ export default function RegisterPage() {
                 name: form.name,
                 phoneNumber: form.phoneNumber,
             });
-            // alert("회원가입을 축하드립니다! 로그인 해주세요");
-            // nav("/login");
             nav("/login", { state: { message: "회원가입을 축하드립니다! 로그인 해주세요" } });
         } catch (err) {
             alert(err.response?.data || "회원가입 실패");
@@ -148,114 +133,179 @@ export default function RegisterPage() {
 
     return (
         <div style={{ maxWidth: 500, margin: "0 auto" }}>
-            <h2>회원가입</h2>
+            <h2 className="text-center mb-4">회원가입</h2>
             <form onSubmit={onSubmit}>
                 {/* 아이디 */}
-                <div>
-                    <input
-                        type="text"
-                        name="id"
-                        placeholder="아이디"
-                        value={form.id}
-                        onChange={onChange}
-                    />
-                    <button type="button" onClick={checkId}>
-                        중복검사
-                    </button>
-                    <div style={{ color: idMessage.color }}>{idMessage.text}</div>
+                <div className="mb-3">
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                        <input
+                            type="text"
+                            name="id"
+                            placeholder="아이디"
+                            value={form.id}
+                            onChange={onChange}
+                            className="form-control"
+                            style={{ flex: 1 }}
+                        />
+                        <button
+                            type="button"
+                            onClick={checkId}
+                            style={{
+                                marginLeft: "8px",
+                                whiteSpace: "nowrap",
+                                height: "38px",
+                                padding: "0 12px",
+                                fontWeight: "bold",
+                                background: "black",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                            }}
+                        >
+                            중복검사
+                        </button>
+                    </div>
+                    <div style={{ marginTop: "4px", color: idMessage.color }}>{idMessage.text}</div>
                 </div>
 
                 {/* 비밀번호 */}
-                <div>
+                <div className="mb-3 position-relative">
                     <input
                         type={showPw ? "text" : "password"}
                         name="password"
                         placeholder="비밀번호"
                         value={form.password}
                         onChange={onChange}
+                        className="form-control pe-5"
                     />
-                    <button type="button" onClick={() => setShowPw(!showPw)}>
-                        {showPw ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                    <div style={{ color: pwMessage.color }}>{pwMessage.text}</div>
+                    <span
+                        onClick={() => setShowPw(!showPw)}
+                        style={{
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                            color: "#888",
+                        }}
+                    >
+            {showPw ? <FaEyeSlash /> : <FaEye />}
+          </span>
+                    <div style={{ marginTop: "4px", color: pwMessage.color }}>{pwMessage.text}</div>
                 </div>
 
                 {/* 비밀번호 확인 */}
-                <div>
+                <div className="mb-3 position-relative">
                     <input
                         type={showConfirmPw ? "text" : "password"}
                         name="confirmPassword"
                         placeholder="비밀번호 확인"
                         value={form.confirmPassword}
                         onChange={onChange}
+                        className="form-control pe-5"
                     />
-                    <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)}>
-                        {showConfirmPw ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                    <div style={{ color: confirmPwMessage.color }}>{confirmPwMessage.text}</div>
+                    <span
+                        onClick={() => setShowConfirmPw(!showConfirmPw)}
+                        style={{
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                            color: "#888",
+                        }}
+                    >
+            {showConfirmPw ? <FaEyeSlash /> : <FaEye />}
+          </span>
+                    <div style={{ marginTop: "4px", color: confirmPwMessage.color }}>{confirmPwMessage.text}</div>
                 </div>
 
                 {/* 이메일 */}
-                <div>
-                    <input
-                        type="text"
-                        name="emailLocal"
-                        placeholder="이메일 아이디"
-                        value={form.emailLocal}
-                        onChange={onChange}
-                    />
-                    @
-                    {form.emailDomain === "custom" ? (
+                <div className="mb-3">
+                    <div style={{ display: "flex", alignItems: "center" }}>
                         <input
                             type="text"
-                            name="customDomain"
-                            placeholder="직접입력"
-                            value={form.customDomain}
+                            name="emailLocal"
+                            placeholder="이메일 아이디"
+                            value={form.emailLocal}
                             onChange={onChange}
+                            className="form-control"
+                            style={{ flex: 1 }}
                         />
-                    ) : (
-                        <select
-                            name="emailDomain"
-                            value={form.emailDomain}
-                            onChange={onChange}
+                        <span style={{ margin: "0 6px" }}>@</span>
+                        {form.emailDomain === "custom" ? (
+                            <input
+                                type="text"
+                                name="customDomain"
+                                placeholder="직접입력"
+                                value={form.customDomain}
+                                onChange={onChange}
+                                className="form-control"
+                            />
+                        ) : (
+                            <select
+                                name="emailDomain"
+                                value={form.emailDomain}
+                                onChange={onChange}
+                                className="form-select"
+                                style={{ maxWidth: "150px" }}
+                            >
+                                <option value="naver.com">naver.com</option>
+                                <option value="gmail.com">gmail.com</option>
+                                <option value="daum.net">daum.net</option>
+                                <option value="nate.com">nate.com</option>
+                                <option value="outlook.com">outlook.com</option>
+                                <option value="custom">직접입력</option>
+                            </select>
+                        )}
+                        <button
+                            type="button"
+                            onClick={checkEmail}
+                            style={{
+                                marginLeft: "8px",
+                                whiteSpace: "nowrap",
+                                height: "38px",
+                                padding: "0 12px",
+                                fontWeight: "bold",
+                                background: "black",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                            }}
                         >
-                            <option value="naver.com">naver.com</option>
-                            <option value="gmail.com">gmail.com</option>
-                            <option value="daum.net">daum.net</option>
-                            <option value="nate.com">nate.com</option>
-                            <option value="outlook.com">outlook.com</option>
-                            <option value="custom">직접입력</option>
-                        </select>
-                    )}
-                    <button type="button" onClick={checkEmail}>
-                        중복검사
-                    </button>
-                    <div style={{ color: emailMessage.color }}>{emailMessage.text}</div>
+                            중복검사
+                        </button>
+                    </div>
+                    <div style={{ marginTop: "4px", color: emailMessage.color }}>{emailMessage.text}</div>
                 </div>
 
                 {/* 이름 */}
-                <div>
+                <div className="mb-3">
                     <input
                         type="text"
                         name="name"
                         placeholder="이름"
                         value={form.name}
                         onChange={onChange}
+                        className="form-control"
                     />
                 </div>
 
                 {/* 전화번호 */}
-                <div>
+                <div className="mb-4">
                     <input
                         type="text"
                         name="phoneNumber"
                         placeholder="전화번호"
                         value={form.phoneNumber}
                         onChange={onChange}
+                        className="form-control"
                     />
                 </div>
 
-                <button type="submit">회원가입</button>
+                <button type="submit" className="btn btn-primary w-100">
+                    회원가입
+                </button>
             </form>
         </div>
     );

@@ -1,0 +1,8 @@
+.input-group {
+    margin-bottom: 10px;  /* 기본 간격 */
+}
+
+.input-message {
+    margin-top: 4px;      /* 인풋과 메시지 사이 여백 */
+    font-size: 0.9rem;
+}
