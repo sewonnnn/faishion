@@ -33,7 +33,7 @@ const ProductCard = ({ product }) => {
         <Card className="product-card h-100 border-0" onClick={productClick}>
             {/* 상품 이미지 */}
             <div className="card-img-wrapper">
-                <Card.Img variant="top" src={imageUrl || reactLogo} alt={name} />
+                <Card.Img variant="top" src={imageUrl} alt={name} />
 
                 {/* 뱃지 컨테이너: isNew, isSale, isBest 모두 여기에 표시됩니다. */}
                 {/* 셋 중 하나라도 true이면 컨테이너를 렌더링합니다. */}

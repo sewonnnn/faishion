@@ -1,178 +1,49 @@
-:root {
-    --text: #222;
-    --muted: #777;
-    --border: #e6e6e6;
-    --border-strong: #d4d4d4;
-    --bg: #fff;
-    --hover: #fafafa;
-    --black: #111;
-    --blue: #007bff;
+
+/* 체크박스 전체 선택 텍스트 스타일 */
+.custom-checkbox-text .form-check-label {
+    font-size: 1rem; /* 이미지에 맞춰 글자 크기 조정 */
+    color: #333; /* 글자 색상 조정 */
+    padding-left: 0.5rem; /* 체크박스와 텍스트 사이 간격 조정 */
 }
 
-body { margin: 0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, sans-serif; color: var(--text); }
 
-.cart-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+/* 체크박스 선택 시 색상 변경 */
+.custom-checkbox-input .form-check-input:checked,
+.form-check-input:checked { /* 전체 선택 체크박스에도 적용되도록 */
+    background-color: #1850DB !important; /* 파란색 적용 */
+    border-color: #1850DB !important;     /* 파란색 테두리 적용 */
 }
 
-.cart-main {
-    flex-grow: 1;
-    max-width: 700px;
+/* 체크박스 포커스 시 그림자 효과 변경 (옵션) */
+.custom-checkbox-input .form-check-input:focus,
+.form-check-input:focus { /* 전체 선택 체크박스에도 적용되도록 */
+    border-color: #1850DB !important;
+    box-shadow: 0 0 0 0.25rem rgba(24, 80, 219, 0.25) !important; /* 파란색 그림자 */
 }
 
-.cart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-strong);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+/* 상품 리스트 내부 체크박스 크기 조정 (선택 사항) */
+.custom-checkbox-input .form-check-input {
+    width: 1.25em; /* 크기 약간 키움 */
+    height: 1.25em;
 }
 
-.cart-header .checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 14px;
+/* 결제 정보 글자 크기 조정 */
+.card-body > .d-flex > span {
+    font-size: 0.95rem; /* 결제 정보 항목 글자 크기 */
+    color: #333; /* 글자 색상 */
 }
 
-.cart-header .checkbox-group label {
-    cursor: pointer;
+.card-body > .d-flex > span:last-child {
+    font-weight: 500; /* 금액 글자 굵기 */
 }
 
-.cart-header .action-buttons button {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 14px;
-    cursor: pointer;
+/* 총 구매 금액 글자 굵기 및 크기 */
+.card-body > .border-top.pt-3 > .font-bold {
+    font-weight: 700 !important;
 }
 
-.cart-item {
-    display: flex;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.cart-item .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: var(--muted);
-    cursor: pointer;
-}
-
-.cart-item .item-details {
-    display: flex;
-    gap: 20px;
-    flex-grow: 1;
-}
-
-.cart-item .item-info {
-    flex-grow: 1;
-}
-
-.cart-item .item-title {
-    font-weight: 600;
-    margin: 0;
-}
-
-.cart-item .item-options, .cart-item .item-price {
-    font-size: 14px;
-    color: var(--muted);
-    margin-top: 5px;
-}
-
-.cart-item .item-price {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text);
-    margin-top: 10px;
-}
-
-.cart-item .item-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.cart-item .item-actions button {
-    border: 1px solid var(--border);
-    background: #fff;
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.cart-delivery-info {
-    font-size: 14px;
-    color: var(--blue);
-    margin-top: 10px;
-}
-
-.price-summary-box {
-    background-color: #f8f8f8;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-}
-
-.price-summary-box h3 {
-    font-size: 18px;
-    font-weight: 600;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-.price-summary-box .price-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.price-summary-box .total-price {
-    font-size: 20px;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid var(--border-strong);
-    padding-top: 15px;
-    margin-top: 15px;
-}
-
-.price-summary-box .order-btn {
-    width: 100%;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-    .cart-container {
-        flex-direction: column;
-    }
-    .price-summary-box {
-        width: 100%;
-    }
+/* 주문하기 버튼 텍스트 색상 및 폰트 사이즈 */
+.order-btn {
+    font-size: 1.1rem; /* 버튼 텍스트 크기 */
+    font-weight: 600; /* 버튼 텍스트 굵기 */
 }
