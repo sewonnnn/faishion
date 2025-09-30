@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Container, Table, Button, Pagination } from "react-bootstrap";
+import { Container, Table, Button, Pagination, Modal } from "react-bootstrap";
 import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
-
+import ReviewList from "../../components/productdetail/ReviewList";
 const SellerProductListPage = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
@@ -12,6 +12,9 @@ const SellerProductListPage = () => {
     const [pageSize] = useState(5);
     const { api } = useAuth();
     const navigate = useNavigate();
+
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState(null);
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -49,7 +52,17 @@ const SellerProductListPage = () => {
         }
         return items;
     };
+    // 2. 모달 열기 핸들러 추가
+    const handleShowReviewModal = (productId) => {
+        setSelectedProductId(productId); // 리뷰를 보여줄 상품 ID 설정
+        setShowReviewModal(true); // 모달 열기
+    };
 
+    // 3. 모달 닫기 핸들러 추가
+    const handleCloseReviewModal = () => {
+        setShowReviewModal(false); // 모달 닫기
+        setSelectedProductId(null); // 상품 ID 초기화
+    };
     return (
         <Container className="my-5">
             <h1 className="mb-4">Seller Product List</h1>
@@ -72,7 +85,7 @@ const SellerProductListPage = () => {
                         <tbody>
                             {products.map((product, index) => (
                                 <tr key={`product-${product.id}`} className="align-middle">
-                                    <td className="d-flex align-items-center">
+                                    <td className="d-flex align-items-center" onClick={() => handleShowReviewModal(product.id)}>
                                         <img
                                             src={`http://localhost:8080/image/${product.mainImageList[0]}`}
                                             style={{
@@ -133,6 +146,19 @@ const SellerProductListPage = () => {
                     상품 등록
                 </Button>
             </div>
+            <Modal show={showReviewModal} onHide={handleCloseReviewModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>상품 리뷰 목록</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedProductId && <ReviewList productId={selectedProductId} />}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseReviewModal}>
+                        닫기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
