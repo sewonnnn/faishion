@@ -58,6 +58,33 @@ public class AuthController {
                 .body(Map.of("accessToken", tokens.get("access")));
     }
 
+    //추가
+    // 아이디 중복검사
+    @PostMapping("/check-id")
+    public ResponseEntity<?> checkId(@RequestBody Map<String, String> body) {
+        String id = body.get("id");
+        boolean available = authService.checkId(id);
+
+        if (available) {
+            return ResponseEntity.ok("사용 가능한 아이디입니다.");
+        } else {
+            return ResponseEntity.badRequest().body("이미 사용 중인 아이디입니다.");
+        }
+    }
+
+    // 이메일 중복검사
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        boolean available = authService.checkEmail(email);
+
+        if (available) {
+            return ResponseEntity.ok("사용 가능한 이메일입니다.");
+        } else {
+            return ResponseEntity.badRequest().body("이미 사용 중인 이메일입니다.");
+        }
+    }
+
     // 판매자 회원가입
     @PostMapping("/seller/register")
     public ResponseEntity<?> registerSeller(@RequestBody SellerDTO dto) {
@@ -146,7 +173,6 @@ public class AuthController {
                         "email", u.getEmail(),
                         "name", u.getName()
                 ));
-//        System.out.println("네이버 유저: " + naverUserId + ", email=" + email + ", name=" + name + ", mobile=" + mobile);
 
     }
 
