@@ -30,7 +30,7 @@
 /* 결제 정보 글자 크기 조정 */
 .card-body > .d-flex > span {
     font-size: 0.95rem; /* 결제 정보 항목 글자 크기 */
-    color: #333; /* 글자 색상 */
+    /*color: #333; !* 글자 색상 *!*/
 }
 
 .card-body > .d-flex > span:last-child {

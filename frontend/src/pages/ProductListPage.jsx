@@ -59,12 +59,7 @@ const ProductListPage = () => {
 
     return (
         <Container className="my-5">
-            {/* 페이지 헤더는 ProductListPage에서 직접 렌더링 */}
-            {/*<div className="mb-5">*/}
-            {/*    <Banner/>*/}
-            {/*</div>*/}
-            <h1 className="text-center mb-4 bg-light rounded py-4">{typeName ? typeName : "전체상품"}</h1>
-
+            <h1 className="text-center mb-4 bg-light rounded py-2">{typeName ? typeName : "전체상품"}</h1>
 
             <ProductList
                 products={products}

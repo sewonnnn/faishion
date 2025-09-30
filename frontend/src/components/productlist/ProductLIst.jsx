@@ -34,7 +34,7 @@ const ProductList = ({ products, loading, currentPage, totalPages, setCurrentPag
             {products.length > 0 ? (
                 <>
                     <Container>
-                        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+                        <Row xs={1} sm={2} md={3} lg={4} className="g-0">
                             {products.map(product => (
                                 <Col key={product.productId}>
                                     <ProductCard product={product} />
