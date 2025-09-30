@@ -27,11 +27,12 @@ const ProductListPage = () => {
                     params: {
                         categoryId: categoryId, // URL에서 읽어온 categoryId 사용
                         searchQuery: searchQuery, // URL에서 읽어온 searchQuery 사용
-                        type:type,
+                        type: type,
                         page: currentPage,
                         size: pageSize
                     }
                 });
+                console.log(response.data);
                 setProducts(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setLoading(false);
@@ -42,13 +43,25 @@ const ProductListPage = () => {
         };
         switch (type){
             case "new":
-                setTypeName("신상품");
+                setTypeName("신상");
                 break;
             case "best":
-                setTypeName("추천상품");
+                setTypeName("베스트");
                 break;
             case "sale":
                 setTypeName("할인상품");
+                break;
+            case "common":
+                setTypeName("공용");
+                break;
+            case "man":
+                setTypeName("남성");
+                break;
+            case "woman":
+                setTypeName("여성");
+                break;
+            case "pick":
+                setTypeName("추천");
                 break;
             default:
                 break;
@@ -59,7 +72,9 @@ const ProductListPage = () => {
 
     return (
         <Container className="my-5">
+
             <h1 className="text-center mb-4 bg-light rounded py-2">{typeName ? typeName : "전체상품"}</h1>
+
 
             <ProductList
                 products={products}

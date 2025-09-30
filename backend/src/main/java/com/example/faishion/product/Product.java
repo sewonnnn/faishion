@@ -39,6 +39,8 @@ public class Product {
     private Integer discountPrice;
     private LocalDateTime discountStartDate;
     private LocalDateTime discountEndDate;
+    private boolean pick; // 관리자의 상품 추천여부
+    private String type; // 상품 타입 (man, woman)
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Image> mainImageList = new HashSet<>(); // 썸네일
