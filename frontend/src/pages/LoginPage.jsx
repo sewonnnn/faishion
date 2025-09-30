@@ -1,15 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";  // ← 빠졌던 useLocation 추가
 import axios from "axios";
 import { Tabs, Tab } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
     const nav = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
+
     const [key, setKey] = useState("user"); // 'user' | 'seller'
     const [form, setForm] = useState({ loginId: "", password: "", id: "" });
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const [showPw, setShowPw] = useState(false);
+
+    // RegisterPage → 로그인 리다이렉트 시 alert 띄우기
+    useEffect(() => {
+        if (location.state?.message) {
+            alert(location.state.message);
+            // alert 한 번만 뜨게 state 초기화
+            nav(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, nav]);
 
     const onChange = (e) => {
         const { name, value } = e.target;
@@ -40,7 +53,6 @@ const LoginPage = () => {
                 withCredentials: true,
             });
             login(res.data.accessToken);
-
             alert("로그인 성공!");
             nav("/");
         } catch (err) {
@@ -51,7 +63,7 @@ const LoginPage = () => {
         }
     };
 
-    // 네이버 로그인 핸들러만 유지
+    // 네이버 로그인 핸들러
     const handleNaverLogin = () => {
         const naverClientId = "UbIrUTt9yAJ42TARcJC5";
         const naverRedirectUri = encodeURIComponent(
@@ -84,15 +96,29 @@ const LoginPage = () => {
                         </div>
                         <div className="mb-3">
                             <label className="form-label">비밀번호</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="password"
-                                value={form.password}
-                                onChange={onChange}
-                                placeholder="비밀번호"
-                                autoComplete="current-password"
-                            />
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <input
+                                    type={showPw ? "text" : "password"}
+                                    className="form-control"
+                                    name="password"
+                                    value={form.password}
+                                    onChange={onChange}
+                                    placeholder="비밀번호"
+                                    autoComplete="current-password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw(!showPw)}
+                                    style={{
+                                        border: "none",
+                                        background: "transparent",
+                                        marginLeft: "-35px",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    {showPw ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
                         </div>
                         <button className="btn btn-primary w-100 mb-2" disabled={loading}>
                             {loading ? "로그인 중..." : "로그인하기"}
@@ -106,7 +132,7 @@ const LoginPage = () => {
                         </button>
                     </form>
 
-                    {/* 네이버 로그인 버튼만 유지 */}
+                    {/* 네이버 로그인 버튼 */}
                     <hr />
                     <div className="d-grid gap-2">
                         <button

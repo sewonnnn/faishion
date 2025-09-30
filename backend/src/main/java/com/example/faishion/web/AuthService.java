@@ -52,44 +52,21 @@ public class AuthService {
         return u;
     }
 
+    // 추가
+    @Transactional
+    public boolean checkId(String id) {
+        return !userRepo.existsByLoginId(id);  // true = 사용 가능
+    }
+
+    // 추가
+    @Transactional
+    public boolean checkEmail(String email) {
+        return !userRepo.existsByEmail(email); // true = 사용 가능
+    }
+
+
 
     // 네이버 소셜 로그인 (DB 저장/조회)
-//    @Transactional
-//    public User saveOrUpdateNaverUser(String naverUserId, String email, String name, String mobile) {
-//        return userRepo.findByProviderAndProviderUserId(AuthProvider.NAVER, naverUserId)
-//                .orElseGet(() -> {
-//                    User u = new User();
-//                    u.setId("NAVER_" + naverUserId);
-//                    u.setProvider(AuthProvider.NAVER);
-//                    u.setProviderUserId(naverUserId);
-//                    u.setEmail(email != null ? email : "no-email@naver.com");
-//                    u.setName(name != null ? name : "네이버사용자");
-//                    u.setPhoneNumber(mobile != null ? mobile : "010-0000-0000");
-//                    return userRepo.save(u);
-//                });
-//    }
-//    @Transactional
-//    public User saveOrUpdateNaverUser(String naverUserId, String email, String name, String mobile) {
-//        return userRepo.findByProviderAndProviderUserId(AuthProvider.NAVER, naverUserId)
-//                .map(existing -> {
-//                    // 업데이트
-//                    existing.setEmail(email != null ? email : existing.getEmail());
-//                    existing.setName(name != null ? name : existing.getName());
-//                    existing.setPhoneNumber(mobile != null ? mobile : existing.getPhoneNumber());
-//                    return userRepo.save(existing);
-//                })
-//                .orElseGet(() -> {
-//                    // 신규 저장
-//                    User u = new User();
-//                    u.setId(UUID.randomUUID().toString()); // ️ PK는 랜덤 UUID
-//                    u.setProvider(AuthProvider.NAVER);
-//                    u.setProviderUserId(naverUserId);
-//                    u.setEmail(email != null ? email : "no-email@naver.com");
-//                    u.setName(name != null ? name : "네이버사용자");
-//                    u.setPhoneNumber(mobile != null ? mobile : "010-0000-0000");
-//                    return userRepo.save(u);
-//                });
-//    }
     @Transactional
     public User saveOrUpdateNaverUser(String naverUserId, String email, String name, String mobile) {
         // 우선 provider + providerUserId 조회

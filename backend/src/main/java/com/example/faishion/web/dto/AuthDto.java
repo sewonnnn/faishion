@@ -10,30 +10,39 @@ import lombok.NoArgsConstructor;
 
 public class AuthDto {
 
+    // 수정
     // 로컬 회원가입 DTO
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterLocalReq {
-        @NotBlank
-        @Size(min = 6, max = 20, message = "아이디는 최소 6자 이상 20자 이하로 입력해야 합니다.")
-        private String id;   // 사용자가 직접 입력할 아이디 (PK)
+        @NotBlank(message = "아이디는 필수 입력값입니다.")
+        @Pattern(
+                regexp = "^[a-z0-9]{8,16}$",
+                message = "아이디는 영소문자와 숫자 조합, 8~16자여야 합니다."
+        )
+        private String id;
 
-        @Email
-        @NotBlank
+        @NotBlank(message = "이메일은 필수 입력값입니다.")
+        @Email(message = "올바른 이메일 형식이 아닙니다.")
         private String email;
 
-        @NotBlank
-        @Size(min = 8, max = 64, message = "비밀번호는 최소 8자 이상 64자 이하로 입력해야 합니다.")
+
+        @NotBlank(message = "비밀번호는 필수 입력값입니다.")
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,16}$",
+                message = "비밀번호는 영소문자, 숫자, 특수문자를 최소 1개 이상 포함한 8~16자여야 합니다."
+        )
         private String password;
 
-        @NotBlank
+        @NotBlank(message = "이름은 필수 입력값입니다.")
+        @Size(max = 20, message = "이름은 최대 20자까지 가능합니다.")
         private String name;
 
-        @NotBlank
+        @NotBlank(message = "전화번호는 필수 입력값입니다.")
         @Pattern(
                 regexp = "^010-\\d{4}-\\d{4}$",
-                message = "전화번호는 010-0000-0000 형식으로 입력해야 합니다."
+                message = "전화번호는 010-0000-0000 형식이어야 합니다."
         )
         private String phoneNumber;
     }
