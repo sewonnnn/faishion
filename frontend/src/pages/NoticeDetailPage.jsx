@@ -127,51 +127,48 @@ const NoticeDetailPage = () => {
     return (
         <section className="notice-detail">
             <div className="card">
+                {/* 📢 Card Header: 제목과 메타 정보 */}
                 <div className="card-header">
-                    <h1>공지사항</h1>
+                    {/* 수정 중일 때는 input, 아니면 h1 */}
+                    {isEditing ? (
+                        <div className="editor title-editor">
+                            <input
+                                id="title"
+                                type="text"
+                                className="form-control" // title-box 클래스 대신 form-control 사용
+                                placeholder="제목을 입력하세요"
+                                maxLength={MAX_TITLE}
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
+                            />
+                            <div className="count">{editedTitle.length}/{MAX_TITLE}</div>
+                        </div>
+                    ) : (
+                        <h1>{notice.title}</h1>
+                    )}
+
                     <div className="meta">
                         <span className="label">작성일</span>
                         <span className="value">{formatDate(created)}</span>
                     </div>
                 </div>
 
+                {/* 📢 Card Body: 내용과 버튼 */}
                 <div className="card-body">
-                    {/* 제목 */}
-                    <div className="row">
-                        <label htmlFor="title">제목</label>
-                        {isEditing ? (
-                            <div className="editor">
-                                <input
-                                    id="title"
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="제목을 입력하세요"
-                                    maxLength={MAX_TITLE}
-                                    value={editedTitle}
-                                    onChange={(e) => setEditedTitle(e.target.value)}
-                                />
-                                <div className="count">{editedTitle.length}/{MAX_TITLE}</div>
-                            </div>
-                        ) : (
-                            <div className="read">{notice.title}</div>
-                        )}
-                    </div>
-
                     {/* 내용 */}
-                    <div className="row">
-                        <label htmlFor="content">내용</label>
+                    <div className="row content-row">
                         {isEditing ? (
                             <div className="editor">
-                <textarea
-                    id="content"
-                    className="form-control textarea"
-                    placeholder="내용을 입력하세요"
-                    rows={12}
-                    maxLength={MAX_CONTENT}
-                    value={editedContent}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                />
-                                <div className="count">{editedContent.length}/{MAX_CONTENT}</div>
+                                <textarea
+                                    id="content"
+                                    className="form-control textarea"
+                                    placeholder="내용을 입력하세요"
+                                    rows={12}
+                                    maxLength={MAX_CONTENT}
+                                    value={editedContent}
+                                    onChange={(e) => setEditedContent(e.target.value)}
+                                />
+                                <div className="count content-count">{editedContent.length}/{MAX_CONTENT}</div>
                             </div>
                         ) : (
                             <div className="read prewrap">{notice.content}</div>
@@ -191,12 +188,12 @@ const NoticeDetailPage = () => {
                             ) : (
                                 <>
                                     <button className="btn btn-light" onClick={goList}>목록</button>
-                                    <button className="btn btn-outline" onClick={() => setIsEditing(true)}>수정</button>
+                                    <button className="btn btn-primary" onClick={() => setIsEditing(true)}>수정</button>
                                     <button className="btn btn-danger" onClick={handleDelete}>삭제</button>
                                 </>
                             )
                         ) : (
-                            <button className="btn btn-light" onClick={goList}>목록</button>
+                            <button className="btn btn-primary" onClick={goList}>목록</button>
                         )}
                     </div>
                 </div>
