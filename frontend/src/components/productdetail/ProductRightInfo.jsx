@@ -19,7 +19,6 @@ const showMessage = (message) => {
     alert(message);
 };
 
-
 const ProductRightInfo = ({productId, product}) => {
     const navigate = useNavigate();
     const [selectedColor, setSelectedColor] = useState("");
@@ -27,6 +26,25 @@ const ProductRightInfo = ({productId, product}) => {
     const [availableSizes, setAvailableSizes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const {api} = useAuth();
+    // 찜 상태를 추적하기 위한 state 추가
+    const [isWished, setIsWished] = useState(null);
+
+    useEffect(() => {
+        if (!productId) return;
+
+        let canceled = false;
+        (async () => {
+            try {
+                const { data } = await api.get(`/wish/check/${productId}`);
+                if (!canceled) setIsWished(Boolean(data));   // true/false로 세팅
+            } catch (e) {
+                console.error("찜 상태 확인 실패:", e);
+                if (!canceled) setIsWished(false);          // 실패 시 기본값
+            }
+        })();
+
+        return () => { canceled = true; };
+    }, [productId, api]);
 
     useEffect(() => {
         if (product && product.stockByColorAndSize) {
@@ -182,14 +200,45 @@ const ProductRightInfo = ({productId, product}) => {
         return price.toLocaleString("ko-KR");
     };
 
+    /**
+     * 찜하기 상태에 따라 찜 추가 또는 취소 요청을 처리하는 통합 함수
+     */
+    const handleWishClick = async () => {
+        if (isWished) {
+            // 이미 찜한 상태일 경우, 취소 로직 실행
+            await onWishCancel();
+        } else {
+            // 찜하지 않은 상태일 경우, 추가 로직 실행
+            await onWishSave();
+        }
+    };
+
+    /**
+     * 찜하기 (위시리스트에 상품 추가)
+     */
     const onWishSave = async () => {
         try {
             const response = await api.post(`/wish/save/${productId}`);
-            showMessage(response.data);
+            showMessage(response.data); // "위시리스트에 추가되었습니다."
+            setIsWished(true); // 찜 상태를 true로 변경
         } catch (error) {
-            console.error('Error fetching banner data:', error);
-            // 에러 처리 메시지 추가
+            console.error('찜 추가 실패:', error);
             showMessage("위시리스트 추가에 실패했습니다.");
+        }
+    };
+
+    /**
+     * 찜 취소 (위시리스트에서 상품 제거)
+     */
+    const onWishCancel = async () => {
+        try {
+            // DELETE 요청으로 찜 취소 API 호출
+            const response = await api.delete(`/wish/delete/${productId}`);
+            showMessage(response.data); // "위시리스트에서 삭제되었습니다."
+            setIsWished(false); // 찜 상태를 false로 변경
+        } catch (error) {
+            console.error('찜 취소 실패:', error);
+            showMessage("위시리스트 취소에 실패했습니다.");
         }
     };
 
@@ -382,28 +431,32 @@ const ProductRightInfo = ({productId, product}) => {
                         <Button
                             variant="secondary"
                             size="lg"
-                            onClick={onWishSave}
-                            className="w-100 border-0 "
+                            onClick={handleWishClick}
+                            className="w-100 border-0"
+                            disabled={isWished === null}   // ← 서버 응답 오기 전 클릭 방지 (선택)
                             style={{
+                                backgroundColor: 'white',
                                 height: '56px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                border: '1px solid #ced4da'
                             }}
                         >
-                            <FaHeart color="lightgray" size={16}/>
+                            <FaHeart color={isWished ? "red" : "lightgray"} size={20}/>
                         </Button>
+
                     </div>
                     {/* 장바구니 버튼 */}
-                        <Button
-                            variant="dark"
-                            size="lg"
-                            onClick={onCartSave}
-                            className="w-100"
-                            style={{height: '56px', fontSize: '1.1rem'}}
-                        >
-                            장바구니
-                        </Button>
+                    <Button
+                        variant="dark"
+                        size="lg"
+                        onClick={onCartSave}
+                        className="w-100"
+                        style={{height: '56px', fontSize: '1.1rem'}}
+                    >
+                        장바구니
+                    </Button>
                 </div>
                 {/* 바로 구매 버튼 */}
                 <Button

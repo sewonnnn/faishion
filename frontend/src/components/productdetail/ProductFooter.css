@@ -1,0 +1,9 @@
+/* ProductFooter.css */
+.custom-tabs .nav-link {
+    color: #1850DB !important;     /* 기본 파란색 */
+}
+
+.custom-tabs .nav-link.active {
+    color: #000 !important;        /* 활성 탭 검은색 */
+    font-weight: bold;             /* 강조 (선택 사항) */
+}

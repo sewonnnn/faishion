@@ -4,3 +4,29 @@
     padding: 20px
 
 }
+/*ProductList.jsx의 페이지 버튼 css*/
+/* 기본 버튼 색상 */
+.pagination .page-link {
+    color: #1850DB;           /* 글자 색 */
+    background-color: #fff;   /* 배경 */
+    border: none;
+}
+
+/* hover 시 */
+.pagination .page-link:hover {
+    color: #fff;
+    background-color: #1850DB;
+}
+
+/* 활성(active)된 버튼 */
+.pagination .page-item.active .page-link {
+    color: #fff;
+    background-color: black;
+}
+
+/* 비활성(disabled) 버튼 */
+.pagination .page-item.disabled .page-link {
+    color: #aaa;
+    background-color: #f1f1f1;
+    border-color: #ddd;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, Container, Pagination, Spinner } from 'react-bootstrap';
 import ProductCard from "./ProductCard.jsx";
+import '../../pages/ProductListPage.css';
 
 const ProductList = ({ products, loading, currentPage, totalPages, setCurrentPage }) => {
 

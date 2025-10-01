@@ -10,10 +10,11 @@
 .card-img-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 100%;
+    padding-top: 325px; /* 4:3보다 살짝 세로로 긴 박스 */
     overflow: hidden;
     background-color: #f8f8f8;
 }
+
 
 /* 이미지 자체의 스타일 */
 .product-card .card-img-top {
