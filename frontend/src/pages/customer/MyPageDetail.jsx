@@ -412,7 +412,7 @@ const MyPageDetail = () => {
 
                                 <Form.Group className="mb-4">
                                     <Form.Label>기본 배송지</Form.Label>
-                                    <Card className="p-3 bg-light border-info">
+                                    <Card className="p-3 bg-light border-secondary">
                                         {defaultAddress ? (
                                             <>
                                                 <p className="mb-1 fw-bold">
@@ -427,7 +427,7 @@ const MyPageDetail = () => {
                                         )}
                                     </Card>
                                     <Button
-                                        variant="outline-info"
+                                        variant="outline-secondary"
                                         className="mt-2 w-100"
                                         onClick={() => setShowAddressModal(true)}
                                     >
@@ -444,7 +444,6 @@ const MyPageDetail = () => {
                     </Card>
                 </Col>
             </Row>
-            {/* ⭐ 배송지 관리 모달 추가 */}
             <AddressModal
                 show={showAddressModal}
                 handleClose={() => setShowAddressModal(false)}

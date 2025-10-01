@@ -1,12 +1,9 @@
-// AddressManagerModal.jsx
-
 import React, {useState, useEffect} from 'react';
 import {Modal, Button, ListGroup, Form, Row, Col, Card} from 'react-bootstrap';
 import {FaMapMarkerAlt, FaPlus, FaPencilAlt, FaTrashAlt, FaCheckCircle} from 'react-icons/fa';
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import PostcodeSearch from "./PostcodeSearch.jsx";
 
-// Address DTO (서버 응답 형태)
 const initialAddressData = {
     id: null,
     zipcode: '',
@@ -88,18 +85,9 @@ const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSel
     const handleDeleteAddress = async (id) => {
         if (!window.confirm("정말 이 배송지를 삭제하시겠습니까?")) return;
         try {
-            // ✅ 삭제: DELETE /address/{id} API 호출 적용
             await api.delete(`/address/${id}`);
             alert("배송지가 성공적으로 삭제되었습니다.");
-
-            // 삭제 후 기본 배송지가 변경되었을 수 있으므로 부모 상태도 업데이트합니다.
-            // (가장 최신 기본 주소를 다시 불러와 부모에게 전달하는 로직이 필요하지만,
-            // 일단은 목록만 새로고침하고 부모 컴포넌트에서 알아서 처리하게 두는 것이 간단합니다.)
             await fetchAddresses();
-
-            // 💡 중요: 만약 삭제된 주소가 기본 주소였다면 MyPageDetail의 defaultAddress 상태를 null로 만들어야 합니다.
-            // 백엔드에서 기본 주소 삭제 시 다른 주소로 자동 변경해주지 않는다면 (현재는 에러 반환)
-            // 명시적으로 `handleAddressUpdated(null);`을 호출해야 합니다.
 
         } catch (error) {
             const errorMessage = error.response?.status === 400
@@ -113,7 +101,6 @@ const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSel
     // 기본 배송지 설정
     const handleSetDefault = async (addressId) => {
         try {
-            // ✅ 기본 설정: PUT /address/default/{id} API 호출 (이미 올바름)
             const response = await api.put(`/address/default/${addressId}`);
 
             const newDefaultAddress = response.data;
@@ -199,7 +186,7 @@ const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSel
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h5 className="mb-0">등록된 배송지 목록</h5>
                     {!isAdding && !editingAddress && (
-                        <Button variant="success" onClick={() => setIsAdding(true)}>
+                        <Button variant="primary" onClick={() => setIsAdding(true)}>
                             <FaPlus className="me-1"/> 새 주소 추가
                         </Button>
                     )}

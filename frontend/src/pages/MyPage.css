@@ -46,3 +46,21 @@
     /* 부트스트랩 Button variant="link"의 기본 padding을 재정의 */
     padding: 0.25rem;
 }
+
+.profile-image-wrapper {
+    position: relative; /* 자식 요소인 버튼의 absolute 기준점 */
+    display: inline-block; /* 버튼이 생겨도 컨테이너 크기가 사진 크기로 유지되도록 */
+}
+
+/* 2. 삭제 버튼에 absolute를 적용하여 이미지 위에 겹쳐지게 설정 */
+.image-delete-btn {
+    position: absolute;
+    top: 0; /* 사진의 상단에 위치 */
+    right: 0; /* 사진의 오른쪽에 위치 */
+    z-index: 10; /* 사진보다 위에 표시되도록 설정 */
+
+    /* 디자인 조정 */
+    padding: 0;
+    line-height: 1;
+    border: none;
+    b
