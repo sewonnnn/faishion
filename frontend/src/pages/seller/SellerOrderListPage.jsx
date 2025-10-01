@@ -128,19 +128,19 @@ function OrderManagementPage() {
   return (
     <Container className="my-4">
       {/* H1 태그의 내용을 '주문 현황 관리'로 수정 */}
-      <h1 className="mb-4">주문 현황 관리 ({ordersPage.totalElements}건)</h1>
+      <h3 className="mb-4">주문 현황 관리 ({ordersPage.totalElements}건)</h3>
 
       {/* Table - responsive 속성으로 모바일에서 가로 스크롤 가능 */}
       <Table striped bordered hover responsive className="text-center">
         <thead>
           <tr>
-            <th style={{ width: '10%' }}>ID</th>
-            <th style={{ width: '35%' }}>상품 정보</th>
-            <th style={{ width: '15%' }}>결제 금액</th>
-            <th style={{ width: '40%' }}>배송 정보</th>
+            <th style={{ width: '10%', backgroundColor:'#F5F5F5' }}>ID</th>
+            <th style={{ width: '35%' , backgroundColor:'#F5F5F5'}}>상품 정보</th>
+            <th style={{ width: '15%' , backgroundColor:'#F5F5F5'}}>결제 금액</th>
+            <th style={{ width: '40%' , backgroundColor:'#F5F5F5'}}>배송 정보</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{backgroundColor:'white'}}>
           {ordersPage.content.length > 0 ? (
             ordersPage.content.map((order) => {
               const isShipped = !!order.delivery;
@@ -149,9 +149,9 @@ function OrderManagementPage() {
               const shippingLoading = isShipping[order.id] || false;
 
               return (
-                <tr key={order.id}>
+                <tr key={order.id} >
                   {/* 주문 ID */}
-                  <td className="align-middle border-end">
+                  <td className="align-middle border-end" style={{ backgroundColor: 'white'}}>
                     <strong>{order.id}</strong>
                   </td>
 
@@ -198,7 +198,6 @@ function OrderManagementPage() {
                             </Col>
                             <Col xs={12} className="text-center">
                               <Button
-                                variant="primary"
                                 onClick={() => handleShipOrder(order.id)}
                                 disabled={shippingLoading || !currentTrackingNumber.trim()} // 송장 번호 없으면 비활성화
                                 className="p-2 mb-0 w-100"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card } from 'react-bootstrap';
 import './ProductCard.css'; // 최신 CSS 파일 임포트
 import { BsStarFill, BsHeartFill } from 'react-icons/bs';
@@ -6,10 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
     const nav = useNavigate();
-
-    // 임의의 좋아요 수 (백엔드 데이터에 없으므로 시뮬레이션)
-    // 사용자의 요청에 따라 기본값을 "좋아요수" 문자열로 변경했습니다.
-    const [likeCount, setLikeCount] = useState(product.likeCount || 0);
 
     // Destructuring the product object
     const {
@@ -21,7 +17,8 @@ const ProductCard = ({ product }) => {
         originalPrice,
         brandName,
         reviewRating,
-        reviewCount
+        reviewCount,
+        wish
     } = product;
 
     // 상품 선택시 상품 상세로 이동
@@ -44,7 +41,7 @@ const ProductCard = ({ product }) => {
 
             {/* 좋아요 */}
             <BsHeartFill className="heart-icon" />
-            <span className="like-count">{likeCount}</span>
+            <span className="like-count">{wish}</span>
         </div>
     );
 

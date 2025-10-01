@@ -183,6 +183,7 @@ public class ProductController {
                         map.put("name", p.getName());
                         map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
                         map.put("type", p.getType());
+                        map.put("wish",productService.countByProduct(productService.findById(p.getId())));
                         System.out.println("상품 타입?"+p.getType());
                         if(isDiscounting) {
                             map.put("originalPrice", p.getPrice());
@@ -222,7 +223,7 @@ public class ProductController {
 
                     map.put("name", p.getName());
                     map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
-
+                    map.put("wish",productService.countByProduct(productService.findById(p.getId())));
                     if(isDiscounting) {
                         map.put("originalPrice", p.getPrice());
                         map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());

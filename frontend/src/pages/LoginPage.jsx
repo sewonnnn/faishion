@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";  // ← 빠졌던 useLocation 추가
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Tabs, Tab } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext.jsx";
@@ -10,16 +10,14 @@ const LoginPage = () => {
     const location = useLocation();
     const { login } = useAuth();
 
-    const [key, setKey] = useState("user"); // 'user' | 'seller'
+    const [key, setKey] = useState("user");
     const [form, setForm] = useState({ loginId: "", password: "", id: "" });
     const [loading, setLoading] = useState(false);
     const [showPw, setShowPw] = useState(false);
 
-    // RegisterPage → 로그인 리다이렉트 시 alert 띄우기
     useEffect(() => {
         if (location.state?.message) {
             alert(location.state.message);
-            // alert 한 번만 뜨게 state 초기화
             nav(location.pathname, { replace: true, state: {} });
         }
     }, [location, nav]);
@@ -63,7 +61,6 @@ const LoginPage = () => {
         }
     };
 
-    // 네이버 로그인 핸들러
     const handleNaverLogin = () => {
         const naverClientId = "UbIrUTt9yAJ42TARcJC5";
         const naverRedirectUri = encodeURIComponent(
@@ -77,11 +74,17 @@ const LoginPage = () => {
 
     return (
         <div className="container mt-5" style={{ maxWidth: 420 }}>
-            <h2 className="mb-4 text-center">로그인</h2>
+            <h2 className="mb-4 text-center">LOGIN</h2>
 
-            <Tabs activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
+            {/* 탭 → 폭 맞추고 반반 배치 */}
+            <Tabs
+                activeKey={key}
+                onSelect={(k) => setKey(k)}
+                className="mb-3 nav-fill"
+                justify
+            >
                 {/* 일반회원 로그인 */}
-                <Tab eventKey="user" title="일반회원 로그인">
+                <Tab eventKey="user" title="일반회원">
                     <form onSubmit={onSubmit} className="mb-4">
                         <div className="mb-3">
                             <label className="form-label">아이디</label>
@@ -96,28 +99,29 @@ const LoginPage = () => {
                         </div>
                         <div className="mb-3">
                             <label className="form-label">비밀번호</label>
-                            <div style={{ display: "flex", alignItems: "center" }}>
+                            <div className="position-relative">
                                 <input
                                     type={showPw ? "text" : "password"}
-                                    className="form-control"
+                                    className="form-control pe-5"
                                     name="password"
                                     value={form.password}
                                     onChange={onChange}
                                     placeholder="비밀번호"
                                     autoComplete="current-password"
                                 />
-                                <button
-                                    type="button"
+                                <span
                                     onClick={() => setShowPw(!showPw)}
                                     style={{
-                                        border: "none",
-                                        background: "transparent",
-                                        marginLeft: "-35px",
+                                        position: "absolute",
+                                        right: "10px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
                                         cursor: "pointer",
+                                        color: "#888",
                                     }}
                                 >
-                                    {showPw ? <FaEyeSlash /> : <FaEye />}
-                                </button>
+                  {showPw ? <FaEyeSlash /> : <FaEye />}
+                </span>
                             </div>
                         </div>
                         <button className="btn btn-primary w-100 mb-2" disabled={loading}>
@@ -125,27 +129,40 @@ const LoginPage = () => {
                         </button>
                         <button
                             type="button"
-                            className="btn btn-outline-secondary w-100"
+                            className="btn btn-outline-secondary w-100 my-0"
                             onClick={() => nav("/register")}
                         >
                             회원가입 하기
                         </button>
+
+                        {/* SNS 로그인 구분선 */}
+                        <div className="d-flex align-items-center my-2">
+                            <hr className="flex-grow-1" />
+                            <span className="mx-2 text-muted">SNS 계정으로 로그인</span>
+                            <hr className="flex-grow-1" />
+                        </div>
+                        {/* 네이버 로그인 버튼 */}
+                        {/*<hr />*/}
+                        <div className="d-grid gap-1">
+                            <button
+                                className="btn  mb-5"
+                                style={{
+                                    backgroundColor: "#03C75A",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                }}
+                                onClick={handleNaverLogin}
+                            >
+                                <span style={{ marginRight: "6px" }}>N</span> 네이버로 로그인
+                            </button>
+                        </div>
                     </form>
 
-                    {/* 네이버 로그인 버튼 */}
-                    <hr />
-                    <div className="d-grid gap-2">
-                        <button
-                            className="btn btn-naverlogin"
-                            onClick={handleNaverLogin}
-                        >
-                            네이버로 로그인
-                        </button>
-                    </div>
+
                 </Tab>
 
                 {/* 판매자 로그인 */}
-                <Tab eventKey="seller" title="판매자 로그인">
+                <Tab eventKey="seller" title="판매자">
                     <form onSubmit={onSubmit}>
                         <div className="mb-3">
                             <label className="form-label">아이디</label>
@@ -160,15 +177,30 @@ const LoginPage = () => {
                         </div>
                         <div className="mb-3">
                             <label className="form-label">비밀번호</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="password"
-                                value={form.password}
-                                onChange={onChange}
-                                placeholder="비밀번호"
-                                autoComplete="current-password"
-                            />
+                            <div className="position-relative">
+                                <input
+                                    type={showPw ? "text" : "password"}
+                                    className="form-control pe-5"
+                                    name="password"
+                                    value={form.password}
+                                    onChange={onChange}
+                                    placeholder="비밀번호"
+                                    autoComplete="current-password"
+                                />
+                                <span
+                                    onClick={() => setShowPw(!showPw)}
+                                    style={{
+                                        position: "absolute",
+                                        right: "10px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        color: "#888",
+                                    }}
+                                >
+                  {showPw ? <FaEyeSlash /> : <FaEye />}
+                </span>
+                            </div>
                         </div>
                         <button className="btn btn-primary w-100 mb-2" disabled={loading}>
                             {loading ? "로그인 중..." : "로그인하기"}
@@ -176,6 +208,7 @@ const LoginPage = () => {
                         <button
                             type="button"
                             className="btn btn-outline-secondary w-100"
+                            style={{ marginBottom: "225px" }}
                             onClick={() => nav("/seller/register")}
                         >
                             회원가입 하기
