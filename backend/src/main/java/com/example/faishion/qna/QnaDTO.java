@@ -57,7 +57,6 @@ public class QnaDTO {
         }
 
         // 💡 isAnswered 설정: answer 필드가 null이 아니고 내용이 비어있지 않으면 true
-
         this.answered = qna.getAnswer() != null && !qna.getAnswer().trim().isEmpty();
     }
 }
