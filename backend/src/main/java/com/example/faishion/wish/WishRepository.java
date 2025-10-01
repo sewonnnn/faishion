@@ -1,6 +1,7 @@
 package com.example.faishion.wish;
 
 
+import com.example.faishion.product.Product;
 import com.example.faishion.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
@@ -15,5 +16,7 @@ public interface WishRepository extends JpaRepository<Wish,Integer> {
     // 유저에 해당하는 위시리스트 목록 가져오기
     List<Wish> findByUser(User user);
 
+    int countByProduct(Product product);
     Optional<Object> findByUserAndProduct_Id(User user, Long productId);
+
 }

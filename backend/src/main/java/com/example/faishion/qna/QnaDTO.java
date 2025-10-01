@@ -31,7 +31,7 @@ public class QnaDTO {
         this.id = qna.getId();
 
         // Null-safe user_id 설정
-        this.user_id = (qna.getUser() != null) ? qna.getUser().getId() : null;
+        this.user_id = (qna.getUser() != null) ? qna.getUser().getName() : null;
 
         this.title = qna.getTitle();
         this.content = qna.getContent();

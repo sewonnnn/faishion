@@ -17,6 +17,7 @@ public class NoticeController {
     @GetMapping("/list")
     public Page<NoticeDTO> getNoticeList(@RequestParam(value = "q", required = false) String searchQuery,
                                    @PageableDefault(size = 10,
+                                           sort = "createdAt",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
         System.out.println("컨트롤러 검색어: " + searchQuery);
         return noticeService.getNoticeList(searchQuery, pageable);

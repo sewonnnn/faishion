@@ -38,6 +38,7 @@ public class QnaController {
     @GetMapping("/list")
     public Page<QnaDTO> getQnaList(@RequestParam(value = "q", required = false) String searchQuery,
                                    @PageableDefault(size = 10,
+                                           sort = "createdAt",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
         return qnaService.getQnaList(searchQuery, pageable);
     }
@@ -193,7 +194,7 @@ public class QnaController {
         List<Qna> questions = qnaService.findByProduct_Id(productId, currentUsername);
         List<QnaResponseDTO> responseDTOs = questions.stream()
                 .map(qna -> {
-                    String userName = (qna.getUser() != null) ? qna.getUser().getId() : "익명";
+                    String userName = (qna.getUser() != null) ? qna.getUser().getName() : "익명";
                     boolean isUserLoggedIn = (currentUsername != null);
                     boolean isAuthor = isUserLoggedIn && qna.getUser() != null && currentUsername.equals(qna.getUser().getId());
                     // 비밀글인 경우
@@ -276,7 +277,7 @@ public class QnaController {
     public ResponseEntity<Page<QnaDTO>> getDashboardQnaList(
             @RequestParam(value = "q", required = false) String searchQuery,
             @RequestParam(value = "pending", required = false, defaultValue = "false") boolean isPending, // 💡 isPending 파라미터 추가
-            @PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 10, sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         String requiredType = null;
