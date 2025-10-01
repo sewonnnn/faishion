@@ -24,7 +24,7 @@ const ProductFooter = ({ productId }) => {
 
     return (
         <Container className="my-5">
-            <Nav variant="tabs" defaultActiveKey="review" onSelect={(selectedKey) => {
+            <Nav variant="tabs" defaultActiveKey="review" className="custom-tabs" onSelect={(selectedKey) => {
                 setActiveTab(selectedKey);
                 // 탭 전환 시 문의 폼 상태를 초기화.
                 // Q&A 탭을 다시 선택하면 폼이 다시 나타남
