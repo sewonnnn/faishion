@@ -1,0 +1,9 @@
+.adminSeller-table th{
+    background-color: #F5F5F5 !important;
+}
+
+.adminSeller-table tbody tr{
+    background-color: white !important;
+    vertical-align: middle;
+    font-size: 15px;
+}

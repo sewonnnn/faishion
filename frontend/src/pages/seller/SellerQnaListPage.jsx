@@ -99,7 +99,7 @@ const SellerQnaListPage = () => {
         <Container className="my-5">
             <Row className="mb-4">
                 <Col>
-                    <h1 className="text-center">대시보드 Q&A 관리</h1>
+                    <h3>대시보드 Q&A 관리</h3>
                 </Col>
             </Row>
 
@@ -137,7 +137,7 @@ const SellerQnaListPage = () => {
                     </Button>
                 </Form>
             </div>
-            <div className="bg-light p-4 rounded shadow-sm">
+            <div className="bg-light p-4 rounded">
                 <Table hover responsive className="text-center">
                     <colgroup>
                         <col style={{ width: "8%" }} />
