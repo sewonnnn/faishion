@@ -1,69 +1,132 @@
-/* 기존 CSS에 추가 */
+.notice-detail {
+    padding: 24px;
+}
 
-.notice-form {
-    max-width: 960px;
+.notice-detail .card {
+    max-width: 880px;
     margin: 0 auto;
-    padding: 64px 20px 56px;
-}
-
-.notice-inner {
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    overflow: hidden;
 }
 
-.answer-section {
-    margin-top: 20px;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-}
-
-.answer-box {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
-    position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.answer-box p {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    color: #555;
-    line-height: 1.5;
-}
-
-.answered-by {
-    font-size: 12px;
-    color: #888;
-    display: block;
-    text-align: right;
-}
-
-.answer-form textarea {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    font-size: 14px;
-    color: #333;
-}
-
-.answer-form button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
+.notice-detail .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
     text-align: center;
-    text-decoration: none;
+}
+.notice-detail .card-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+.notice-detail .card-header .meta {
+    margin-top: 8px;
+    display: inline-flex;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+.notice-detail .card-header .meta .label { color: #9aa0a6; }
+
+.notice-detail .card-body {
+    padding: 20px 22px 22px;
+}
+
+.notice-detail .row {
+    margin-bottom: 18px;
+}
+.notice-detail label {
     display: inline-block;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.notice-detail .read {
+    font-size: 15px;
+    color: #111;
+}
+.notice-detail .prewrap {
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+    line-height: 1.7;
+}
+
+.notice-detail .editor { position: relative; }
+.notice-detail .form-control {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 8px;
+    padding: 10px 12px;
     font-size: 14px;
-    margin-top: 10px;
+    color: #222;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.notice-detail .form-control:focus {
+    outline: none;
+    border-color: #84a5ff;
+    box-shadow: 0 0 0 3px rgba(132,165,255,.25);
+}
+.notice-detail .textarea { min-height: 260px; resize: vertical; }
+
+.notice-detail .count {
+    position: absolute;
+    right: 10px;
+    bottom: -18px;
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+.notice-detail .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* 버튼 */
+.notice-detail .btn {
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    background: #fff;
+    color: #111;
     cursor: pointer;
-    border-radius: 4px;
+}
+.notice-detail .btn:disabled { opacity: .7; cursor: default; }
+
+.notice-detail .btn-light {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #374151;
+}
+.notice-detail .btn-light:hover { background: #e5e7eb; }
+
+.notice-detail .btn-outline {
+    border-color: #d1d5db;
+}
+.notice-detail .btn-outline:hover {
+    background: #111827; color: #fff; border-color: #111827;
+}
+
+.notice-detail .btn-primary {
+    background: #111827; border-color: #111827; color: #fff;
+}
+.notice-detail .btn-primary:hover { background: #0f172a; border-color: #0f172a; }
+
+.notice-detail .btn-danger {
+    background: #dc2626; border-color: #dc2626; color: #fff;
+}
+.notice-detail .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+
+/* 반응형 */
+@media (max-width: 576px) {
+    .notice-detail { padding: 16px; }
+    .notice-detail .card { border-radius: 10px; }
+    .notice-detail .card-header h1 { font-size: 22px; }
 }
