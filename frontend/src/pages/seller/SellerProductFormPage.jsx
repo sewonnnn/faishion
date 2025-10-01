@@ -390,10 +390,9 @@ const SellerProductFormPage = () => {
 
     return (
         <Container className="my-5">
-            <h2 className="text-center mb-4">상품 등록</h2>
-            <Form onSubmit={handleSubmit}>
-                {/* ... (폼 필드는 변경 없음) ... */}
-
+            <h4 className="mb-4">상품 등록</h4>
+            <hr/>
+            <Form onSubmit={handleSubmit} className="my-5">
                 <Form.Group as={Row} className="mb-3" controlId="formProductName">
                     <Form.Label column sm="2">상품명 :</Form.Label>
                     <Col sm="10">
@@ -502,7 +501,7 @@ const SellerProductFormPage = () => {
                         <Button variant="secondary" onClick={() => navigate('/seller/product/list')} className="me-3">
                             메인으로 가기
                         </Button>
-                        <Button variant="success" type="submit">
+                        <Button type="submit">
                             등록하기
                         </Button>
                     </Col>

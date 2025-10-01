@@ -93,7 +93,7 @@ function SellerLayout() {
 
 function AdminLayout() {
   return (
-        <div className="d-md-flex w-100 min-vh-100">
+        <div className="d-md-flex w-100 min-vh-100" style={{ backgroundColor: '#F5F5F5' }} >
             <SideBar menuItems={adminMenuItems}/>
             <div className="flex-grow-1 w-100 overflow-auto p-4">
                 <Outlet />
