@@ -6,6 +6,7 @@ import com.example.faishion.review.Review;
 import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
+import com.example.faishion.wish.WishRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class ProductService {
     private final SellerRepository sellerRepository;
     private final StockRepository stockRepository;
     private final ImageService imageService;
+    private final WishRepository wishRepository;
 
     public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
         return productRepository.sellerProducts(sellerId, pageable);
@@ -287,5 +289,10 @@ public class ProductService {
         }
 
         return (rating/count) >= 4;
+    }
+
+    // 해당 상품의 찜하기 수 확인
+    public int countByProduct (Product product){
+        return wishRepository.countByProduct(product);
     }
 }
