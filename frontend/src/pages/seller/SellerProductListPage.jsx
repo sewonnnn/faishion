@@ -68,7 +68,7 @@ const SellerProductListPage = () => {
 
     return (
         <Container className="my-5 seller-container">
-            <h4 className="mb-4 seller-title">상품 관리</h4>
+            <h3 className="mb-4 seller-title">상품 관리</h3>
 
             {totalElements === 0 ? (
                 <p className="text-center seller-no-products">상품이 없습니다.</p>

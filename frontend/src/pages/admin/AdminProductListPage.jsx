@@ -3,6 +3,7 @@ import { Container, Table, Button, Pagination, Form } from "react-bootstrap";
 import React from "react";
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
+import "./AdminProductListPage.css";
 
 const AdminProductListPage = () => {
     const [products, setProducts] = useState([]);
@@ -67,14 +68,13 @@ const AdminProductListPage = () => {
 
     return (
         <Container className="my-5">
-            <h1 className="mb-4">Admin Product List</h1>
+            <h3 className="mb-4">판매자 상품 관리</h3>
             {totalElements === 0 ? (
                 <p>상품이 없습니다.</p>
             ) : (
                 <>
-                    {/* The problem is here. Remove the nested div and table tags. */}
-                    <Table bordered hover responsive>
-                        <thead>
+                    <Table bordered hover responsive className="admin-table text-center align-middle">
+                        <thead s>
                             <tr className="text-center">
                                 <th>브랜드명</th>
                                 <th>상품명</th>
@@ -110,8 +110,8 @@ const AdminProductListPage = () => {
                                                 <div style={{ textDecoration: "line-through", color: "gray" }}>
                                                     {product.price}원
                                                 </div>
-                                                <div style={{ color: "red" }}>
-                                                    {product.discountPrice}원
+                                                <div style={{ color: "#1850DB" }}>
+                                                   <b>{product.discountPrice}원</b>
                                                 </div>
                                             </div>
                                         ) : (
