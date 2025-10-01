@@ -2,6 +2,7 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./RegisterPage.css" ;
 
 export default function RegisterPage() {
     const nav = useNavigate();
@@ -183,7 +184,7 @@ export default function RegisterPage() {
                         style={{
                             position: "absolute",
                             right: "10px",
-                            top: "50%",
+                            top: "16px",
                             transform: "translateY(-50%)",
                             cursor: "pointer",
                             color: "#888",
@@ -209,7 +210,7 @@ export default function RegisterPage() {
                         style={{
                             position: "absolute",
                             right: "10px",
-                            top: "50%",
+                            top: "16px",
                             transform: "translateY(-50%)",
                             cursor: "pointer",
                             color: "#888",
@@ -241,6 +242,7 @@ export default function RegisterPage() {
                                 value={form.customDomain}
                                 onChange={onChange}
                                 className="form-control"
+                                style={{ flex: 1, minWidth: 0 }}
                             />
                         ) : (
                             <select

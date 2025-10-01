@@ -6,3 +6,12 @@
     margin-top: 4px;      /* 인풋과 메시지 사이 여백 */
     font-size: 0.9rem;
 }
+.email-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.email-row .form-control,
+.email-row .form-select {
+    min-width: 0;
+}
