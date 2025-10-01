@@ -7,7 +7,7 @@
 /*ProductList.jsx의 페이지 버튼 css*/
 /* 기본 버튼 색상 */
 .pagination .page-link {
-    color: #1850DB;           /* 글자 색 */
+    color: black;           /* 글자 색 */
     background-color: #fff;   /* 배경 */
     border: none;
 }
@@ -15,7 +15,7 @@
 /* hover 시 */
 .pagination .page-link:hover {
     color: #fff;
-    background-color: #1850DB;
+    background-color: black;
 }
 
 /* 활성(active)된 버튼 */

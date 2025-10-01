@@ -36,12 +36,11 @@ const MultipleImageUploader = ({ images, onAddImage, onRemoveImage, onReplaceIma
                                 {/* 삭제 버튼 */}
                                 <Button
                                     variant="danger"
-                                    size="sm"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         onRemoveImage(index);
                                     }}
-                                    style={{ position: 'absolute', top: '5px', right: '5px' }}
+                                    style={{ position: 'absolute', top: '5px', right: '8px', height:'28px', paddingBottom:'30px'}}
                                 >
                                     &times;
                                 </Button>
