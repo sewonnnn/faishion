@@ -10,9 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,49 +43,41 @@ public class BannerService {
             }
         }
         final String findUserId = useDefaultBanners ? null : userId;
+        // 1. 필요한 모든 Banner를 한 번에 가져옵니다.
+        List<Long> productIds = products.stream().map(Product::getId).toList();
+        List<Banner> banners = bannerRepository.findByUserIdAndProductIdIn(findUserId, productIds);
+        // 2. Map<ProductId, Banner>으로 변환하여 O(1) 조회 가능하게 합니다.
+        Map<Long, Banner> bannerMap = banners.stream()
+                .collect(Collectors.toMap(banner -> banner.getProduct().getId(), Function.identity()));
+        // 3. products를 순회하며 Map에서 찾습니다. (DB 쿼리 없이 메모리에서 조회)
         return products.stream().map(product -> {
-            Banner banner = bannerRepository.findWithExclusiveLock(findUserId, product.getId());
             Long aiImageId = null;
-            if(banner == null){
-                aiImageId = null;
-                //비동기 AI 이미지(제미나이 레스트 템플릿) 생성 로직
-                banner = new Banner();
-            }else{
-                switch (banner.getStatus()) {
-                    case COMPLETED:
-                        // 이미지가 성공적으로 생성되었으면 ID를 사용합니다.
-                        if (banner.getImage() != null) {
-                            aiImageId = banner.getImage().getId();
-                        }
-                        break;
+            Banner b = bannerMap.get(product.getId()); // Map에서 조회
 
-                    case GENERATING:
-                        aiImageId = null;
-                        // AI 이미지가 생성 중이면 aiImageId는 null로 유지하거나
-                        // 로딩 이미지 ID 등을 설정할 수 있습니다.
-                        // 현재는 null로 유지합니다.
-                        break;
-
-                    case FAILED:
-                        // 생성 실패 시 재시도 로직을 추가할 수 있습니다.
-                        // 현재는 null로 유지합니다.
-                        // **TODO: 재시도 로직 구현**
-                        break;
-
-                    case READY:
-                        // 생성 대기 중 상태입니다.
-                        // 현재는 null로 유지합니다.
-                        break;
-
-                    default:
-                        // 예기치 않은 상태 처리
-                        break;
-                }
-                aiImageId = banner.getImage().getId();
+            if (b != null && b.getStatus() == BannerStatus.COMPLETED) {
+                aiImageId = b.getImage().getId();
             }
             return new BannerDTO(product, aiImageId);
         }).toList();
     }
 
+    @Async // 이 메서드를 별도의 스레드에서 비동기로 실행
+    @Transactional
+    public void completeBannerUpdate(Long productId, Image generatedImage) {
+        try {
+            // 메인 트랜잭션이 이미 커밋되어 락이 해제된 상태에서 안전하게 조회 및 업데이트
+            Banner banner = bannerRepository.findByUserIdAndProductId(null, productId)
+                    .orElseThrow(() -> new RuntimeException("비동기 작업 완료 후 Banner를 찾을 수 없습니다."));
+
+            banner.setImage(generatedImage);
+            banner.setStatus(BannerStatus.COMPLETED); // 최종 상태로 업데이트
+            bannerRepository.save(banner);
+
+        } catch (Exception e) {
+            // 로깅 또는 상태 롤백 처리 (예: 상태를 FAILED로 변경)
+            System.err.println("비동기 Banner 업데이트 중 치명적 오류: " + e.getMessage());
+            // 필요한 경우 handleFailureByProductId(productId) 호출
+        }
+    }
 
 }

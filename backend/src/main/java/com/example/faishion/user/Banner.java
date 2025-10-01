@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "banner")
+@Table(name = "banner", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"userId", "productId"})
+})
+
 public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
