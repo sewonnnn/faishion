@@ -132,7 +132,7 @@ const SellerRegisterPage = () => {
     };
 
     // -------------------------------
-    // ✅ 사업자등록번호 유효성 검사
+    // 사업자등록번호 유효성 검사
     // -------------------------------
     const onlyDigits = (s) => (s || "").replace(/\D/g, "");
     const isValidBRNFormat = (digits) => /^\d{10}$/.test(digits); // 10자리
@@ -190,7 +190,7 @@ const SellerRegisterPage = () => {
             }
         } catch (err) {
             setBusinessMessage({ text: "조회에 실패했습니다. 잠시 후 다시 시도해주세요.", color: "gray" });
-            setIsBusinessValid(false);
+            setIsBusinessValid(true);
         }
     };
 
