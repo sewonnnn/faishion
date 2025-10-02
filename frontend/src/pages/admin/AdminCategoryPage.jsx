@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
+import "./AdminCategoryPage.css";
 
 const AdminCategoryPage = () => {
     const [groups, setGroups] = useState([]);
@@ -7,19 +8,14 @@ const AdminCategoryPage = () => {
     const [newGroupName, setNewGroupName] = useState("");
     const [newCategoryName, setNewCategoryName] = useState("");
     const [loading, setLoading] = useState(false);
-
-    // Create new state variables for each error
     const [groupError, setGroupError] = useState("");
     const [categoryError, setCategoryError] = useState("");
 
-    // 카테고리 그룹 + 카테고리 가져오기
     const fetchGroups = async () => {
         try {
             const response = await axios.get("/api/category/groups");
             const data = Array.isArray(response.data) ? response.data : [];
             setGroups(data);
-
-            // 페이지 처음 로딩 시 첫 번째 그룹 선택
             if (!selectedGroup && data.length > 0) {
                 setSelectedGroup(data[0]);
             } else if (selectedGroup) {
@@ -31,31 +27,24 @@ const AdminCategoryPage = () => {
         }
     };
 
-    useEffect(() => {
-        fetchGroups();
-    }, []);
+    useEffect(() => { fetchGroups(); }, []);
 
-    // 카테고리 그룹 추가
     const handleAddGroup = async () => {
         if (!newGroupName.trim()) {
             setGroupError("카테고리 그룹 이름을 입력해주세요.");
             return;
         }
         setLoading(true);
-        setGroupError(""); // Clear previous error
+        setGroupError("");
         try {
             await axios.post("/api/category/group", { name: newGroupName });
             setNewGroupName("");
             await fetchGroups();
-        } catch (err) {
-            console.error(err);
-            setGroupError("카테고리 그룹 추가 실패"); // Set the specific error message
-        } finally {
-            setLoading(false);
-        }
+        } catch {
+            setGroupError("카테고리 그룹 추가 실패");
+        } finally { setLoading(false); }
     };
 
-    // 카테고리 추가
     const handleAddCategory = async () => {
         if (!newCategoryName.trim()) {
             setCategoryError("카테고리 이름을 입력해주세요.");
@@ -66,7 +55,7 @@ const AdminCategoryPage = () => {
             return;
         }
         setLoading(true);
-        setCategoryError(""); // Clear previous error
+        setCategoryError("");
         try {
             await axios.post("/api/category", {
                 name: newCategoryName,
@@ -74,27 +63,21 @@ const AdminCategoryPage = () => {
             });
             setNewCategoryName("");
             await fetchGroups();
-        } catch (err) {
-            console.error(err);
-            setCategoryError("카테고리 추가 실패"); // Set the specific error message
-        } finally {
-            setLoading(false);
-        }
+        } catch {
+            setCategoryError("카테고리 추가 실패");
+        } finally { setLoading(false); }
     };
 
     return (
-        <div style={{ display: "flex", gap: "20px", padding: "20px", height: "500px" }}>
-            {/* 좌측: 카테고리 그룹 */}
-            <div style={{ flex: 1, border: "1px solid #000", display: "flex", flexDirection: "column", padding: "10px" }}>
+        <div className="admin-category">
+            {/* 좌측: 그룹 */}
+            <div className="admin-panel">
                 <h2>카테고리 그룹</h2>
-                <ul style={{ flex: 1, overflowY: "auto", border: "1px solid #ccc", padding: "5px" }}>
+                <ul className="admin-list">
                     {groups.map((group) => (
                         <li
                             key={group.id}
-                            style={{
-                                cursor: "pointer",
-                                fontWeight: selectedGroup?.id === group.id ? "bold" : "normal",
-                            }}
+                            className={selectedGroup?.id === group.id ? "active" : ""}
                             onClick={() => setSelectedGroup(group)}
                         >
                             {group.name}
@@ -102,57 +85,44 @@ const AdminCategoryPage = () => {
                     ))}
                 </ul>
 
-                <div style={{ display: "flex", gap: "10px", marginTop: "10px", flexDirection: "column" }}>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                        <input
-                            type="text"
-                            value={newGroupName}
-                            onChange={(e) => {
-                                setNewGroupName(e.target.value);
-                                setGroupError(""); // Clear error on input change
-                            }}
-                            placeholder="카테고리 그룹 추가"
-                            disabled={loading}
-                        />
-                        <button onClick={handleAddGroup} disabled={loading}>추가</button>
-                    </div>
-                    {groupError && <p style={{ color: "red", marginTop: "5px" }}>{groupError}</p>}
+                <div className="input-row">
+                    <input
+                        type="text"
+                        value={newGroupName}
+                        onChange={(e) => { setNewGroupName(e.target.value); setGroupError(""); }}
+                        placeholder="카테고리 그룹 추가"
+                        disabled={loading}
+                    />
+                    <button onClick={handleAddGroup} disabled={loading}>추가</button>
                 </div>
+                {groupError && <p className="error-text">{groupError}</p>}
             </div>
 
             {/* 우측: 카테고리 */}
-            <div style={{ flex: 1, border: "1px solid #000", display: "flex", flexDirection: "column", padding: "10px" }}>
+            <div className="admin-panel">
                 <h2>카테고리</h2>
-                <ul style={{ flex: 1, overflowY: "auto", border: "1px solid #ccc", padding: "5px" }}>
+                <ul className="admin-list">
                     {selectedGroup?.categories?.map((c) => (
                         <li key={c.id}>{c.name}</li>
                     ))}
                 </ul>
 
-                <div style={{ display: "flex", gap: "10px", marginTop: "10px", flexDirection: "column" }}>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                        <input
-                            type="text"
-                            value={newCategoryName}
-                            onChange={(e) => {
-                                setNewCategoryName(e.target.value);
-                                setCategoryError(""); // Clear error on input change
-                            }}
-                            placeholder="카테고리 추가"
-                            disabled={loading || !selectedGroup}
-                        />
-                        <button
-                            onClick={handleAddCategory}
-                            disabled={loading || !selectedGroup}
-                        >
-                            추가
-                        </button>
-                    </div>
-                    {categoryError && <p style={{ color: "red", marginTop: "5px" }}>{categoryError}</p>}
+                <div className="input-row">
+                    <input
+                        type="text"
+                        value={newCategoryName}
+                        onChange={(e) => { setNewCategoryName(e.target.value); setCategoryError(""); }}
+                        placeholder="카테고리 추가"
+                        disabled={loading || !selectedGroup}
+                    />
+                    <button onClick={handleAddCategory} disabled={loading || !selectedGroup}>
+                        추가
+                    </button>
                 </div>
+                {categoryError && <p className="error-text">{categoryError}</p>}
             </div>
         </div>
     );
-}
+};
 
 export default AdminCategoryPage;
