@@ -26,11 +26,11 @@ public class Qna {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY) //상품 아이디
-    @JoinColumn(name = "product_id", nullable = true, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "product_id", nullable = true)
     private Product product;
 
     private String title; //질문제목
@@ -44,11 +44,11 @@ public class Qna {
     private String qnaType; // "PRODUCT" (상품문의) 또는 "GENERAL" (일반문의)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answered_by_seller", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "answered_by_seller")
     private Seller answeredBySeller; //답변한 판매자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answered_by_admin", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "answered_by_admin")
     private Admin answeredByAdmin; //답변한 관리자
 
     private boolean isSecret;

@@ -28,10 +28,10 @@ public class Stock {
     private Integer quantity; //상품 재고 수량
 
     @OneToOne
-    @JoinColumn(name = "image_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "image_id", nullable = false)
     private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 }

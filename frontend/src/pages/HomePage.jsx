@@ -18,10 +18,11 @@ const HomePage = () => {
                 const transformedItems = bannerDTOs.map((dto) => ({
                     id: dto.productId,
                     image: `${api.defaults.baseURL}/image/${dto.imageId}`,
-                    aiImage: `${api.defaults.baseURL}/image/${dto.aiImageId}`,
+                    aiImage: dto.aiImageId ? `${api.defaults.baseURL}/image/${dto.aiImageId}` : null,
                     description: dto.description,
                     businessName: dto.businessName,
                 }));
+                console.log(transformedItems);
                 setCarouselItems(transformedItems);
             } catch (e) {
                 console.error("Error fetching banners:", e);

@@ -6,15 +6,11 @@ import com.example.faishion.review.Review;
 import com.example.faishion.seller.SellerRepository;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.stock.StockRepository;
-import com.example.faishion.user.Banner;
-import com.example.faishion.user.BannerRepository;
-import com.example.faishion.user.BannerService;
-import com.example.faishion.user.BannerStatus;
+import com.example.faishion.user.*;
 import com.example.faishion.wish.WishRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -34,7 +30,7 @@ public class ProductService {
     private final ImageService imageService;
     private final WishRepository wishRepository;
     private final BannerRepository bannerRepository;
-    private final BannerService bannerService;
+    private final BannerAsyncService bannerAsyncService;
 
     public Page<Product> sellerProducts(String sellerId, Pageable pageable) {
         return productRepository.sellerProducts(sellerId, pageable);
@@ -325,26 +321,26 @@ public class ProductService {
                 // 2-1. 상태를 GENERATING으로 변경하고 DB에 저장 (현재 트랜잭션 내에서 즉시 반영)
                 bannerToUpdate.setStatus(BannerStatus.GENERATING);
                 bannerRepository.save(bannerToUpdate);
-                System.out.println("비동기 이미지 생성 요청 시작");
+                //System.out.println("비동기 이미지 생성 요청 시작");
                 // 2-2. 비동기 이미지 생성 요청 시작
-                CompletableFuture<Image> imageFuture = null;
+                CompletableFuture<Image> imageFuture;
                 try {
-                    // product.getMainImageList() 사용 가정
                     Long productMainImageId = product.getMainImageList().stream().findFirst().orElseThrow().getId();
                     imageFuture = imageService.generateImage(List.of(productMainImageId),
                             "Replace the fashion model with a realistic, glossy white mannequin that has no hair and no facial features. The model's clothes and pose must be perfectly maintained.");
                 } catch (IOException e) {
+                    bannerToUpdate.setStatus(BannerStatus.READY);
                     // 이미지 생성 요청 실패 시 RuntimeException을 던져 트랜잭션 롤백 유도
                     throw new RuntimeException("이미지 생성 요청 실패", e);
                 }
                 // 2-3. 비동기 작업 완료 후 후속 작업 연결
                 if (imageFuture != null) {
                     imageFuture.thenAcceptAsync(generatedImage -> {
-                        bannerService.completeBannerUpdate(productId, generatedImage);
-                        System.out.println("배너 생성 후 연결 완료");
+                        bannerAsyncService.bannerStatusUpdate(null, productId, generatedImage, BannerStatus.COMPLETED);
+                        //System.out.println("배너 생성 후 연결 완료");
                     }).exceptionally(ex -> {
-                        // 비동기 작업 자체에서 예외 발생 시 상태 처리 필요
-                        System.err.println("비동기 이미지 생성 실패: " + ex.getMessage());
+                        bannerAsyncService.bannerStatusUpdate(null, productId, null, BannerStatus.READY);
+                        //System.err.println("비동기 이미지 생성 실패: " + ex.getMessage());
                         return null;
                     });
                 }

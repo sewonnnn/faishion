@@ -43,23 +43,27 @@ public class Product {
     private String type; // 상품 타입 (man, woman)
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private Set<Image> mainImageList = new HashSet<>(); // 썸네일
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private Set<Image> detailImageList = new HashSet<>(); // 상세에 나오는 바디 사진
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private Set<Stock> stockList = new HashSet<>(); //상품 옵션(재고)
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id DESC")
     private Set<Review> reviewList = new HashSet<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "seller_id")
     private Seller seller; //연관 판매자
 
     @CreationTimestamp

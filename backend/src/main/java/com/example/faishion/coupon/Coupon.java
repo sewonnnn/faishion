@@ -21,7 +21,7 @@ public class Coupon {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     private String type; //쿠폰 할인 타입

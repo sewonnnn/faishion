@@ -63,7 +63,7 @@ public class User {
     private String pwHash;
 
     @OneToOne
-    @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "image_id")
     private Image image;
 
     private LocalDateTime imageUpdatedAt;
