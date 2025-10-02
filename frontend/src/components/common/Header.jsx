@@ -185,14 +185,15 @@ const Header = () => {
                             </Button>
                         </Form>
                     </div>
+                    {isMenuOpen && (
+                        <div
+                            className="full-screen-dropdown w-100"
+                        >
+                            {renderAllMenu()}
+                        </div>
+                    )}
                 </Container>
-                {isMenuOpen && (
-                    <div
-                        className="full-screen-dropdown"
-                    >
-                        {renderAllMenu()}
-                    </div>
-                )}
+
             </div>
         </>
     );
