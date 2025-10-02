@@ -1,6 +1,7 @@
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import "./CheckoutPage.css";
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = generateRandomString();
@@ -56,16 +57,14 @@ export function CheckoutPage() {
     }, [widgets, amount]);
 
     return (
-        <div className="wrapper">
-            <div className="box_section">
+        <div className="checkWrapper">
+            <div className="box_section" style={{ maxWidth: '700px', margin: '0 auto' }}>
                 {/* 결제 UI */}
-                <div id="payment-method" />
+                <div id="payment-method" style={{ width: '100%', minHeight: '500px' }} />
                 {/* 이용약관 UI */}
-                <div id="agreement" />
-
-                {/* 결제하기 버튼 */}
+                <div id="agreement" style={{ width: '100%' }} />  {/* 결제하기 버튼 */}
                 <button
-                    className="button"
+                    className="custom-pay-button"
                     disabled={!ready}
                     onClick={async () => {
                         if (!clientOrderId) {

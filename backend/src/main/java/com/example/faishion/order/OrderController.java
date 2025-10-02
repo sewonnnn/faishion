@@ -47,7 +47,7 @@ public class OrderController {
 
     // 주문서 생성
     @GetMapping("/new")
-    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString, @AuthenticationPrincipal UserDetails userDetails) {
+    public List<CartProductDTO> getOrderData(@RequestParam("ids") String idsString) {
 
         // 1. URL 파라미터에서 받은 장바구니의 목록 추출
         List<Long> cartIds = Arrays.stream(idsString.split(","))
@@ -184,10 +184,15 @@ public class OrderController {
     // 주문 내역 가져오기
     @GetMapping("/my-history")
     public ResponseEntity<List<OrderListResponseDTO>> getMyOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
+       String userId = userDetails.getUsername(); // 유저 id
+        System.out.println(" 주문 내역 가져오기 유저 id:"+userId);
+
         if (userDetails == null) {
             return ResponseEntity.status(401).build(); // 인증되지 않음 처리
         }
-        List<OrderListResponseDTO> orderHistory = orderService.getMyOrderHistory(userDetails.getUsername());
+
+        // 결제 완료된 상품 리스트만 가져오기
+        List<OrderListResponseDTO> orderHistory = orderService.getCompleteOrder(userDetails.getUsername());
         return ResponseEntity.ok(orderHistory);
     }
 
@@ -197,17 +202,21 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(401).build(); // 인증되지 않음 처리
+            return ResponseEntity.status(401).build(); // 401 Unauthorized
         }
+
         try {
             Order order = orderService.getOrderDetails(orderId, userDetails.getUsername());
             return ResponseEntity.ok(new OrderDetailDTO(order));
 
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            // ⭐ OrderService에서 던진 모든 404 관련 예외를 여기서 처리합니다.
+            System.err.println("주문 상세 조회 실패: " + e.getMessage());
+            return ResponseEntity.notFound().build(); // 404 Not Found
         } catch (Exception e) {
-            System.err.println("주문 상세 조회 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            // 그 외 모든 예상치 못한 오류 (DB 오류 등)
+            System.err.println("주문 상세 조회 중 치명적인 오류 발생: " + e.getMessage());
+            return ResponseEntity.internalServerError().build(); // 500 Internal Server Error
         }
     }
 }
