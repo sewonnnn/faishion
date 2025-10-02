@@ -260,7 +260,7 @@ const OrderFormPage = () => {
                         <Card.Body className="p-0">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h5 className="text-lg font-bold mb-0 d-inline-block me-2"><b>{userProfile?.name || "박세원"}</b></h5>
+                                    <h5 className="text-lg font-bold mb-0 d-inline-block me-2"><b>{userProfile?.name || "사용자"}</b></h5>
                                     <span className="text-sm text-gray-500 font-medium delivery-tag">기본 배송지</span>
                                 </div>
 
