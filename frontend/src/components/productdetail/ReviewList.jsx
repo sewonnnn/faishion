@@ -22,7 +22,7 @@ const ReviewList = ({ productId }) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
-                <span key={i} style={{ color: '#ffc107' }}>
+                <span key={i} style={{ color: '#888' }}>
                     {i <= rating ? <BsStarFill /> : <BsStar />}
                 </span>
             );

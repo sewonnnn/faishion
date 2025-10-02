@@ -50,7 +50,7 @@ const Footer = () => {
                                 <li><a href="/notice/list">공지사항</a></li>
                                 <li><a href="/qna/list">Q&A</a></li>
                                 {/* 아래 3개 비활성화 */}
-                                <li><span className="disabled-link" aria-disabled="true" role="text">주문/배송조회</span></li>
+                                <li><a href="/mypage">주문/배송조회</a></li>
                                 <li><span className="disabled-link" aria-disabled="true" role="text">교환/반품 안내</span></li>
                                 <li><span className="disabled-link" aria-disabled="true" role="text">판매자 입점문의</span></li>
                             </ul>
