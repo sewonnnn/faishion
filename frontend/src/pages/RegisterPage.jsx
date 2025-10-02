@@ -126,8 +126,14 @@ export default function RegisterPage() {
                 name: form.name,
                 phoneNumber: form.phoneNumber,
             });
-            nav("/login", { state: { message: "회원가입을 축하드립니다! 로그인 해주세요" } });
+//             nav("/login", { state: { message: "회원가입을 축하드립니다! 로그인 해주세요" } });
+        alert("회원가입을 축하드립니다! 로그인해주세요"); // 자꾸 두번 alert 나와서 바꿈 ho
+        nav("/login");
         } catch (err) {
+            if(err.response.data.status === 500){
+                alert("전화번호가 중복되었습니다.");
+                return;
+                }
             alert(err.response?.data || "회원가입 실패");
         }
     };
