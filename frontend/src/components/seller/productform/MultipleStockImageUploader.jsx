@@ -22,7 +22,7 @@ const MultipleStockImageUploader = ({ stocks, onAddStockImage, onRemoveStockImag
                         return (
                             <div key={index} style={{
                                 position: 'relative', display: 'inline-block', border: '1px solid #ddd',
-                                borderRadius: '5px', padding: '5px', textAlign: 'center', cursor: 'pointer'
+                                 padding: '5px', textAlign: 'center', cursor: 'pointer'
                             }}>
                                 {/* 이미지 영역: 클릭 시 파일 교체 input 활성화 */}
                                 <div
@@ -61,8 +61,11 @@ const MultipleStockImageUploader = ({ stocks, onAddStockImage, onRemoveStockImag
 
                                 {/* 삭제 버튼 */}
                                 <Button
-                                    variant="danger" size="sm" onClick={() => onRemoveStockImage(index)}
-                                    style={{ position: 'absolute', top: '5px', right: '5px' }}
+                                    variant="danger"
+                                    onClick={() => onRemoveStockImage(index)}
+                                    style={{ position: 'absolute',
+                                        top: '15px', right: '17px',
+                                        height:'28px', paddingBottom:'30px'}}
                                 >
                                     &times;
                                 </Button>

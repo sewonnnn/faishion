@@ -1,13 +1,210 @@
-.Footer_Container{
+/*!* 기존 주석 블록 유지 가능
+.Foot er_Container{
     display: flex;
     background: #aaaaaa;
     width: 100%;
-    height: 200px; /* 헤더 높이 고정 */
-    border-bottom: 1px solid #333333; /* 하단 경계선 */
-    bottom: 0;
-    left: 0;
-    align-items: center; /* 세로 중앙 정렬 */
-    padding: 0 20px; /* 좌우 패딩 */
-    box-sizing: border-box; /* 패딩 포함하여 크기 계산 */
-    justify-content: space-around;
+    height: 200px; !* 헤더 높이 고정 *!
+border-bottom: 1px solid #333333; !* 하단 경계선 *!
+bottom: 0;
+left: 0;
+align-items: center; !* 세로 중앙 정렬 *!
+padding: 0 20px; !* 좌우 패딩 *!
+box-sizing: border-box; !* 패딩 포함하여 크기 계산 *!
+justify-content: space-around;
+}
+*!*/
+
+/* 기본 텍스트: 진한 회색계열 */
+.footer {
+    color: #4a4a4a;
+    font-size: 14px;
+    /* 배경 지정 안 함 → 현재 페이지 배경 유지 */
+}
+
+.footer a {
+    color: #4a4a4a;
+    text-decoration: none;
+}
+.footer a:hover {
+    color: #111;                /* 살짝 더 진하게 */
+    text-decoration: underline;
+}
+
+/* 상단/하단 구분선만 옅은 검정으로 */
+.footer-top {
+    padding: 40px 0 28px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+/* 하단 라인: 배경 유지 + 위쪽 경계선 */
+.footer-bottom {
+    padding: 14px 0;
+    color: #6b7280;             /* 회색 문구 */
+    background: transparent;    /* 다크 배경 제거 */
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+/* 섹션 타이틀: 더 진한 회색/거의 검정 */
+.footer-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+/* 브랜드 문구 */
+.footer-brand {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 8px;
+}
+.footer-desc {
+    color: #666;                /* 진한 회색 */
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+/* 고객센터 라인 */
+.footer-cc .cc-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    color: #444;                /* 기본 텍스트 */
+}
+.footer-cc .cc-link {
+    font-weight: 700;
+    color: #333;                /* 강조 */
+}
+.footer-cc .cc-time {
+    color: #777;
+    margin-left: 8px;
+    font-size: 13px;
+}
+
+/* 리스트 */
+.footer-list,
+.footer-info {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 14px;
+}
+.footer-list li,
+.footer-info li {
+    margin: 8px 0;
+    color: #444;
+}
+.footer-info li strong {
+    display: inline-block;
+    width: 110px;
+    color: #555;
+}
+
+/* 정책 링크 */
+.policy-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.policy-links .emph { color: #222; font-weight: 700; }
+.policy-links .divider { color: #9aa0a6; }
+
+/* 소셜 아이콘: 밝은 회색 배경으로 */
+.footer-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+.footer-social .social {
+    display: inline-flex;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: #f3f4f6;                       /* 밝은 회색 */
+    border: 1px solid rgba(0,0,0,0.08);
+    color: #444;
+}
+.footer-social .social:hover { background: #e5e7eb; }
+
+/* 에스크로 안내 박스: 라이트 카드 스타일 */
+.escrow-box {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #f8f9fa;                       /* 밝은 배경 */
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 8px;
+    color: #555;
+    line-height: 1.5;
+}
+.escrow-box .escrow-link {
+    color: #444;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* 사업자정보 확인 링크 */
+.lookup {
+    margin-left: 6px;
+    color: #444;
+    text-decoration: underline;
+}
+
+/* 비활성 링크(필요 시) */
+.disabled-link {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.8;
+    text-decoration: none;
+    color: #777;
+}
+
+/* 반응형 여백 조정 */
+@media (max-width: 576px) {
+    .footer-top { padding: 28px 0 20px; }
+    .footer-info li strong { width: 96px; }
+}
+/* 회사 정보: 라벨/값 2열 그리드 */
+.footer-info {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.8;
+    word-break: keep-all;     /* 한국어 단어 중간 줄바꿈 방지 */
+}
+
+.footer-info li {
+    display: grid;
+    grid-template-columns: 120px 1fr; /* ← 라벨 고정폭, 값 가변 */
+    column-gap: 8px;
+    align-items: baseline;           /* 콜론/텍스트 베이스라인 정렬 */
+    margin: 6px 0;
+}
+
+/* 라벨(왼쪽) */
+.footer-info li strong {
+    color: #555;
+    font-weight: 700;
+    width: auto;              /* 기존 width 고정 제거 */
+}
+
+/* 값(오른쪽) 기본 색 */
+.footer-info li > :not(strong) {
+    color: #444;
+}
+
+/* ‘사업자정보확인’ 같은 보조 링크 톤 & 간격 */
+.footer-info .lookup {
+    margin-left: 8px;
+    color: #6b7280;
+    text-decoration: underline;
+}
+
+/* 번호처럼 끊기면 어색한 값은 줄바꿈 금지용 */
+.footer-info .nowrap {
+    white-space: nowrap;
 }

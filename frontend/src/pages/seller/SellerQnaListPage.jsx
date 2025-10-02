@@ -99,7 +99,7 @@ const SellerQnaListPage = () => {
         <Container className="my-5">
             <Row className="mb-4">
                 <Col>
-                    <h1 className="text-center">대시보드 Q&A 관리</h1>
+                    <h3>대시보드 Q&A 관리</h3>
                 </Col>
             </Row>
 
@@ -137,7 +137,7 @@ const SellerQnaListPage = () => {
                     </Button>
                 </Form>
             </div>
-            <div className="bg-light p-4 rounded shadow-sm">
+            <div className=" p-4 rounded">
                 <Table hover responsive className="text-center">
                     <colgroup>
                         <col style={{ width: "8%" }} />
@@ -146,7 +146,7 @@ const SellerQnaListPage = () => {
                         <col style={{ width: "17%" }} />
                         <col style={{ width: "15%" }} />
                     </colgroup>
-                    <thead>
+                    <thead className="table-light">
                     <tr>
                         <th>No</th>
                         <th>유형</th>
@@ -169,7 +169,7 @@ const SellerQnaListPage = () => {
                             .map((item, index) => {
                                 const sequentialNumber = page * pageSize + index + 1;
 
-                                // ⭐ 콘솔 로그 2: 각 항목의 답변 상태 확인
+                                // 콘솔 로그 2: 각 항목의 답변 상태 확인
                                 console.log(`QnA ID ${item.id} - Title: ${item.title}`);
                                 console.log(`  -> isAnswered: ${item.isAnswered}`);
                                 console.log(`  -> Answer Content (for check): ${item.answer}`);
@@ -181,7 +181,7 @@ const SellerQnaListPage = () => {
                                         style={{ cursor: "pointer" }}
                                     >
                                         <td>{sequentialNumber}</td>
-                                        {/* 💡 유형 표시 복원 */}
+                                        {/* 유형 표시 복원 */}
                                         <td className="text-center">
                                             {item.qnaType === 'GENERAL' ? '일반문의' :
                                                 (item.productName || '상품문의')}

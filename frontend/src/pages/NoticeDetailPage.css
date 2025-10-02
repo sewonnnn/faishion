@@ -1,69 +1,223 @@
-/* 기존 CSS에 추가 */
+/* 페이지 여백 */
+.notice-detail { padding: 24px; }
 
-.notice-form {
+/* 카드: 그림자 최소화 + 얇은 보더 */
+.notice-detail .card {
     max-width: 960px;
     margin: 0 auto;
-    padding: 64px 20px 56px;
-}
-
-.notice-inner {
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid #dcdfe3; /* 약간 더 짙은 경계선 */
+    border-radius: 12px; /* 조금 더 둥글게 */
+    box-shadow: 0 4px 12px rgba(0,0,0,.05); /* 부드러운 그림자 */
+    overflow: hidden;
 }
 
-.answer-section {
-    margin-top: 20px;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
+/* 헤더: 제목 영역 */
+.notice-detail .card-header {
+    padding: 24px 24px 16px; /* 상하 여백 조정 */
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb; /* 얇은 구분선 */
+}
+.notice-detail .card-header h1 {
+    margin: 0 0 16px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    word-break: break-word;
 }
 
-.answer-box {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
-    position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.answer-box p {
-    margin: 0 0 10px 0;
+/* 헤더 메타 정보 (작성일) */
+.notice-detail .card-header .meta {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     font-size: 14px;
-    color: #555;
-    line-height: 1.5;
+    color: #6b7280;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+.notice-detail .card-header .meta .label {
+    color: #9aa0a6;
+    margin-right: 8px;
+    font-weight: 500;
+}
+.notice-detail .card-header .meta .value {
+    font-weight: 600;
 }
 
-.answered-by {
-    font-size: 12px;
-    color: #888;
-    display: block;
-    text-align: right;
+/* 바디 */
+.notice-detail .card-body {
+    padding: 24px;
 }
 
-.answer-form textarea {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    font-size: 14px;
+/* 행 여백 */
+.notice-detail .row { margin-bottom: 24px; } /* 내용 영역과 버튼 영역 사이 여백 */
+.notice-detail .content-row { margin-bottom: 30px; } /* 내용 영역 하단 여백 강조 */
+
+
+/* 읽기/내용 */
+.notice-detail .read {
+    font-size: 16px;
     color: #333;
+    line-height: 1.8;
+    padding: 0;
+    text-align: left;
+    min-height: 200px;
+}
+.notice-detail .prewrap {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
-.answer-form button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin-top: 10px;
-    cursor: pointer;
-    border-radius: 4px;
+/* 입력 컨트롤 */
+.notice-detail .editor { position: relative; }
+
+/* 제목 입력 필드 */
+.notice-detail .title-editor { margin-bottom: 24px; }
+.notice-detail .title-editor .form-control {
+    font-size: 24px;
+    font-weight: 700;
+    padding: 10px 12px;
 }
+.notice-detail .title-editor .count { bottom: -20px; } /* 제목 입력란 하단으로 이동 */
+
+.notice-detail .form-control {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dcdfe3;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #222;
+    transition: border-color .15s, box-shadow .15s;
+}
+.notice-detail .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.25);
+}
+.notice-detail .textarea { min-height: 260px; resize: vertical; }
+
+/* 글자수 */
+.notice-detail .count {
+    position: absolute; right: 4px; bottom: -20px; /* 위치 조정 */
+    font-size: 12px; color: #9aa0a6;
+}
+
+/* 버튼 그룹: 오른쪽 배치 */
+.notice-detail .actions {
+    display: flex; justify-content: flex-end; gap: 8px; /* 간격 증가 */
+}
+
+/* 버튼 기본 스타일 */
+.notice-detail .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.notice-detail .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* 기본 버튼 (목록, 수정 완료) - Primary: 파란색 계열 */
+.notice-detail .btn-primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+.notice-detail .btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+/* 목록/취소 버튼 - Light: 밝은 회색 */
+.notice-detail .btn-light {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+.notice-detail .btn-light:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+/* 삭제 버튼 - Danger: 빨간색 계열 */
+.notice-detail .btn-danger {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+}
+.notice-detail .btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+/* (기존 .btn-outline 스타일은 제거. 수정 버튼을 btn-primary로 통일) */
+
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .notice-detail { padding: 16px; }
+    .notice-detail .card { border-radius: 10px; }
+    .notice-detail .card-header h1 { font-size: 24px; margin-bottom: 12px; }
+    .notice-detail .card-header { padding: 20px 20px 12px; }
+    .notice-detail .card-body { padding: 20px; }
+    .notice-detail .btn { padding: 6px 12px; font-size: 13px; border-radius: 6px; }
+    .notice-detail .title-editor .form-control { font-size: 20px; }
+}
+/* 버튼 그룹: 오른쪽 배치 */
+.notice-detail .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* 버튼 기본 스타일 */
+.notice-detail .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.notice-detail .btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* 목록 버튼 - 밝은 회색 */
+.notice-detail .btn-light {
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+.notice-detail .btn-light:hover:not(:disabled) {
+    background: #e5e7eb;
+}
+
+/* 수정 버튼 - 중간 회색 */
+.notice-detail .btn-primary {
+    background: #4b5563;   /* 회색 */
+    border: 1px solid #4b5563;
+    color: #fff;
+}
+.notice-detail .btn-primary:hover:not(:disabled) {
+    background: #374151;   /* 더 진한 회색 */
+    border-color: #374151;
+}
+
+/* 삭제 버튼 - 검정색 */
+.notice-detail .btn-danger {
+    background: #111827;   /* 거의 검정 */
+    border: 1px solid #111827;
+    color: #fff;
+}
+.notice-detail .btn-danger:hover:not(:disabled) {
+    background: #000;
+    border-color: #000;
+}
+

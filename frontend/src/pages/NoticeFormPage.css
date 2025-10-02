@@ -1,0 +1,118 @@
+/* 페이지 섹션: 가운데 정렬 + 여백 */
+.admin-notice-form {
+    padding: 24px;
+}
+
+/* 카드 레이아웃: 스크린샷 느낌(라운드 + 그림자) */
+.admin-notice-form .card {
+    max-width: 880px;           /* 스크린샷 비율에 맞춘 폭 */
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+/* 카드 헤더: 중앙 타이틀 */
+.admin-notice-form .card-header {
+    padding: 20px 24px 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    text-align: center;
+}
+.admin-notice-form .card-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+.admin-notice-form .card-header .subtitle {
+    margin-top: 6px;
+    color: #9aa0a6;
+    font-size: 13px;
+}
+
+/* 카드 바디 */
+.admin-notice-form .card-body {
+    padding: 20px 24px 24px;
+}
+
+/* 폼 필드 */
+.admin-notice-form .form-row {
+    margin-bottom: 18px;
+    position: relative;
+}
+.admin-notice-form label {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #222;
+}
+.admin-notice-form .form-control {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #222;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.admin-notice-form .form-control:focus {
+    outline: none;
+    border-color: #84a5ff;
+    box-shadow: 0 0 0 3px rgba(132,165,255,.25);
+}
+.admin-notice-form .textarea {
+    resize: vertical;
+    min-height: 200px;
+}
+
+/* 글자수 카운트 */
+.admin-notice-form .count {
+    position: absolute;
+    right: 10px;
+    bottom: -18px;
+    font-size: 12px;
+    color: #9aa0a6;
+}
+
+/* 버튼 영역 */
+.admin-notice-form .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* 버튼 스타일 (부트스트랩이 있으면 그 스타일과 잘 어울리게 톤만) */
+.admin-notice-form .btn {
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+.admin-notice-form .btn-light {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #374151;
+}
+.admin-notice-form .btn-light:hover {
+    background: #e5e7eb;
+}
+.admin-notice-form .btn-primary {
+    background: #111827;
+    border-color: #111827;
+    color: #fff;
+}
+.admin-notice-form .btn-primary:hover {
+    background: #0f172a;
+    border-color: #0f172a;
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+    .admin-notice-form { padding: 16px; }
+    .admin-notice-form .card { border-radius: 10px; }
+    .admin-notice-form .card-header h1 { font-size: 22px; }
+}

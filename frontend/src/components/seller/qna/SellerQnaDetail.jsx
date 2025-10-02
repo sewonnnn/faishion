@@ -84,7 +84,7 @@ const SellerQnaDetail = () => {
         <Container className="my-5">
             <Row className="mb-4">
                 <Col>
-                    <h1 className="text-center">문의사항 상세</h1>
+                    <h3>문의사항 상세</h3>
                 </Col>
             </Row>
 

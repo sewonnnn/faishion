@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Spinner, Alert, Pagination } from 'react-bootstrap';
 // useAuth는 API 호출을 위해 필요하다고 가정합니다.
 import { useAuth } from '../../contexts/AuthContext.jsx'; // 💡 useAuth import 가정
+import "./AdminSellerListPage.css";
 
 const AdminSellerListPage = () => {
     const { api } = useAuth(); // 💡 실제 API 호출을 위해 useAuth 사용
@@ -87,9 +88,9 @@ const AdminSellerListPage = () => {
 
     return (
         <Container className="my-5" style={{ maxWidth: '1000px' }}>
-            <h1 className="mb-4 text-center">판매자 관리 목록</h1>
+            <h3 className="mb-4">판매자 관리 목록</h3>
 
-            <Table striped bordered hover responsive className="text-center">
+            <Table striped bordered hover responsive className="adminSeller-table text-center">
                 <thead>
                     <tr>
                         <th style={{ width: '10%' }}>ID</th>
@@ -100,14 +101,14 @@ const AdminSellerListPage = () => {
                         <th style={{ width: '15%' }}>액션</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{backgroundColor:"white"}}>
                     {currentSellers.length > 0 ? (
                         currentSellers.map((seller) => (
                             <tr key={seller.id}>
                                 <td>{seller.id}</td>
-                                <td className="text-start">{seller.businessName}</td>
+                                <td className="text-center">{seller.businessName}</td>
                                 <td>{seller.ownerName}</td>
-                                <td className="text-start">{seller.email}</td>
+                                <td className="text-center">{seller.email}</td>
                                 <td>{new Date(seller.createdAt).toLocaleDateString('ko-KR')}</td>
                                 <td>
                                     <Button
