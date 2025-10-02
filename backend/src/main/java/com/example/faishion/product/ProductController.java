@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/product")
 public class ProductController {
     private final ProductService productService;
-    private final ProductRepository productRepository;
     private final ReviewService reviewService;
 
     @PostMapping
@@ -37,11 +36,7 @@ public class ProductController {
 
     @PutMapping("/admin/pick/{productId}")
     boolean adminPick(@PathVariable Long productId, @RequestBody Map<String, Object> requestBody){
-        Product product = productRepository.findById(productId).orElseThrow();
-        boolean pick = (boolean)requestBody.get("pick");
-        product.setPick(pick);
-        productRepository.save(product);
-        return pick;
+        return productService.adminPick(productId, (boolean)requestBody.get("pick"));
     }
 
     @PutMapping

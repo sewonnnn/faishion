@@ -27,6 +27,13 @@ public class UserController {
     private final ImageRepository imageRepository;
     private final AddressService addressService;
     private final PasswordEncoder passwordEncoder; // ⭐ 추가: PasswordEncoder 주입
+    private final BannerService bannerService;
+
+    @GetMapping("/banner")
+    public ResponseEntity<List<BannerDTO>> userBanner(@AuthenticationPrincipal UserDetails userDetails){
+        List<BannerDTO> bannerList = bannerService.getBannersForUser(userDetails == null ? null : userDetails.getUsername());
+        return ResponseEntity.ok(bannerList);
+    }
 
     @GetMapping("/")
     public ResponseEntity<UserUpdateDTO> tokenUser(@AuthenticationPrincipal UserDetails userDetails) {

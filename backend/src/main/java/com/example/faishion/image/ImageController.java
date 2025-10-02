@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/image")
@@ -37,4 +40,15 @@ public class ImageController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    /*
+    @PostMapping("/generate")
+    public void generateFashionImage(
+            @RequestParam("dressId") Long dressId,
+            @RequestParam("modelId") Long modelId) throws IOException {
+        List<Long> imageIds = List.of(dressId, modelId);
+        Image generatedImage = imageService.generateImage(imageIds,
+                "Create a professional e-commerce fashion photo. Take the blue floral dress from the first image and let the woman from the second image wear it. Generate a realistic, full-body shot of the woman wearing the dress, with the lighting and shadows adjusted to match the outdoor environment.");
+    }
+     */
 }
