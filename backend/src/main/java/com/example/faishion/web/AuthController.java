@@ -43,19 +43,9 @@ public class AuthController {
 
     // 로컬 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
+    public ResponseEntity<String> login(@Valid @RequestBody AuthDto.LoginReq req, HttpServletResponse response) {
         User u = authService.loginLocal(req.getLoginId(), req.getPassword()); //수정
-        Map<String, String> tokens = authService.issueTokens(u);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.get("refresh"))
-                .httpOnly(true)
-                .path("/")
-                .maxAge(1209600)
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of("accessToken", tokens.get("access")));
+        return token(u.getId(), "USER");
     }
 
     //추가

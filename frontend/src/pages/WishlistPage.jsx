@@ -101,7 +101,7 @@ const WishlistPage = () => {
                                 </button>
                             </div>
                             <Card.Body>
-                                <Card.Title className="text-truncate">{product.name}</Card.Title>
+                                <Card.Title><h6>{product.name}</h6></Card.Title>
                                 <Card.Text>
                                     <strong>{product.price.toLocaleString()}원</strong>
                                 </Card.Text>

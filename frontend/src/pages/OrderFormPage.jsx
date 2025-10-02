@@ -146,24 +146,22 @@ const OrderFormPage = () => {
     const totals = useMemo(() => {
         let totalOriginal = 0;
         let totalDiscounted = 0;
-        let totalDisc = 0;
+        let totalDiscount = 0;
         orderItems.forEach(item => {
             const priceToUse = item.discountedProductPrice != null ? item.discountedProductPrice : item.productPrice;
-            totalOriginal += item.productPrice * item.quantity;
-            totalDiscounted += priceToUse * item.quantity;
-            totalDisc += (item.productPrice - priceToUse) * item.quantity;
-        });
 
-        // 이미지에 맞춰 '장바구니 쿠폰' 할인 2,000원을 시뮬레이션
-        const couponDiscount = 2000;
-        const finalTotalDiscount = totalDisc + couponDiscount;
-        const finalTotalDiscountedPrice = totalDiscounted - couponDiscount;
+            const originalItemTotal = item.productPrice * item.quantity;
+            const discountedItemTotal = priceToUse * item.quantity;
+
+            totalOriginal += originalItemTotal;
+            totalDiscounted += discountedItemTotal;
+            totalDiscount += (originalItemTotal - discountedItemTotal);
+        });
 
         return {
             totalOriginalPrice: totalOriginal,
-            totalDiscountedPrice: finalTotalDiscountedPrice > 0 ? finalTotalDiscountedPrice : 0,
-            totalDiscount: finalTotalDiscount,
-            couponDiscount: couponDiscount,
+            totalDiscountedPrice: totalDiscounted, // ⭐ 수정: 직접 계산된 변수 사용
+            totalDiscount: totalDiscount, // ⭐ 수정: 직접 계산된 변수 사용
         };
     }, [orderItems]);
 
@@ -256,13 +254,13 @@ const OrderFormPage = () => {
             <Row>
                 {/* A. 주문/배송 정보 (좌측, 큰 영역) */}
                 <Col lg={8} className="mb-4">
-                    <h2 className="text-xl font-bold mb-4 border-bottom pb-2 order-section-title" >주문서</h2>
+                    <h2 className="text-xl font-bold mb-4 border-bottom pb-4 order-section-title" >주문서</h2>
                     {/* 1. 배송지 정보 */}
                     <Card className="shadow-none border-0 mb-5 p-0">
                         <Card.Body className="p-0">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h4 className="text-lg font-bold mb-0 d-inline-block me-2"><b>{userProfile?.name || "박세원"}</b></h4>
+                                    <h5 className="text-lg font-bold mb-0 d-inline-block me-2"><b>{userProfile?.name || "사용자"}</b></h5>
                                     <span className="text-sm text-gray-500 font-medium delivery-tag">기본 배송지</span>
                                 </div>
 
@@ -286,10 +284,8 @@ const OrderFormPage = () => {
                             </p>
 
                             {/* 배송 요청사항 */}
-                            <Form.Group as={Row} className="mt-4 align-items-center">
-
+                            <Form.Group as={Row} className="mt-4 align-items-top">
                                 <Form.Label column sm="3" className="font-medium text-sm">배송 요청 (선택)</Form.Label>
-
                                 <Col sm="9">
                                     <Form.Control
                                         as="textarea" // 여러 줄 입력을 위해 textarea 사용
@@ -298,7 +294,6 @@ const OrderFormPage = () => {
                                         onChange={handleRequestMsgChange}
                                         className="rounded-lg"
                                         placeholder="예: 문 앞에 놔주세요, 경비실에 맡겨주세요, 배송 전에 전화 부탁드립니다."
-
                                     />
                                 </Col>
                             </Form.Group>
@@ -367,7 +362,7 @@ const OrderFormPage = () => {
                 <Col lg={4}>
                     <Card className="shadow-none border-1 sticky-card">
                         <Card.Body className="p-4">
-                            <h3 className="text-xl font-bold mb-4 pb-2"><b>결제 정보</b></h3>
+                            <h4 className="text-xl font-bold mb-4 pb-2"><b>결제 정보</b></h4>
 
                             {/* 상품 금액 */}
                             <div className="d-flex justify-content-between mb-3 text-gray-700 payment-detail-row">
@@ -384,7 +379,7 @@ const OrderFormPage = () => {
                             {/* 할인 금액 */}
                             <div className="d-flex justify-content-between mb-3 text-gray-700 payment-detail-row">
                                 <span>할인 금액</span>
-                                <span> -{formatPrice(totals.couponDiscount)}원</span>
+                                <span> -{formatPrice(totals.totalDiscount)}원</span>
                             </div>
 
                             {/* 총 결제 금액 */}

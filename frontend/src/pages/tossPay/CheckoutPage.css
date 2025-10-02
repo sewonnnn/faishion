@@ -1,0 +1,30 @@
+.checkWrapper{
+    padding-bottom: 28px;
+}
+
+.custom-pay-button {
+    background-color: #1850DB;
+    color: white;
+    width: 50%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+    margin-left: 333px;
+}
+
+/* 버튼 비활성화 상태 스타일 */
+.custom-pay-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 마우스 오버 시 스타일 */
+.custom-pay-button:not(:disabled):hover {
+    background-color: #2b51cc; /* 조금 더 진한 색상 */
+}

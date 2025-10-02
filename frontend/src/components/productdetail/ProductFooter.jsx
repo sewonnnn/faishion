@@ -18,10 +18,6 @@ const ProductFooter = ({ productId }) => {
         setRefreshQuestionList(prev => !prev);
     };
 
-    const handleReviewSubmitted = () => {
-        setRefreshReviewList(prev => !prev);
-    };
-
     return (
         <Container className="my-5">
             <Nav variant="tabs" defaultActiveKey="review" className="custom-tabs" onSelect={(selectedKey) => {
@@ -36,9 +32,6 @@ const ProductFooter = ({ productId }) => {
                 <Nav.Item>
                     <Nav.Link eventKey="qna">상품 문의</Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="shipping">배송/교환/반품 안내</Nav.Link>
-                </Nav.Item>
             </Nav>
             <Tab.Content className="mt-4">
                 <Tab.Pane eventKey="review" active={activeTab === 'review'}>
@@ -50,9 +43,6 @@ const ProductFooter = ({ productId }) => {
                         onQuestionSubmitted={handleQuestionSubmitted}
                     />
                     <QuestionList productId={productId} key={refreshQuestionList} />
-                </Tab.Pane>
-                <Tab.Pane eventKey="shipping" active={activeTab === 'shipping'}>
-                    <p>배송/교환/반품에 대한 안내 내용입니다.</p>
                 </Tab.Pane>
             </Tab.Content>
         </Container>

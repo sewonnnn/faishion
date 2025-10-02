@@ -111,7 +111,7 @@ const Header = () => {
 
     return (
         <>
-            <Navbar expand="lg" className="top-nav">
+            <Navbar className="top-nav">
                 <Container fluid>
                     <Navbar.Brand href="/">
                         <h1 className="logo">fAIshion</h1>
@@ -180,19 +180,20 @@ const Header = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <Button variant="outline-success" type="submit">
+                            <Button type="submit" class="border-0">
                                 <i className="bi bi-search"></i>
                             </Button>
                         </Form>
                     </div>
+                    {isMenuOpen && (
+                        <div
+                            className="full-screen-dropdown w-100"
+                        >
+                            {renderAllMenu()}
+                        </div>
+                    )}
                 </Container>
-                {isMenuOpen && (
-                    <div
-                        className="full-screen-dropdown"
-                    >
-                        {renderAllMenu()}
-                    </div>
-                )}
+
             </div>
         </>
     );

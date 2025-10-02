@@ -1,5 +1,7 @@
 // src/components/AdminReportList.jsx (최종 수정본: 필터 및 검색 기능 추가)
 import React, { useState, useEffect, useCallback } from 'react';
+import "./AdminReportList.css";
+
 import {
     ListGroup, Card, Button, Pagination, Alert, Badge,
     Container, Row, Col, Form, InputGroup

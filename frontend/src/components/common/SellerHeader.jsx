@@ -27,7 +27,7 @@ const SellerHeader = () => {
                         </a>
 
                         <NavDropdown title="상품 관리" id="product-dropdown">
-                            <a className="dropdown-item" href="/seller/product/list">
+                            <a className="dropdown-item" href="/seller">
                                 상품 목록
                             </a>
                             <a className="dropdown-item" href="/seller/product/new">

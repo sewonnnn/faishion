@@ -62,4 +62,5 @@ public class Order {
 
     @Column(nullable = false) // 최종 결제 금액 (백엔드 검증에 필수)
     private double totalAmount;
+
 }

@@ -239,7 +239,7 @@ const AddressModal = ({show, handleClose, handleAddressUpdated, handleAddressSel
                                     </div>
                                     {!address.isDefault && (
                                         <Button
-                                            variant="info"
+                                            variant="outline-secondary"
                                             size="sm"
                                             onClick={(e) => {
                                                 e.stopPropagation();

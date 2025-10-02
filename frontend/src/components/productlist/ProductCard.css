@@ -10,7 +10,7 @@
 .card-img-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 325px; /* 4:3보다 살짝 세로로 긴 박스 */
+    padding-top: 350px; /* 4:3보다 살짝 세로로 긴 박스 */
     overflow: hidden;
     background-color: #f8f8f8;
 }
