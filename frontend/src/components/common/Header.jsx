@@ -180,7 +180,7 @@ const Header = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <Button type="submit">
+                            <Button type="submit" class="border-0">
                                 <i className="bi bi-search"></i>
                             </Button>
                         </Form>

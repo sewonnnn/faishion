@@ -11,7 +11,7 @@ const ProductListPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [typeName, setTypeName] = useState('');
-    const pageSize = 8;
+    const pageSize = 10;
     const location = useLocation();
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
