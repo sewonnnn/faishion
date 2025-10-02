@@ -178,14 +178,14 @@ const OrderDetailPage = () => {
                     <button onClick={() => nav(-1)} className="btn btn-link text-dark p-0 me-2" style={{ textDecoration: 'none' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
-                    <h1 className="fs-4 fw-bold mb-0">주문 상세 내역</h1>
+                    <h5 className=" fw-bold mb-0">주문 상세 내역</h5>
                 </header>
 
                 <div className="p-3">
 
                     {/* 배송지 정보 섹션 (공통) */}
                     <section className="pb-3 border-bottom">
-                        <h2 className="fs-5 fw-bold mb-3 text-start">수령 및 배송 정보</h2>
+                        <h5 className=" fw-bold mb-3 text-start">수령 및 배송 정보</h5>
                         <p className="fw-bold mb-1">{receiverName}
                             <span className="badge bg-secondary ms-2" style={{ fontSize: '0.75rem' }}>수령인</span>
                         </p>
@@ -242,7 +242,7 @@ const OrderDetailPage = () => {
                                                 <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.8rem' }}>
                                                     {formatPrice(item.originPrice)}원
                                                 </p>
-                                                <p className="fw-bold mb-0 text-danger" style={{ fontSize: '1.05rem' }}>
+                                                <p className="orderDetailDiscount" style={{ fontSize: '1.05rem' }}>
                                                     {formatPrice(item.price)}원
                                                 </p>
                                             </div>
@@ -290,7 +290,7 @@ const OrderDetailPage = () => {
                         </p>
                         <p className="d-flex justify-content-between fw-bold fs-6 border-top pt-2 mt-2">
                             <span>총 결제 금액</span>
-                            <span className="text-danger">{formatPrice(orderDetail.totalAmount)}원</span>
+                            <span className="orderDetailDiscount">{formatPrice(orderDetail.totalAmount)}원</span>
                         </p>
                         <p className="text-end text-muted" style={{fontSize: '0.8rem'}}>({orderDate} 결제)</p>
                     </section>

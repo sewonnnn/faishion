@@ -75,3 +75,7 @@
 .delivery-steps-container > .delivery-step:last-child .step-line {
     display: none;
 }
+
+.orderDetailDiscount{
+    color: #1850DB;
+}

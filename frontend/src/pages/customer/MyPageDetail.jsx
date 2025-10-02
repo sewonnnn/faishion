@@ -212,8 +212,8 @@ const MyPageDetail = () => {
         <Container className="mt-5">
             <Row className="justify-content-center">
                 <Col md={8} lg={6}>
-                    <Card>
-                        <Card.Body className="p-4">
+                    <Card className="border-0">
+                        <Card.Body className="p-4 bg-white" >
                             <h4 className="text-center mb-4">회원 정보 수정</h4>
                             <Form onSubmit={handleSubmit}>
                                 {/* 프로필 사진 섹션 */}
