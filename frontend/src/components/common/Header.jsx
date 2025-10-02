@@ -111,7 +111,7 @@ const Header = () => {
 
     return (
         <>
-            <Navbar expand="lg" className="top-nav">
+            <Navbar className="top-nav">
                 <Container fluid>
                     <Navbar.Brand href="/">
                         <h1 className="logo">fAIshion</h1>
