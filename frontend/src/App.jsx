@@ -19,13 +19,10 @@ import SellerProductFormPage from "./pages/seller/SellerProductFormPage.jsx";
 import AdminPage from "./pages/admin/AdminPage.jsx";
 import AdminSellerListPage from "./pages/admin/AdminSellerListPage.jsx";
 import AdminSellerDetailPage from "./pages/admin/AdminSellerDetailPage.jsx";
-import AdminHeader from "./components/common/AdminHeader.jsx";
-import SellerHeader from "./components/common/SellerHeader.jsx";
 import Header from "./components/common/Header.jsx";
 import Gemini from "./pages/Gemini.jsx";
 import Footer from "./components/common/Footer.jsx";
 import SellerQnaListPage from "./pages/seller/SellerQnaListPage.jsx";
-import AdminNoticeListPage from "./pages/admin/AdminNoticeListPage.jsx";
 import NoticeListPage from "./pages/NoticeListPage.jsx";
 import NoticeDetailPage from "./pages/NoticeDetailPage.jsx";
 import QnaFormPage from "./pages/QnaFormPage.jsx";
@@ -63,9 +60,8 @@ function Layout() {
 }
 
 const adminMenuItems = [
-    {name : "대시보드", href : "/admin"},
+    {name : "추천 상품 관리", href : "/admin"},
     {name : "카테고리 관리", href : "/admin/category"},
-    {name : "추천 상품 관리", href : "/admin/product/list"},
     {name : "판매자 관리", href : "/admin/seller/list"},
     {name : "문의 글 관리", href : "/admin/qna/list"},
     {name : "신고 관리", href : "/admin/report/list"},
@@ -73,8 +69,7 @@ const adminMenuItems = [
 ];
 
 const sellerMenuItems = [
-    {name : "대시보드", href : "/seller"},
-    {name : "상품 관리", href : "/seller/product/list"},
+    {name : "상품 관리", href : "/seller"},
     {name : "주문 현황 관리", href : "/seller/order/list"},
     {name : "문의 글 관리", href : "/seller/qna/list"},
 ];
@@ -163,8 +158,7 @@ function App() {
               <Route element={<SellerLayout />}>
                 <Route path="/seller/order/list" element={<SellerOrderListPage />}/>
                 <Route path="/seller/qna/list" element={<SellerQnaListPage />}/>
-                <Route path="/seller" element={<SellerPage />} /> {/*판매자 대시보드*/}
-                <Route path="/seller/product/list" element={<SellerProductListPage />}/> {/*판매자 상품 목록 페이지*/}
+                <Route path="/seller" element={<SellerProductListPage />}/> {/*판매자 상품 목록 페이지*/}
                 <Route path="/seller/product/:productId" element={<SellerProductDetailPage />}/> {/*판매자 상품 상세 조회 페이지*/}
                 <Route path="/seller/product/new" element={<SellerProductFormPage />}/> {/*판매자 상품 등록 폼 페이지*/}
                 <Route path="/seller/product/edit" element={<SellerProductFormPage />}/> {/*판매자 상품 편집 폼 페이지*/}
@@ -178,10 +172,9 @@ function App() {
                    <Route path="/admin/notice/:noticeId" element={<NoticeDetailPage/>}/> {/*공지사항 작성 페이지*/}
                    <Route path="/admin/notice/new" element={<NoticeFormPage/>}/> {/*공지사항 작성 페이지*/}
                    <Route path="/admin/notice/list" element={<NoticeListPage/>}/> {/* 관리자 공지사항 목록 페이지 */}
-                   <Route path="/admin" element={<AdminPage />} />   {/*관리자 대시보드*/}
+                    <Route path="/admin" element={<AdminProductListPage />} />{/* 관리자 상품추천 페이지*/}
                    <Route path="/admin/category" element={<AdminCategoryPage />}/> {/*판매자 카테고리 페이지*/}
                    <Route path="/admin/seller/list" element={<AdminSellerListPage />} />   {/*관리자 판매자 목록 페이지*/}
-                   <Route path="/admin/product/list" element={<AdminProductListPage />} />
                    <Route path="/admin/seller/:sellerId" element={<AdminSellerDetailPage />} />   {/*관리자 판매자 상세/권한 수정 페이지*/}
                    <Route path="/admin/report/list" element={<AdminReportList />} />   {/*관리자 신고글 확인 페이지 */}
                     <Route path="/admin/qna/list" element={<QnaListPage/>}/> {/*문의사항 페이지*/}

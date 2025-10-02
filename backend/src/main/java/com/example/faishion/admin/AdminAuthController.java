@@ -30,8 +30,8 @@ public class AdminAuthController {
         Admin admin = adminService.loginAdmin(id, password);
 
         // 관리자 전용 JWT 발급
-        String accessToken = jwt.generateAccess(admin.getId(), List.of("ROLE_ADMIN"));
-        String refreshToken = jwt.generateRefresh(admin.getId(), List.of("ROLE_ADMIN"));
+        String accessToken = jwt.generateAccess(admin.getId(), List.of("ADMIN"));
+        String refreshToken = jwt.generateRefresh(admin.getId(), List.of("ADMIN"));
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)

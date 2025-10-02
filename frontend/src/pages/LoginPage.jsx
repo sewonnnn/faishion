@@ -50,7 +50,7 @@ const LoginPage = () => {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
-            login(res.data.accessToken);
+            key === "seller" ? login(res.data.accessToken) : login(res.data);
             alert("로그인 성공!");
             nav("/");
         } catch (err) {
