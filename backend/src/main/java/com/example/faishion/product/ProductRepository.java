@@ -61,4 +61,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 관리자가 추천상품 등록 한 상품 찾기
     List<Product> findByPickTrue();
+
+    Page<Product> findByPickTrue(Pageable pageable);
 }

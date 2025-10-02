@@ -42,7 +42,7 @@ function ToggleImageCard({item}) {
             <p className="mb-0 fw-bold" style={{ fontSize: "0.9rem" }}>{item.businessName}</p>
           </div>
           <div className="text-end">
-            <Button
+             {item.aiImage && (<Button
               variant="dark"
               className="rainbow-btn"
               size="lg"
@@ -52,6 +52,7 @@ function ToggleImageCard({item}) {
             >
               AI 미리보기
             </Button>
+            )}
           </div>
         </div>
       </Card.ImgOverlay>

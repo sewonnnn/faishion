@@ -24,7 +24,7 @@ public class Delivery {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @Enumerated(EnumType.STRING)   // Enum을 문자열로 DB에 저장
@@ -33,7 +33,7 @@ public class Delivery {
     private String trackingNumber; // 운송장 번호
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "seller_id", nullable = false)
     private Seller seller;
 
     @CreationTimestamp

@@ -1,100 +1,52 @@
 import Banner from "../components/productlist/Banner.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import ProductListPage from "./ProductListPage.jsx";
 import MultiCarousel from '../components/home/MultiCarousel';
 
-const items = [
-    {
-      id: 1,
-      image: 'http://localhost:5173/ex1_1.png',
-      aiImage: 'http://localhost:5173/ex1_2.png',
-      description: '페이션 패션쇼 컬렉션 2025',
-      businessName: '페이션',
-    },
-{
-      id: 2,
-      image: 'http://localhost:5173/ex2_1.png',
-      aiImage: 'http://localhost:5173/ex2_2.png',
-      description: '매일 입고 싶은 데일리 웨어',
-      businessName: 'BOOMI',
-    }
-,{
-       id: 3,
-       image: 'http://localhost:5173/ex3_1.png',
-       aiImage: 'http://localhost:5173/ex3_2.png',
-       description: '가을 스트리트 정장룩 100% 할인',
-       businessName: 'SEWON',
-     },
- {
-       id: 4,
-       image: 'http://localhost:5173/ex4_1.png',
-       aiImage: 'http://localhost:5173/ex4_2.png',
-       description: '차분한 명절 한복',
-       businessName: '현호네 한복',
-     },
- {
-       id: 5,
-       image: 'http://localhost:5173/ex1_1.png',
-       aiImage: 'http://localhost:5173/ex1_2.png',
-       description: '페이션 패션쇼 컬렉션 2025',
-       businessName: '페이션',
-     },
- {
-       id: 6,
-       image: 'http://localhost:5173/ex2_1.png',
-       aiImage: 'http://localhost:5173/ex2_2.png',
-       description: '매일 입고 싶은 데일리 웨어',
-       businessName: 'BOOMI',
-     }
- ,{
-        id: 7,
-        image: 'http://localhost:5173/ex3_1.png',
-        aiImage: 'http://localhost:5173/ex3_2.png',
-        description: '가을 스트리트 정장룩 100% 할인',
-        businessName: 'SEWON',
-      },
-  {
-        id: 8,
-        image: 'http://localhost:5173/ex4_1.png',
-        aiImage: 'http://localhost:5173/ex4_2.png',
-        description: '차분한 명절 한복',
-        businessName: '현호네 한복',
-      },
-  {
-        id: 9,
-        image: 'http://localhost:5173/ex1_1.png',
-        aiImage: 'http://localhost:5173/ex1_2.png',
-        description: '페이션 패션쇼 컬렉션 2025',
-        businessName: '페이션',
-      },
-  {
-        id: 10,
-        image: 'http://localhost:5173/ex2_1.png',
-        aiImage: 'http://localhost:5173/ex2_2.png',
-        description: '매일 입고 싶은 데일리 웨어',
-        businessName: 'BOOMI',
-      }
-  ,{
-         id: 11,
-         image: 'http://localhost:5173/ex3_1.png',
-         aiImage: 'http://localhost:5173/ex3_2.png',
-         description: '가을 스트리트 정장룩 100% 할인',
-         businessName: 'SEWON',
-       },
-   {
-         id: 12,
-         image: 'http://localhost:5173/ex4_1.png',
-         aiImage: 'http://localhost:5173/ex4_2.png',
-         description: '차분한 명절 한복',
-         businessName: '현호네 한복',
-       },
-];
-
 const HomePage = () => {
+    const { api } = useAuth();
+    const [carouselItems, setCarouselItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchBanners = async () => {
+            try {
+                const response = await api.get('/user/banner');
+                const bannerDTOs = response.data;
+                const transformedItems = bannerDTOs.map((dto) => ({
+                    id: dto.productId,
+                    image: `${api.defaults.baseURL}/image/${dto.imageId}`,
+                    aiImage: dto.aiImageId ? `${api.defaults.baseURL}/image/${dto.aiImageId}` : null,
+                    description: dto.description,
+                    businessName: dto.businessName,
+                }));
+                console.log(transformedItems);
+                setCarouselItems(transformedItems);
+            } catch (e) {
+                console.error("Error fetching banners:", e);
+                // Axios 에러 처리
+                setError(e.response ? e.response.data.message : e.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBanners();
+    }, [api]); // api가 변경될 일은 거의 없지만, useEffect의 의존성 배열에 포함
+
+    if (isLoading) {
+        return <div style={{textAlign: 'center', padding: '20px'}}>✨ 배너 정보를 로딩 중이에요...</div>;
+    }
+    if (error) {
+        // 서버에서 에러 메시지가 온 경우를 보여줍니다.
+        return <div style={{textAlign: 'center', padding: '20px', color: 'red'}}>⚠️ 배너 로딩 실패: {error}</div>;
+    }
+
     return (
         <>
-            <MultiCarousel items={items}/>
+            <MultiCarousel items={carouselItems}/>
             <div className="productListPage_Banners">
 {/*                 <Banner /> */}
                 <ProductListPage/>

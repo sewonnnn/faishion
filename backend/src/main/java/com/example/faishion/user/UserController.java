@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder; // ⭐추�
 import org.springframework.web.bind.annotation.*;
 import com.example.faishion.address.Address;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,13 @@ public class UserController {
     private final ImageRepository imageRepository;
     private final AddressService addressService;
     private final PasswordEncoder passwordEncoder; // ⭐ 추가: PasswordEncoder 주입
+    private final BannerService bannerService;
+
+    @GetMapping("/banner")
+    public ResponseEntity<List<BannerDTO>> userBanner(@AuthenticationPrincipal UserDetails userDetails){
+        List<BannerDTO> bannerList = bannerService.getBannersForUser(userDetails == null ? null : userDetails.getUsername());
+        return ResponseEntity.ok(bannerList);
+    }
 
     @GetMapping("/")
     public ResponseEntity<UserUpdateDTO> tokenUser(@AuthenticationPrincipal UserDetails userDetails) {
@@ -99,6 +107,7 @@ public class UserController {
                 Image image = imageRepository.findById(userUpdateDTO.getImage().getId())
                         .orElseThrow(() -> new RuntimeException("Image not found with ID: " + userUpdateDTO.getImage().getId()));
                 existingUser.setImage(image);
+                existingUser.setImageUpdatedAt(LocalDateTime.now());
             } else {
                 // 이미지가 null이고 ID도 없으면 이미지 삭제로 판단
                 existingUser.setImage(null);

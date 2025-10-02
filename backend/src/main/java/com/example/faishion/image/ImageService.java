@@ -1,10 +1,16 @@
 package com.example.faishion.image;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -12,16 +18,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ImageService {
-
+    private final RestTemplate restTemplate;
     private final ImageRepository imageRepository;
-    private final String uploadDir = "C:/upload/"; // 환경변수로 변경 가능
+    private final String uploadDir; // 환경변수로 변경 가능
+
+    @Value("${google.api.key}")
+    private String googleApiKey;
 
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
+        this.restTemplate = new RestTemplate();
+        this.uploadDir = "C:/upload/";
     }
 
     // 이미지 저장
@@ -122,5 +137,83 @@ public class ImageService {
         byte[] fileContent = Files.readAllBytes(path);
         // 바이트 배열을 Base64 문자열로 인코딩하여 반환합니다.
         return Base64.getEncoder().encodeToString(fileContent);
+    }
+
+    @Async
+    public CompletableFuture<Image> generateImage(List<Long> imageIds, String customPrompt) throws IOException {
+        // HTTP 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("x-goog-api-key", googleApiKey);
+        // 요청 본문 (JSON) 생성
+        // Content-Type이 application/json 이므로 Map/List 구조로 요청 본문을 만듭니다.
+        List<Map<String, Object>> parts = new ArrayList<>();
+        for (Long id : imageIds) {
+            String imgBase64 = getImageBase64(id);
+            String mimeType = getMediaType(id).toString();
+            // 주의: 모든 입력 이미지를 PNG로 가정하고 처리합니다.
+            // 실제로는 getImageBase64와 getMediaType을 조합하여 동적으로 MIME 타입을 가져와야 합니다.
+            parts.add(Map.of("inline_data", Map.of(
+                    "mime_type", mimeType,
+                    "data", imgBase64
+            )));
+        }
+        // 텍스트 프롬프트
+        parts.add(Map.of("text", customPrompt));
+        Map<String, List<Map<String, List<Map<String, Object>>>>> body = Map.of(
+                "contents", List.of(
+                        Map.of("parts", parts)
+                )
+        );
+        HttpEntity<Map<String, ?>> entity = new HttpEntity<>(body, headers);
+        // Gemini API 요청 URL
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent";
+        // RestTemplate를 사용한 POST 요청 및 응답 받기
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                url,
+                entity,
+                String.class
+        );
+        // 응답 처리 및 Base64 디코딩
+        byte[] generatedImageBytes;
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode candidatesNode = rootNode.path("candidates");
+            if (!candidatesNode.isArray() || candidatesNode.isEmpty()) {
+                throw new RuntimeException("API 응답에서 'candidates' 데이터를 찾을 수 없습니다.");
+            }
+            JsonNode partsNode = candidatesNode.path(0).path("content").path("parts");
+            if (!partsNode.isArray()) {
+                throw new RuntimeException("API 응답에서 'parts' 배열을 찾을 수 없습니다.");
+            }
+            String generatedImageBase64 = null;
+            // parts 배열을 순회하여 inline_data가 있는 part를 찾습니다.
+            for (JsonNode partNode : partsNode) {
+                JsonNode inlineDataNode = partNode.path("inlineData");
+                // inlineData 내부의 "data" 필드를 확인합니다.
+                JsonNode dataNode = inlineDataNode.path("data");
+                if (!dataNode.isMissingNode() && dataNode.isTextual()) {
+                    generatedImageBase64 = dataNode.asText();
+                    break; // 이미지 데이터를 찾았으면 순회를 종료합니다.
+                }
+            }
+            if (generatedImageBase64 != null) {
+                // Base64 문자열을 byte 배열로 디코딩하여 반환
+                generatedImageBytes = Base64.getDecoder().decode(generatedImageBase64);
+            } else {
+                throw new RuntimeException("API 응답에서 이미지 Base64 데이터를 찾을 수 없습니다 (inlineData.data 없음).");
+            }
+        } else {
+            throw new RuntimeException("API 요청 실패: " + response.getStatusCode() + " - " + response.getBody());
+        }
+        return CompletableFuture.completedFuture(saveImage(
+            new ByteArrayMultipartFile(
+                generatedImageBytes,
+                "generatedImage",
+                "generatedImage.png",
+                "image/png"
+            )
+        ));
     }
 }

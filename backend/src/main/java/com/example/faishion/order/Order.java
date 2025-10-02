@@ -28,28 +28,15 @@ public class Order {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Address address;
-
-     */
 
     private String zipcode; //우편번호
     private String street; //도로명 주소
     private String detail; //상세주소
     private String requestMsg; // 요청사항
 
-    /*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)) // 쿠폰을 사용 안 할 수도 있으므로 nullable true
-    private Coupon coupon;
-
-    private Integer usedPoint; //주문에 사용된 포인트
-     */
 
     private String status; // 주문 상태 (PENDING, COMPLETED, FAILED 등)
 
