@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.format.DateTimeFormatter;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,6 +16,7 @@ public class OrderListResponseDTO {
     private Long orderId;        // 주문 ID (주문 그룹의 고유 식별자)
     private String orderStatus;  // 주문 상태 ("PENDING", "SHIPPED", "DELIVERED" 등)
     private String orderDate;    // 주문 날짜 (필요하다면 Date/String 타입으로 추가)
+    private String userId;
 
     // --- 주문 항목(상품) 정보 ---
     private Long orderItemId;    // 주문 항목 ID (각 상품 라인의 고유 식별자)
@@ -34,7 +37,7 @@ public class OrderListResponseDTO {
         // 주문 정보
         this.orderId = orderItem.getOrder().getId();
         this.orderStatus = orderItem.getOrder().getStatus();
-        // this.orderDate = orderItem.getOrder().getOrderDate().toString(); // 필요 시 추가
+        this.orderDate = orderItem.getOrder().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")); // 필요 시 추가
 
         // 상품 정보
         Stock stock = orderItem.getStock();

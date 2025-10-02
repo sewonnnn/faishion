@@ -212,8 +212,8 @@ const MyPageDetail = () => {
         <Container className="mt-5">
             <Row className="justify-content-center">
                 <Col md={8} lg={6}>
-                    <Card>
-                        <Card.Body className="p-4">
+                    <Card className="border-0">
+                        <Card.Body className="p-4 bg-white" >
                             <h4 className="text-center mb-4">회원 정보 수정</h4>
                             <Form onSubmit={handleSubmit}>
                                 {/* 프로필 사진 섹션 */}
@@ -416,7 +416,7 @@ const MyPageDetail = () => {
                                     <Card className="p-3 bg-light border-secondary">
                                         {defaultAddress ? (
                                             <>
-                                                <p className="mb-1 fw-bold">
+                                                <p className="mb-1 ">
                                                     [{defaultAddress.zipcode}] {defaultAddress.street}
                                                 </p>
                                                 <p className="text-muted small mb-0">
@@ -436,7 +436,7 @@ const MyPageDetail = () => {
                                     </Button>
                                 </Form.Group>
                                 <div className="d-grid gap-2">
-                                    <Button variant="primary" type="submit" size="lg">
+                                    <Button style={{backgroundColor:'#1850DB'}} type="submit" size="lg">
                                         수정 완료
                                     </Button>
                                 </div>

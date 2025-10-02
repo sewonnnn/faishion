@@ -5,7 +5,7 @@ import "./MyPage.css";
 import { Container, Row, Col, Button, Image as BootstrapImage, Spinner } from "react-bootstrap";
 import defaultImage from "../assets/user.jpg";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { FaRegBell, FaCog } from "react-icons/fa";
+import { FaCog } from "react-icons/fa";
 
 // 금액을 쉼표 형식으로 포맷하는 헬퍼 함수
 const formatPrice = (price) => {
@@ -107,10 +107,10 @@ const MyPage = () => {
     const userName = profile.name || '이름 없음';
 
     return (
-        <div className="bg-light min-vh-100 d-flex justify-content-center">
-            <Container className="p-0 bg-white" style={{ maxWidth: '768px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.05)' }}>
-                <header className="d-flex justify-content-between align-items-center py-3 px-3 border-bottom">
-                    <h1 className="fs-4 fw-bold mb-0">마이페이지</h1>
+        <div className="min-vh-100 d-flex justify-content-center">
+            <Container className="p-0 bg-white" style={{ maxWidth: '768px'}}>
+                <header className="d-flex justify-content-between align-items-center py-3 px-3 border-botto">
+                    <h3 className="fs-4 fw-bold mb-0">마이페이지</h3>
                     <div className="d-flex">
                         <Button variant="link" className="text-dark p-0 icon-btn-custom" onClick={onDetailPage}>
                             <FaCog size={24} />
@@ -140,12 +140,12 @@ const MyPage = () => {
 
                 {/* 4. 내가 작성한 후기 링크 */}
                 <section onClick={onReviewListForm} className="d-flex justify-content-between align-items-center py-3 px-3 border-bottom text-dark cursor-pointer" style={{ fontSize: '0.9rem' }}>
-                    <p className="mb-0">내가 작성한 후기</p>
+                    <h6 className="mb-0">내가 작성한 후기</h6>
                 </section>
 
                 {/* 5. 주문 내역 섹션 */}
                 <section className="py-3 px-3">
-                    <h2 className="fs-5 fw-bold mb-3">주문 내역</h2>
+                    <h4 className="fs-5 fw-bold mb-3">주문 내역</h4>
 
                     {/* 주문 내역 리스트 (스크롤 가능한 영역) */}
                     <div className="order-list-scroll">
@@ -170,7 +170,9 @@ const MyPage = () => {
                                         <p className="text-muted mb-1" style={{ fontSize: '0.8rem' }}>{item.productName} / {item.quantity}개</p>
                                         <p className="text-muted text-decoration-line-through mb-0" style={{ fontSize: '0.75rem' }}>{formatPrice(item.originalPrice)}원</p>
                                         <p className="fw-bold mb-0" style={{ fontSize: '0.95rem' }}>{formatPrice(item.discountedPrice)}원</p>
+
                                     </div>
+                                    <div  className="MypageOrderDate ms-auto align-self-start text-end" style={{ fontSize: '0.95rem' }}>{item.orderDate}</div>
                                 </div>
                             ))
                         ) : (

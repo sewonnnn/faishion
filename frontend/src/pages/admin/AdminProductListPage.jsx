@@ -120,7 +120,7 @@ const AdminProductListPage = () => {
                                             </div>
                                         )}
                                     </td>
-                                    <td>{product.categoryGroupName} {product.categoryName}</td>
+                                    <td>{product.categoryGroupName} &gt; {product.categoryName}</td>
                                     <td>{product.status === 1 ? '판매 중' : '판매 중지'}</td>
                                     <td>
                                         <ul className="list-unstyled mb-0">

@@ -180,19 +180,20 @@ const Header = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <Button variant="outline-success" type="submit">
+                            <Button type="submit">
                                 <i className="bi bi-search"></i>
                             </Button>
                         </Form>
                     </div>
+                    {isMenuOpen && (
+                        <div
+                            className="full-screen-dropdown w-100"
+                        >
+                            {renderAllMenu()}
+                        </div>
+                    )}
                 </Container>
-                {isMenuOpen && (
-                    <div
-                        className="full-screen-dropdown"
-                    >
-                        {renderAllMenu()}
-                    </div>
-                )}
+
             </div>
         </>
     );
