@@ -39,7 +39,7 @@ const SideBar = ({ menuItems = [] }) => {
             {/* 1. 데스크탑 사이드바 (md 이상) */}
             <Container
                 fluid
-                className="sidebar-container d-none d-md-flex flex-column vh-100 p-0"
+                className="sidebar-container d-none d-md-flex flex-column vh-100 p-0 position-sticky top-0"
             >
                 <div className="p-3 text-center ">
                     <h2 className="mb-0 text-white">fAIshion</h2>
