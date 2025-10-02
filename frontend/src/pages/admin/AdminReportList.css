@@ -1,0 +1,141 @@
+:root {
+    --text: #222;
+    --muted: #666;
+    --border: #e6e6e6;
+    --border-strong: #d4d4d4;
+    --bg: #fff;
+    --hover: #f9fafb;
+    --black: #111;
+}
+
+/* 전체 컨테이너 */
+.admin-report-list {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: var(--bg);
+    padding: 32px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 타이틀 */
+.admin-report-list h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 24px;
+}
+
+/* 필터 + 검색 */
+.admin-report-list .form-select {
+    border-radius: 6px;
+    border: 1px solid var(--border-strong);
+    font-size: 14px;
+    padding: 8px;
+}
+
+.admin-report-list .input-group .form-control {
+    border: 1px solid var(--border-strong);
+    border-radius: 6px 0 0 6px;
+    font-size: 14px;
+}
+
+.admin-report-list .input-group .btn {
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--black);
+    border: 1px solid var(--black);
+    color: #fff;
+    transition: 0.2s;
+}
+.admin-report-list .input-group .btn:hover {
+    background: #000;
+}
+
+/* 리스트 */
+.admin-report-list .list-group-item {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: background 0.15s;
+}
+.admin-report-list .list-group-item:hover {
+    background: var(--hover);
+}
+
+/* 신고 유형 뱃지 */
+.admin-report-list .badge {
+    font-size: 12px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: 600;
+}
+
+/* 신고 사유 강조 */
+.admin-report-list strong {
+    font-size: 14px;
+}
+
+/* 상태 표시 */
+.admin-report-list .text-success {
+    color: #16a34a !important;
+}
+.admin-report-list .text-danger {
+    color: #dc2626 !important;
+}
+
+/* 카드 텍스트 */
+.admin-report-list .card-text {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* 신고자 정보 */
+.admin-report-list small {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* 처리 버튼 */
+.admin-report-list .btn-sm {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.admin-report-list .btn-danger {
+    background: #2b2b2b;
+    border-color: #2b2b2b;
+    color: #fff;
+}
+.admin-report-list .btn-danger:hover {
+    background: #000;
+    border-color: #000;
+}
+
+.admin-report-list .btn-success {
+    background: #444;
+    border-color: #444;
+    color: #fff;
+}
+.admin-report-list .btn-success:hover {
+    background: #000;
+    border-color: #000;
+}
+
+/* 페이지네이션 */
+.admin-report-list .pagination .page-item .page-link {
+    color: var(--black);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 0 2px;
+}
+.admin-report-list .pagination .page-item.active .page-link {
+    background: var(--black);
+    border-color: var(--black);
+    color: #fff;
+}

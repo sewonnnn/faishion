@@ -110,3 +110,22 @@ body { margin: 0; font-family: system-ui, -apple-system, "Noto Sans KR", Arial, 
     margin-top: 10px;
     float: right;
 }
+
+/* 버튼 스타일: 회색(secondary) + 검정(dark) */
+.qa-form .btn-secondary {
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #374151;
+}
+.qa-form .btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+.qa-form .btn-dark {
+    background-color: #111;
+    border-color: #111;
+    color: #fff;
+}
+.qa-form .btn-dark:hover {
+    background-color: #000;
+}
