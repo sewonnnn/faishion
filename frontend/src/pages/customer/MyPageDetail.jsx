@@ -1,5 +1,6 @@
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useEffect, useState, useRef} from "react";
+import { useNavigate } from "react-router-dom";
 import {Container, Card, Form, Button, Row, Col, Image as BootstrapImage} from 'react-bootstrap';
 import {
     FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight, FaEye, FaEyeSlash,
@@ -32,7 +33,7 @@ const MyPageDetail = () => {
 
     const [selectedImage, setSelectedImage] = useState(null); // 이미지 선택
     const [imagePreviewUrl, setImagePreviewUrl] = useState(''); // 이미지 url
-
+    const nav = useNavigate();
     const fileInputRef = useRef(null);
     const fetchUserData = async () => {
         try {
@@ -195,7 +196,7 @@ const MyPageDetail = () => {
             setFormData(prev => ({ ...prev, password: '' }));
             setIsPasswordChangeMode(false);
             setIsPasswordSaved(false);
-
+            nav("/mypage");
         } catch (error) {
             console.error("회원 정보 수정 실패:", error.response ? error.response.data : error.message);
             alert("회원 정보 수정에 실패했습니다.");
