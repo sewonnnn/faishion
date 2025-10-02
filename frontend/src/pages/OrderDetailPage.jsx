@@ -70,7 +70,7 @@ const OrderDetailPage = () => {
         const fetchOrderDetail = async () => {
             try {
                 // 백엔드 엔드포인트: GET /order/{orderId}
-                const response = await api.get(`/order/${numericOrderId}`);
+                const response = await api.get(`/order/${orderId}`);
                 setOrderDetail(response.data);
                 setError(null);
             } catch (err) {
