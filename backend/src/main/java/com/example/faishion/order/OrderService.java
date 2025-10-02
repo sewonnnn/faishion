@@ -104,21 +104,36 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("주문 ID " + orderId + "를 찾을 수 없습니다."));
 
-        // 2. 보안 검사: 현재 로그인된 사용자가 주문의 소유자인지 확인
-        // User 엔티티의 ID 필드가 username과 동일한 역할을 수행한다고 가정합니다.
+        // 2. 보안 검사: 소유자 확인 (권한이 없거나 주문의 userId 필드가 현재 userId와 다르면 404 처리)
         if (!order.getUser().getId().equals(userId)) {
-            // 다른 사용자의 주문이라면 접근 거부 예외 발생
-            throw new AccessDeniedException("이 주문(" + orderId + ")을 조회할 권한이 없습니다.");
-        }else if(order.getStatus().equals("PENDING")){
-            throw new IllegalStateException("결제가 완료되지 않은 주문입니다.");
+            // ⭐ 다른 사용자의 주문이라면 '찾을 수 없음' (404)으로 처리하여 정보를 노출하지 않음
+            throw new EntityNotFoundException("해당 주문 ID에 대한 접근 권한이 없습니다.");
         }
 
-        // 3. 데이터 준비: Lazy Loading된 OrderItem 목록을 미리 로드(초기화)
-        // OrderController에서 OrderItem 목록을 순회할 때 LazyInitializationException을 피하기 위함입니다.
+        // 3. 결제 상태 확인: PENDING 상태 주문은 조회 불가 처리
+        if(order.getStatus().equals("PENDING")){
+            // ⭐ 결제 실패나 대기 주문은 조회되지 않도록 404 처리
+            throw new EntityNotFoundException("결제가 완료되지 않은 주문은 조회할 수 없습니다.");
+        }
+
+        // 4. 데이터 준비: Lazy Loading된 OrderItem 목록을 미리 로드(초기화)
         order.getOrderItemList().size();
 
-        // 4. Order 엔티티 반환
+        // 5. Order 엔티티 반환
         return order;
     }
 
+    // 주문 상태가 COMPLETED인 경우만 가져오기
+    public List<OrderListResponseDTO> getCompleteOrder(String username) {
+        // 1. Order Repository에서 COMPLETED 상태의 Order 목록을 가져옵니다.
+        List<Order> orders = orderRepository.getCompleteOrder(username);
+
+        // 2. Order 엔티티 목록을 OrderItem 기준으로 펼치고 DTO로 변환합니다.
+        return orders.stream()
+                // 각 Order 내부의 OrderItem 리스트를 스트림으로 펼칩니다.
+                .flatMap(order -> order.getOrderItemList().stream())
+                // OrderItem을 DTO로 변환합니다.
+                .map(OrderListResponseDTO::new)
+                .collect(Collectors.toList());
+    }
 }

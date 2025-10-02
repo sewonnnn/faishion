@@ -11,7 +11,7 @@
 
 /* 주문 내역 영역의 높이를 제한하고 스크롤바 스타일링 (이미지와 유사하게) */
 .order-list-scroll {
-    max-height: 400px;
+    max-height: 560px;
     overflow-y: auto;
 
     /* 웹킷 기반 브라우저 (Chrome, Safari) 스크롤바 스타일 */
@@ -63,4 +63,9 @@
     padding: 0;
     line-height: 1;
     border: none;
+}
+
+.MypageOrderDate{
+    padding-top: 100px;
+    padding-left: 100px;
 }
