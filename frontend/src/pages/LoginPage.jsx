@@ -14,7 +14,7 @@ const LoginPage = () => {
     const [form, setForm] = useState({ loginId: "", password: "", id: "" });
     const [loading, setLoading] = useState(false);
     const [showPw, setShowPw] = useState(false);
-
+    const [isNaver, setIsNaver] = useState(false);
     useEffect(() => {
         if (location.state?.message) {
             alert(location.state.message);
@@ -29,7 +29,9 @@ const LoginPage = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-
+        if(isNaver){
+            return
+            }
         if (key === "user" && (!form.loginId || !form.password)) {
             alert("아이디와 비밀번호를 입력해주세요.");
             return;
@@ -70,6 +72,7 @@ const LoginPage = () => {
 
         const socialAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${state}`;
         window.location.href = socialAuthUrl;
+        setIsNaver(true);
     };
 
     return (
