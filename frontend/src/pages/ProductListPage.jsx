@@ -72,7 +72,7 @@ const ProductListPage = () => {
 
     return (
         <Container className="my-5">
-            <h4 className="text-center mb-4 mt-3 rounded py-2">{typeName ? typeName : "전체상품"}</h4>
+            <h5 className="text-center mb-4 mt-3 rounded py-2">{typeName ? typeName : "전체상품"}</h5>
             <ProductList
                 products={products}
                 loading={loading}

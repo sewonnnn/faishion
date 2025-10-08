@@ -37,11 +37,11 @@ const HomePage = () => {
     }, [api]); // api가 변경될 일은 거의 없지만, useEffect의 의존성 배열에 포함
 
     if (isLoading) {
-        return <div style={{textAlign: 'center', padding: '20px'}}>✨ 배너 정보를 로딩 중이에요...</div>;
+        return <div style={{textAlign: 'center', padding: '20px'}}>배너 정보를 로딩 중입니다...</div>;
     }
     if (error) {
         // 서버에서 에러 메시지가 온 경우를 보여줍니다.
-        return <div style={{textAlign: 'center', padding: '20px', color: 'red'}}>⚠️ 배너 로딩 실패: {error}</div>;
+        return <div style={{textAlign: 'center', padding: '20px', color: 'red'}}>배너 로딩 실패: {error}</div>;
     }
 
     return (

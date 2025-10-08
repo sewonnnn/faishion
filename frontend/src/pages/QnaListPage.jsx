@@ -18,7 +18,7 @@ const QnaListPage = () => {
     const fetchQnaData = async (query = "", pageNum = 0) => {
         try {
             const response = await api.get(
-                `/qna/list?q=${query}&page=${pageNum}`
+                `/qna/admin/list?q=${query}&page=${pageNum}`
             );
 
             setQnaBoardList(response.data.content);

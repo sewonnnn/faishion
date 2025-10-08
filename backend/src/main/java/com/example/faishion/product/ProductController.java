@@ -238,6 +238,12 @@ public class ProductController {
         return new PageImpl<>(content, pageable, result.getTotalElements());
     }
 
+    @GetMapping("/stockImageIds/{productId}")
+    public List<Long> productStocks(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails){
+        Product findProduct = productService.findById(productId);
+        return findProduct.getStockList().stream().map(stock -> stock.getImage().getId()).toList();
+    }
+
     @GetMapping("/{productId}")
     public ProductDetailDTO productDetail(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
         Product findProduct = productService.findById(productId);

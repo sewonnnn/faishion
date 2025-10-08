@@ -10,6 +10,7 @@ import com.example.faishion.user.*;
 import com.example.faishion.wish.WishRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -306,46 +307,47 @@ public class ProductService {
         product.setPick(pick);
         productRepository.save(product);
         if(pick){
-            // 1. 배너 조회 및 상태 확인 (PESSIMISTIC_WRITE 락 사용)
-            // 락 획득에 실패하면 예외(PessimisticLockingFailureException)가 발생하며 롤백됩니다.
-            Optional<Banner> existingBannerOptional = bannerRepository.findByUserIdAndProductId(null, productId);
-            Banner bannerToUpdate = existingBannerOptional.orElseGet(() -> {
-                // 새 배너 객체 생성 (아직 DB에 저장되지 않음)
-                Banner newBanner = new Banner();
-                newBanner.setUser(null);
-                newBanner.setProduct(productRepository.findById(productId).orElseThrow());
-                return newBanner;
-            });
-            // 2. 상태가 READY일 때만 이미지 생성 로직 실행
-            if (bannerToUpdate.getStatus() == BannerStatus.READY) {
-                // 2-1. 상태를 GENERATING으로 변경하고 DB에 저장 (현재 트랜잭션 내에서 즉시 반영)
-                bannerToUpdate.setStatus(BannerStatus.GENERATING);
-                bannerRepository.save(bannerToUpdate);
-                //System.out.println("비동기 이미지 생성 요청 시작");
-                // 2-2. 비동기 이미지 생성 요청 시작
-                CompletableFuture<Image> imageFuture;
-                try {
-                    Long productMainImageId = product.getMainImageList().stream().findFirst().orElseThrow().getId();
-                    imageFuture = imageService.generateImage(List.of(productMainImageId),
-                            "Replace the fashion model with a realistic, glossy white mannequin that has no hair and no facial features. The model's clothes and pose must be perfectly maintained.");
-                } catch (IOException e) {
-                    bannerToUpdate.setStatus(BannerStatus.READY);
-                    // 이미지 생성 요청 실패 시 RuntimeException을 던져 트랜잭션 롤백 유도
-                    throw new RuntimeException("이미지 생성 요청 실패", e);
-                }
-                // 2-3. 비동기 작업 완료 후 후속 작업 연결
-                if (imageFuture != null) {
-                    imageFuture.thenAcceptAsync(generatedImage -> {
-                        bannerAsyncService.bannerStatusUpdate(null, productId, generatedImage, BannerStatus.COMPLETED);
-                        //System.out.println("배너 생성 후 연결 완료");
-                    }).exceptionally(ex -> {
+            try {
+                // 모든 Banner 상태 확인 및 Lock 획득 로직을 AsyncService로 위임
+                // Banner가 없으면 생성까지 내부에서 처리
+                Banner updatedBanner = bannerAsyncService.updateStatusToGeneratingWithLock(null, productId);
+
+                // Lock 트랜잭션 내부에서 상태가 GENERATING으로 바뀌었는지 확인 (즉, 내가 Lock 획득에 성공했는지 확인)
+                if (updatedBanner.getStatus() == BannerStatus.GENERATING) {
+                    System.out.println("기본 배너 생성 시작");
+
+                    // --- (이후 비동기 작업 시작 로직은 동일) ---
+                    CompletableFuture<Image> imageFuture;
+                    try {
+                        Long productMainImageId = product.getMainImageList().stream().findFirst().orElseThrow().getId();
+                        imageFuture = imageService.generateImage(List.of(productMainImageId),
+                                "Extract the complete fashion outfit only from Original Image 1, maintaining accurate form and texture of all garment components (sleeves, collars, hems, unique features). Arrange each individual piece in a flat lay style, clearly separated, with a top-down view. Items must be lying flat with clear definition. Precisely replicate the Original Image 1 background (texture, color, pattern). The model must be entirely absent. Professional product photography, realistic studio lighting and shadows. High quality, ultra-detailed, flat lay of separated outfit pieces."
+                        );
+                    } catch (IOException e) {
                         bannerAsyncService.bannerStatusUpdate(null, productId, null, BannerStatus.READY);
-                        //System.err.println("비동기 이미지 생성 실패: " + ex.getMessage());
-                        return null;
-                    });
+                        throw new RuntimeException("기본 배너 생성 실패", e);
+                    }
+
+                    if (imageFuture != null) {
+                        imageFuture.thenAcceptAsync(generatedImage -> {
+                            bannerAsyncService.bannerStatusUpdate(null, productId, generatedImage, BannerStatus.COMPLETED);
+                            System.out.println("기본 배너 생성 후 연결 완료");
+                        }).exceptionally(ex -> {
+                            bannerAsyncService.bannerStatusUpdate(null, productId, null, BannerStatus.READY);
+                            System.err.println("기본 배너 생성 실패: " + ex.getMessage());
+                            return null;
+                        });
+                    }
+                } else {
+                    System.out.println("Banner Status is not READY or Lock acquisition failed.");
                 }
-            } else {
-                System.out.println("Banner Status is " + bannerToUpdate.getStatus() + ". Image generation skipped.");
+
+            } catch (PessimisticLockingFailureException e) {
+                // Lock 획득 실패는 예상된 경쟁 상황이므로, 로그만 남기고 정상 종료
+                System.err.println("Banner Lock 획득 실패: 다른 트랜잭션에서 처리 중 (예상된 경합).");
+            } catch (Exception e) {
+                // 그 외 일반적인 오류 처리
+                System.err.println("Banner 처리 중 예외 발생: " + e.getMessage());
             }
         }
         return pick;

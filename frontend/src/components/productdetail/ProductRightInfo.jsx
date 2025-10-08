@@ -20,6 +20,7 @@ const showMessage = (message) => {
 };
 
 const ProductRightInfo = ({productId, product}) => {
+    console.log(product, productId);
     const navigate = useNavigate();
     const [selectedColor, setSelectedColor] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
@@ -123,8 +124,9 @@ const ProductRightInfo = ({productId, product}) => {
         setSelectedOptions(updatedOptions);
     };
 
-    const onAIForm = () => {
-        navigate(`/gemini/${productId}`);
+    const onAIForm = async () => {
+        const response = await api.get(`/product/stockImageIds/${productId}`);
+        navigate('/gemini', { state : response.data });
     };
 
     // 바로가기 클릭 시 주문서 이동

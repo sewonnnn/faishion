@@ -91,9 +91,9 @@ const SellerQnaDetail = () => {
             <Card className="shadow-sm">
                 <Card.Header className="bg-light d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">{qna.title}</h5>
-                    <span className="text-muted small">
-                        {new Date(qna.createdAt).toLocaleDateString("ko-KR")}
-                    </span>
+{/*                     <span className="text-muted small"> */}
+{/*                         {new Date(qna.createdAt).toLocaleDateString("ko-KR")} */}
+{/*                     </span> */}
                 </Card.Header>
                 <Card.Body>
                     {/* <Card.Text>를 제거하고 <div>로 감싸서 HTML 구조 오류 해결 */}

@@ -20,13 +20,13 @@ public class QnaService {
     private final ProductRepository productRepository;
 
 
-    public Page<QnaDTO> getQnaList(String searchQuery, Pageable pageable) {
+    public Page<QnaDTO> getQnaList(String qnaType, String searchQuery, Pageable pageable) {
         Page<Qna> qnaPage;
 
         if (searchQuery != null && !searchQuery.isEmpty()) {
-            qnaPage = qnaRepository.findByTitleContaining(searchQuery, pageable);
+            qnaPage = qnaRepository.findByQnaTypeAndTitleContaining(qnaType, searchQuery, pageable);
         } else {
-            qnaPage = qnaRepository.findAll(pageable);
+            qnaPage = qnaRepository.findByQnaType(qnaType, pageable);
         }
 
         // Qna Page를 QnaDTO Page로 변환하여 반환

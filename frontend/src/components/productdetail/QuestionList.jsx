@@ -63,6 +63,16 @@ const QuestionList = ({ productId, onQuestionUpdate }) => {
                             <small className="text-muted">
                                 {question.answer ? "답변완료" : "답변 대기 중"} · {question.userName}
                             </small>
+                            {question.answer && (
+                                <div className="p-3 mt-2 mb-2 border-3 border-info rounded">
+                                    <div className="d-flex align-items-center mb-1">
+                                        <small className="fw-bold" style={{color:"#1850DB"}}>답변</small>
+                                    </div>
+                                    <p className="mb-0 text-dark">
+                                        {question.answer}
+                                    </p>
+                                </div>
+                            )}
                         </ListGroup.Item>
                     ))
                 ) : (
