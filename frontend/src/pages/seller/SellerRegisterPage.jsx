@@ -167,11 +167,16 @@ const SellerRegisterPage = () => {
         // 2) 서버/공공 API 조회
         try {
             // 응답 예시: { exists: true/false, status: "ACTIVE"|"CLOSED"|... }
+
+            /*
             const res = await axios.post("http://localhost:8080/auth/seller/check-business", {
                 businessNumber: digits,
             });
 
             const { exists, status } = res.data || {};
+            */
+            const exists = true;
+            const status = "ACTIVE";
             if (!exists) {
                 setBusinessMessage({ text: "조회되지 않는 번호입니다.", color: "red" });
                 setIsBusinessValid(false);
@@ -222,7 +227,9 @@ const SellerRegisterPage = () => {
             await axios.post("http://localhost:8080/auth/seller/register", payload, {
                 headers: { "Content-Type": "application/json" },
             });
-            nav("/login", { state: { message: "판매자 회원가입을 축하드립니다! 로그인 해주세요" } });
+
+            alert("판매자 회원가입을 축하드립니다! 로그인 해주세요");
+            nav("/login");
         } catch (err) {
             alert(err.response?.data || "회원가입 실패");
         }

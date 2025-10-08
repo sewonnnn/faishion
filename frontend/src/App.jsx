@@ -139,7 +139,7 @@ function App() {
               {/*로그인한 사용자만 접근 가능한 페이지들*/}
               <Route element={<Layout />}>
                 <Route path="/cart" element={<CartPage />} /> {/*장바구니 페이지*/}
-                <Route path="/gemini/:productId" element={<Gemini />} /> {/*옷 피팅 페이지*/}
+                <Route path="/gemini" element={<Gemini />} /> {/*옷 피팅 페이지*/}
                 <Route path="/wishlist" element={<WishlistPage />} /> {/*찜 목록 페이지*/}
                 <Route path="/order/:orderId" element={<OrderDetailPage />} /> {/*주문 상세 조회 페이지*/}
                 <Route path="/order/new" element={<OrderFormPage />} /> {/*주문 상세 페이지*/}

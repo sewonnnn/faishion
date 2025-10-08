@@ -40,7 +40,12 @@ public class QnaController {
                                    @PageableDefault(size = 10,
                                            sort = "createdAt",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
-        return qnaService.getQnaList(searchQuery, pageable);
+        return qnaService.getQnaList("PRODUCT", searchQuery, pageable);
+    }
+
+    @GetMapping("/admin/list")
+    public Page<QnaDTO> getAdminQnaList(@RequestParam(value = "q", required = false) String searchQuery, @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return qnaService.getQnaList("GENERAL", searchQuery, pageable);
     }
 
     @PostMapping // 관리자에게 문의

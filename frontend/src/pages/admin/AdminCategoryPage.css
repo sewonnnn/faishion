@@ -8,28 +8,6 @@
     --black: #111;
 }
 
-/* 전체 레이아웃 */
-.admin-category {
-    display: flex;
-    gap: 24px;
-    padding: 32px;
-    height: 600px;
-    background: var(--bg);
-    font-family: system-ui, -apple-system, "Noto Sans KR", Arial, sans-serif;
-    color: var(--text);
-}
-
-/* 좌/우 영역 공통 */
-.admin-panel {
-    flex: 1;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
 
 .admin-panel h2 {
     font-size: 20px;

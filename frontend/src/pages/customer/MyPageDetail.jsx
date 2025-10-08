@@ -1,14 +1,15 @@
 import {useAuth} from "../../contexts/AuthContext.jsx";
 import {useEffect, useState, useRef} from "react";
 import { useNavigate } from "react-router-dom";
-import {Container, Card, Form, Button, Row, Col, Image as BootstrapImage} from 'react-bootstrap';
+import {Container, Card, Form, Button, Row, Col, Modal, Image as BootstrapImage} from 'react-bootstrap';
 import {
     FaUser, FaLock, FaEnvelope, FaPhone, FaCamera, FaTimesCircle, FaRulerVertical, FaWeight, FaEye, FaEyeSlash,
-    FaMapMarkerAlt
+    FaMapMarkerAlt, FaExpand
 } from 'react-icons/fa';
 import defaultImage from "../../assets/user.jpg";
 import "../../pages/MyPage.css";
 import AddressModal from "./AddressModal.jsx";
+import UserImageModal from "./UserImageModal.jsx";
 
 
 const MyPageDetail = () => {
@@ -30,11 +31,14 @@ const MyPageDetail = () => {
     const [isPasswordChangeMode, setIsPasswordChangeMode] = useState(false); // 비밀번호 저장모드 전환
     const [isPasswordSaved, setIsPasswordSaved] = useState(false); // 비밀번호 저장가능 여부 (정규화)
     const [showPassword, setShowPassword] = useState(false); // 비밀번호 가시화
-
-    const [selectedImage, setSelectedImage] = useState(null); // 이미지 선택
     const [imagePreviewUrl, setImagePreviewUrl] = useState(''); // 이미지 url
+
+
+    const [showUserImageModal, setShowUserImageModal] = useState(false);
+    const [showImageEnlargedModal, setShowImageEnlargedModal] = useState(false); // 확대된 이미지 모달 관리
+
+
     const nav = useNavigate();
-    const fileInputRef = useRef(null);
     const fetchUserData = async () => {
         try {
             const response = await api.get(`/user/`);
@@ -91,28 +95,38 @@ const MyPageDetail = () => {
         }
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedImage(file);
-            setImagePreviewUrl(URL.createObjectURL(file));
+    const handleUserImageUpdated = ({ generatedImageId, height, weight }) => {
+        // 1. formData (키, 몸무게) 업데이트
+        setFormData(prev => ({
+            ...prev,
+            height: height || '',
+            weight: weight || ''
+        }));
+        // 2. customer 상태 업데이트 (업데이트된 이미지를 반영하기 위함)
+        setCustomer(prev => ({
+            ...prev,
+            height: height || null,
+            weight: weight || null,
+            image: generatedImageId ? { id: generatedImageId } : null,
+        }));
+        // 3. 이미지 미리보기 URL 업데이트
+        if (generatedImageId) {
+            setImagePreviewUrl(`${api.defaults.baseURL}/image/${generatedImageId}`);
         } else {
-            setSelectedImage(null);
-            if (customer?.image) {
-                setImagePreviewUrl(`${api.defaults.baseURL}/image/${customer.image.id}`);
-            } else {
-                setImagePreviewUrl(defaultImage);
-            }
+            setImagePreviewUrl(defaultImage);
         }
-    };
+        // 4. 모달 닫기
+        setShowUserImageModal(false);
+    }
 
-    const handleDeleteImage = () => {
-        setSelectedImage(null);
+    const handleDeleteImage = (e) => {
+        if (e) e.stopPropagation();
+
         setImagePreviewUrl(defaultImage);
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
+        setCustomer(prev => ({
+            ...prev,
+            image: null
+        }));
     };
 
     const handlePasswordSave = () => {
@@ -161,19 +175,9 @@ const MyPageDetail = () => {
                 delete updatedUserData.password;
             }
 
-            // 이미지 처리 로직
-            if (selectedImage) {
-                const imageFormData = new FormData();
-                imageFormData.append('file', selectedImage);
-                const imageUploadResponse = await api.post('/image', imageFormData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-                updatedUserData = { ...updatedUserData, image: { id: imageUploadResponse.data.id } };
-            } else if (imagePreviewUrl === defaultImage && (customer?.image || selectedImage === null)) {
-                updatedUserData = { ...updatedUserData, image: null };
-            } else if (customer && customer.image) {
+            if (customer && customer.image) {
                 updatedUserData = { ...updatedUserData, image: { id: customer.image.id } };
-            } else {
+            }else{
                 updatedUserData = { ...updatedUserData, image: null };
             }
 
@@ -186,10 +190,6 @@ const MyPageDetail = () => {
                 setImagePreviewUrl(`${api.defaults.baseURL}/image/${response.data.image.id}`);
             } else {
                 setImagePreviewUrl(defaultImage);
-            }
-            setSelectedImage(null);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
             }
             // 수정 완료 후 상태 초기화
             setPasswordConfirm('');
@@ -218,13 +218,17 @@ const MyPageDetail = () => {
                             <Form onSubmit={handleSubmit}>
                                 {/* 프로필 사진 섹션 */}
                                 <div className="text-center mb-3">
-                                    <div className="profile-image-wrapper mb-3">
+                                    <div className="profile-image-wrapper mb-3"
+                                        onClick={() => setShowUserImageModal(true)} // <-- 1. 이미지 클릭 이벤트 추가
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <BootstrapImage
                                             src={imagePreviewUrl || defaultImage}
                                             roundedCircle
                                             style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                                         />
                                         {imagePreviewUrl !== defaultImage && (
+                                            <>
                                             <Button
                                                 variant="link"
                                                 className="image-delete-btn"
@@ -232,30 +236,68 @@ const MyPageDetail = () => {
                                             >
                                                 <FaTimesCircle size={24} color="#444" />
                                             </Button>
+                                            <Button
+                                                variant="dark"
+                                                className="image-enlarge-btn" // CSS 스타일링을 위한 클래스
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 부모 (이미지 클릭) 이벤트 방지
+                                                    setShowImageEnlargedModal(true); // 기존 UserImageModal 열기
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: '5px',
+                                                    left: 'calc(50% - 75px + 5px)', // 이미지 중앙에서 왼쪽으로 75px (반지름) + 5px (패딩)
+                                                    transform: 'translateX(0)',
+                                                    borderRadius: '50%',
+                                                    padding: '5px',
+                                                    height: '35px',
+                                                    width: '35px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 10,
+                                                }}
+                                            >
+                                                <FaExpand size={16} />
+                                            </Button>
+                                            </>
                                         )}
                                     </div>
-                                    <Form.Group controlId="formFile" className="mb-2">
-                                        <Form.Label className="btn btn-outline-secondary">
-                                            <FaCamera className="me-1"/> 프로필 사진 변경
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="file"
-                                            onChange={handleImageChange}
-                                            accept="image/*"
-                                            ref={fileInputRef}
-                                            className="visually-hidden"
-                                        />
-                                    </Form.Group>
                                 </div>
 
-                                {/* 아이디 */}
+{/*                                  */}{/* 아이디 */}
+{/*                                 <Form.Group className="mb-3"> */}
+{/*                                     <Form.Label>아이디</Form.Label> */}
+{/*                                     <div className="input-group"> */}
+{/*                                         <div className="input-group-text"><FaUser /></div> */}
+{/*                                         <Form.Control type="text" name="id" value={formData.id} disabled /> */}
+{/*                                     </div> */}
+{/*                                 </Form.Group> */}
+
+                                {/* 이름 */}
                                 <Form.Group className="mb-3">
-                                    <Form.Label>아이디</Form.Label>
+                                    <Form.Label>이름</Form.Label>
                                     <div className="input-group">
                                         <div className="input-group-text"><FaUser /></div>
-                                        <Form.Control type="text" name="id" value={formData.id} disabled />
+                                        <Form.Control type="text" name="name" value={formData.name} onChange={handleInputChange} />
                                     </div>
                                 </Form.Group>
+                                {/* 휴대폰 번호 */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>휴대폰 번호</Form.Label>
+                                <div className="input-group">
+                                    <div className="input-group-text"><FaPhone /></div>
+                                    <Form.Control type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
+                                </div>
+                            </Form.Group>
+                            {/* 이메일 */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>이메일</Form.Label>
+                                <div className="input-group">
+                                    <div className="input-group-text"><FaEnvelope /></div>
+                                    <Form.Control type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                                </div>
+                            </Form.Group>
 
                                 {/* 비밀번호 입력 섹션 */}
                                 {isPasswordChangeMode ? (
@@ -346,71 +388,6 @@ const MyPageDetail = () => {
                                     </Form.Group>
                                 )}
 
-                                {/* 이름 */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>이름</Form.Label>
-                                    <div className="input-group">
-                                        <div className="input-group-text"><FaUser /></div>
-                                        <Form.Control type="text" name="name" value={formData.name} onChange={handleInputChange} />
-                                    </div>
-                                </Form.Group>
-                                {/* 휴대폰 번호 */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>휴대폰 번호</Form.Label>
-                                    <div className="input-group">
-                                        <div className="input-group-text"><FaPhone /></div>
-                                        <Form.Control type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
-                                    </div>
-                                </Form.Group>
-                                {/* 이메일 */}
-                                <Form.Group className="mb-3">
-                                    <Form.Label>이메일</Form.Label>
-                                    <div className="input-group">
-                                        <div className="input-group-text"><FaEnvelope /></div>
-                                        <Form.Control type="email" name="email" value={formData.email} onChange={handleInputChange} />
-                                    </div>
-                                </Form.Group>
-
-                                <Row className="mb-3">
-                                    {/* 키 (왼쪽 절반) */}
-                                    <Col md={6}>
-                                        <Form.Group controlId="formHeight">
-                                            <Form.Label>키 (cm)</Form.Label>
-                                            <div className="input-group">
-                                                <div className="input-group-text"><FaRulerVertical /></div>
-                                                <Form.Control
-                                                    type="number"
-                                                    name="height"
-                                                    value={formData.height}
-                                                    onChange={handleInputChange}
-                                                    placeholder="예: 175"
-                                                    min="0"
-                                                    required
-                                                />
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-                                    {/* 몸무게 (오른쪽 절반 - 필수 입력) */}
-                                    <Col md={6}>
-                                        <Form.Group controlId="formWeight">
-                                            <Form.Label>몸무게 (kg) (*)</Form.Label>
-                                            <div className="input-group">
-                                                <div className="input-group-text"><FaWeight /></div>
-                                                <Form.Control
-                                                    type="number"
-                                                    name="weight"
-                                                    value={formData.weight}
-                                                    onChange={handleInputChange}
-                                                    placeholder="예: 70.5"
-                                                    min="0"
-                                                    step="0.1"
-                                                    required
-                                                />
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-
                                 <Form.Group className="mb-4">
                                     <Form.Label>기본 배송지</Form.Label>
                                     <Card className="p-3 bg-light border-secondary">
@@ -450,7 +427,29 @@ const MyPageDetail = () => {
                 handleClose={() => setShowAddressModal(false)}
                 handleAddressUpdated={handleAddressUpdated} // 기본 주소 변경 시 부모 컴포넌트 업데이트 콜백
             />
-
+            <UserImageModal
+                show={showUserImageModal}
+                handleClose={() => setShowUserImageModal(false)}
+                handleUserImageUpdated={handleUserImageUpdated}
+                api={api}
+                currentHeight={formData.height}
+                currentWeight={formData.weight}
+            />
+            {/* 새로 추가된 이미지 확대 모달 */}
+            <Modal show={showImageEnlargedModal} onHide={() => setShowImageEnlargedModal(false)} centered size="lg">
+                <Modal.Header closeButton className="border-0">
+                </Modal.Header>
+                <Modal.Body className="text-center p-0">
+                    <BootstrapImage
+                        src={imagePreviewUrl || defaultImage}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '80vh', // 뷰포트 높이의 80%를 초과하지 않도록 설정
+                            objectFit: 'contain'
+                        }}
+                    />
+                </Modal.Body>
+            </Modal>
         </Container>
     );
 };

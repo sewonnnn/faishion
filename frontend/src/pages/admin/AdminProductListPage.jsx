@@ -74,7 +74,7 @@ const AdminProductListPage = () => {
             ) : (
                 <>
                     <Table bordered hover responsive className="admin-table text-center align-middle">
-                        <thead s>
+                        <thead>
                             <tr className="text-center">
                                 <th>브랜드명</th>
                                 <th>상품명</th>

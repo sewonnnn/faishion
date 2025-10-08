@@ -43,7 +43,7 @@ const QnaFormPage = () => {
             <div className="card shadow-sm">
                 <div className="card-body">
                     <h1 className="mb-4">Q&A 작성하기</h1>
-                    <div className="text-muted mb-3">작성자: {user.sub}</div>
+{/*                     <div className="text-muted mb-3">작성자: {user.sub}</div> */}
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">

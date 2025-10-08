@@ -49,7 +49,7 @@ function SellerReportModal({show, setShow, item}) {
         <>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>리뷰 신고하기</Modal.Title>
+                    <Modal.Title>판매자 신고하기</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>

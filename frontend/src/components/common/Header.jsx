@@ -126,17 +126,17 @@ const Header = () => {
                             </>
                         ) : (
                             <>
-                                <Form.Select
-                                    aria-label="Select Role"
-                                    value={selectedRole}
-                                    onChange={(e) => setSelectedRole(e.target.value)}
-                                    style={{ width: '120px', marginRight: '10px' }}
-                                >
-                                    <option value="USER">구매자</option>
-                                    <option value="SELLER">판매자</option>
-                                    <option value="ADMIN">운영자</option>
-                                </Form.Select>
-                                <Nav.Link onClick={createTempToken} style={{ cursor: 'pointer' }}>임시 토큰 발급</Nav.Link>
+{/*                                 <Form.Select */}
+{/*                                     aria-label="Select Role" */}
+{/*                                     value={selectedRole} */}
+{/*                                     onChange={(e) => setSelectedRole(e.target.value)} */}
+{/*                                     style={{ width: '120px', marginRight: '10px' }} */}
+{/*                                 > */}
+{/*                                     <option value="USER">구매자</option> */}
+{/*                                     <option value="SELLER">판매자</option> */}
+{/*                                     <option value="ADMIN">운영자</option> */}
+{/*                                 </Form.Select> */}
+{/*                                 <Nav.Link onClick={createTempToken} style={{ cursor: 'pointer' }}>임시 토큰 발급</Nav.Link> */}
                                 <Nav.Link href="/login">login</Nav.Link>
                             </>
                         )}
@@ -180,7 +180,7 @@ const Header = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <Button type="submit" class="border-0">
+                            <Button type="submit">
                                 <i className="bi bi-search"></i>
                             </Button>
                         </Form>
