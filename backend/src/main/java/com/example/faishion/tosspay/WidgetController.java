@@ -39,7 +39,7 @@ public class WidgetController {
 
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("/api/confirm")
     public ResponseEntity<?> confirmPayment(
             @RequestBody String jsonBody
     ) {

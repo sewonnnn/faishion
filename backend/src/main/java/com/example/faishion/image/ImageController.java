@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/image")
+@RequestMapping("/api/image")
 public class ImageController {
     private final ImageService imageService;
 

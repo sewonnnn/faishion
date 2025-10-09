@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 // 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
 const createFileImageObj = (file) => ({ id: null, file: file, url: null });
 const updateFileImageObj = (id, file) => ({ id : id, file : file, url : null});
-const createUrlImageObj = (id) => ({ id: id, file: null, url: `http://localhost:8080/image/${id}` });
+const createUrlImageObj = (id) => ({ id: id, file: null, url: `${api.defaults.baseURL}/image/${id}` });
 const createStockImageObj = (stock) => ({
     id: stock.id || null, // 재고 ID
     quantity: stock.quantity || 0,

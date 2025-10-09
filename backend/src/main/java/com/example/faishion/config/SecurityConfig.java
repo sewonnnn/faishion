@@ -69,7 +69,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var c = new CorsConfiguration();
-        c.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
+        c.setAllowedOrigins(List.of("http://localhost:5173"));
         c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         // 'Cookie' 헤더 추가
         c.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Cookie"));

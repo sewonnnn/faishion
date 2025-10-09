@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 const SellerLoginPage = () => {
     const [form, setForm] = useState({ id: "", password: "" });
@@ -9,11 +9,13 @@ const SellerLoginPage = () => {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    const { api } = useAuth();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             //엔드포인트 수정
-            const res = await axios.post("http://localhost:8080/auth/seller/login", form, {
+            const res = await api.post(`{${api.defaults.baseURL}}/auth/seller/login`, form, {
                 headers: { "Content-Type": "application/json" },
             });
 

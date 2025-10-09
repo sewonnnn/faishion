@@ -79,7 +79,7 @@ export function SuccessPage() {
 
                 {(orderInfo.items || []).filter(Boolean).map((item, idx) => {
                     const imageUrl = item.productImageId
-                        ? `http://localhost:8080/image/${item.productImageId}`
+                        ? `${api.defaults.baseURL}/image/${item.productImageId}`
                         : "/placeholder.png";
 
                     // 숫자로 안전 변환

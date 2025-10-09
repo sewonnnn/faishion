@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import {useAuth} from "../../contexts/AuthContext.jsx";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
 const AdminLoginPage = () => {
     const nav = useNavigate();
     const [form, setForm] = useState({ id: "", password: "" });
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, api } = useAuth();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,13 +18,12 @@ const AdminLoginPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await axios.post("http://localhost:8080/auth/admin/login", form, {
+            console.log(`${api.defaults.baseURL}/auth/admin/login`);
+            const res = await api.post(`${api.defaults.baseURL}/auth/admin/login`, form, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
-            // jwt 저장 + AuthContext 업데이트
-            login(res.data.accessToken);
-            // localStorage.setItem("ADMIN_ACCESS", res.data.accessToken || "");
+            login(res.data);
             alert("관리자 로그인 성공!");
             nav("/admin"); // 관리자 페이지로 이동
         } catch (err) {

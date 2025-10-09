@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ListGroup, Image, Button, Pagination } from 'react-bootstrap';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import ReportModal from "./ReportModal.jsx";
-import axios from 'axios';
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
 // productId를 props로 받도록 변경
 const ReviewList = ({ productId }) => {
@@ -12,6 +12,7 @@ const ReviewList = ({ productId }) => {
     const [totalPages, setTotalPages] = useState(1);
     const [showReportModal, setShowReportModal] = useState(false);
     const [modalReviews, setModalReviews] = useState(null);
+    const { api } = useAuth();
 
     const handleShow = (reviewId) => {
         setModalReviews(reviewId);
@@ -36,8 +37,7 @@ const ReviewList = ({ productId }) => {
 
         const fetchReviews = async () => {
             try {
-                const response = await axios.get(`/api/review/${productId}?page=${currentPage - 1}&size=10`);
-
+                const response = await api.get(`/review/${productId}?page=${currentPage - 1}&size=10`);
                 // 데이터 구조가 예상과 다른 경우를 대비해 방어 코드 추가
                 if (response.data && response.data.content) {
                     const { content, totalPages } = response.data;

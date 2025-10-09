@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/seller/report")
+@RequestMapping("/api/seller/report")
 public class SellerReportController {
     private final SellerReportService sellerReportService;
 

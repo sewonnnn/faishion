@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 import { Tabs, Tab } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -8,8 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const LoginPage = () => {
     const nav = useNavigate();
     const location = useLocation();
-    const { login } = useAuth();
-
+    const { login, api } = useAuth();
     const [key, setKey] = useState("user");
     const [form, setForm] = useState({ loginId: "", password: "", id: "" });
     const [loading, setLoading] = useState(false);
@@ -44,11 +42,11 @@ const LoginPage = () => {
         setLoading(true);
         const url =
             key === "seller"
-                ? "http://localhost:8080/auth/seller/login"
-                : "http://localhost:8080/auth/login";
+                ? "/auth/seller/login"
+                : "/auth/login";
 
         try {
-            const res = await axios.post(url, form, {
+            const res = await api.post(url, form, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
@@ -66,7 +64,7 @@ const LoginPage = () => {
     const handleNaverLogin = () => {
         const naverClientId = "UbIrUTt9yAJ42TARcJC5";
         const naverRedirectUri = encodeURIComponent(
-            "http://localhost:5173/oauthcallback/naver"
+            `${window.location.origin}/oauthcallback/naver`
         );
         const state = Math.random().toString(36).substring(2);
 

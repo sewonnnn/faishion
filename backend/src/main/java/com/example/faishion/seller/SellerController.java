@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/sellers") // 💡 관리자용 API 경로 변경 (관리자 전용임을 명시)
+@RequestMapping("/api/admin/sellers") // 💡 관리자용 API 경로 변경 (관리자 전용임을 명시)
 public class SellerController {
     private final SellerService sellerService;
 

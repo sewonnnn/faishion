@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
@@ -41,8 +41,8 @@ public class UserController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
         int height = user.getHeight();
         int weight = user.getWeight();
-        // ⭐ 주소: 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
-        System.out.println("ㅁ:" + user.getAddressList());
+        // 주소: 사용자의 주소 목록에서 기본 주소지를 찾아 DTO에 설정
+        //System.out.println("ㅁ:" + user.getAddressList());
         List<Address> addressList = user.getAddressList();
 
         Address address = user.getAddressList().stream()

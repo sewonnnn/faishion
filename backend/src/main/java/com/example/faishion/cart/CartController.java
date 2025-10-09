@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
 @RestController
 public class CartController {
     private final CartService cartService;

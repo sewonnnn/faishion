@@ -1,4 +1,3 @@
-import Banner from "../components/productlist/Banner.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
 import React, {useEffect, useState} from "react";
 import ProductListPage from "./ProductListPage.jsx";
@@ -48,7 +47,6 @@ const HomePage = () => {
         <>
             <MultiCarousel items={carouselItems}/>
             <div className="productListPage_Banners">
-{/*                 <Banner /> */}
                 <ProductListPage/>
             </div>
         </>

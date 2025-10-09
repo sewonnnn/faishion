@@ -1,14 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import axios from "axios";
 import {useAuth} from "../contexts/AuthContext.jsx";
 
 export default function LoginSuccessPage() {
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
     const location = useLocation();
-    const { login } = useAuth();
-
+    const { login, api } = useAuth();
     const code = searchParams.get("code");
     const state = searchParams.get("state");
 
@@ -25,10 +23,9 @@ export default function LoginSuccessPage() {
         hasRun.current = true;
         const sendAuthCodeToBackend = async () => {
             try {
-                const url = "http://localhost:8080/auth/login/naver";
                 const body = { code, state };
 
-                const response = await axios.post(url, body, {
+                const response = await api.post("/auth/login/naver", body, {
                     headers: { "Content-Type": "application/json" },
                     withCredentials: true,
                 });
