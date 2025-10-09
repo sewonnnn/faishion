@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {useLocation} from 'react-router-dom';
-import Banner from "../components/productlist/Banner.jsx";
-import axios from 'axios';
 import ProductList from "../components/productlist/ProductList.jsx";
 import { Container } from 'react-bootstrap';
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const ProductListPage = () => {
+    const { api } = useAuth();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
@@ -23,7 +23,7 @@ const ProductListPage = () => {
         const fetchProducts = async () => {
             try {
                 // categoryId와 searchQuery를 사용하여 API 호출
-                const response = await axios.get('/api/product/list', {
+                const response = await api.get('/product/list', {
                     params: {
                         categoryId: categoryId, // URL에서 읽어온 categoryId 사용
                         searchQuery: searchQuery, // URL에서 읽어온 searchQuery 사용
@@ -72,7 +72,7 @@ const ProductListPage = () => {
 
     return (
         <Container className="my-5">
-            <h4 className="text-center mb-4 mt-3 rounded py-2">{typeName ? typeName : "전체상품"}</h4>
+            <h5 className="text-center mb-4 mt-3 rounded py-2">{typeName ? typeName : "전체상품"}</h5>
             <ProductList
                 products={products}
                 loading={loading}

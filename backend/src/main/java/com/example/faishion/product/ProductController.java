@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/product")
+@RequestMapping("/api/product")
 public class ProductController {
     private final ProductService productService;
     private final ReviewService reviewService;
@@ -179,7 +179,7 @@ public class ProductController {
                         map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
                         map.put("type", p.getType());
                         map.put("wish",productService.countByProduct(productService.findById(p.getId())));
-                        System.out.println("상품 타입?"+p.getType());
+                        //System.out.println("상품 타입?"+p.getType());
                         if(isDiscounting) {
                             map.put("originalPrice", p.getPrice());
                             map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());
@@ -188,7 +188,7 @@ public class ProductController {
                         String domain = request.getScheme() + "://" + request.getServerName() +
                                 (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
                         map.put("imageUrl", p.getMainImageList().stream().findFirst().map(
-                                image -> domain + "/image/" + image.getId()
+                                image -> domain + "/api/image/" + image.getId()
                         ));
 
                         map.put("reviewRating", reviewService.findRatingAverage(p.getId()));
@@ -227,7 +227,7 @@ public class ProductController {
                     String domain = request.getScheme() + "://" + request.getServerName() +
                             (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
                     map.put("imageUrl", p.getMainImageList().stream().findFirst().map(
-                            image -> domain + "/image/" + image.getId()
+                            image -> domain + "/api/image/" + image.getId()
                     ));
                     map.put("reviewRating", objects.length > 1 ? objects[1] : 0.0);
                     map.put("reviewCount", objects.length > 2 ? objects[2] : 0L);
@@ -236,6 +236,12 @@ public class ProductController {
                 })
                 .collect(Collectors.toList());
         return new PageImpl<>(content, pageable, result.getTotalElements());
+    }
+
+    @GetMapping("/stockImageIds/{productId}")
+    public List<Long> productStocks(@PathVariable Long productId, @AuthenticationPrincipal UserDetails userDetails){
+        Product findProduct = productService.findById(productId);
+        return findProduct.getStockList().stream().map(stock -> stock.getImage().getId()).toList();
     }
 
     @GetMapping("/{productId}")
@@ -262,7 +268,7 @@ public class ProductController {
                     (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort());
 
             Set<String> imageUrls = product.getDetailImageList().stream()
-                    .map(image -> domain + "/image/" + image.getId())
+                    .map(image -> domain + "/api/image/" + image.getId())
                     .collect(Collectors.toSet());
             return imageUrls;
         }

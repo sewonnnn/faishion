@@ -99,7 +99,7 @@ const SellerQnaListPage = () => {
         <Container className="my-5">
             <Row className="mb-4">
                 <Col>
-                    <h3>대시보드 Q&A 관리</h3>
+                    <h3>문의 글 관리</h3>
                 </Col>
             </Row>
 

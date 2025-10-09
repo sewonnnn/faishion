@@ -17,12 +17,15 @@ public class BannerDTO {
     String description;
     String businessName;
 
-    public BannerDTO(Product product, Long aiImageId){
+    public BannerDTO(Product product, Banner defaultBanner, Banner personalBanner){
         this.productId = product.getId();
         this.imageId = product.getMainImageList().stream().findFirst().orElseThrow().getId();
-        this.aiImageId = aiImageId;
         this.description = product.getDescription();
         this.businessName = product.getSeller().getBusinessName();
+        this.aiImageId = defaultBanner.getImage().getId();
+        if(personalBanner != null && personalBanner.getStatus() == BannerStatus.COMPLETED){
+            this.aiImageId = personalBanner.getImage().getId();
+        }
     }
 
 }

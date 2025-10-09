@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import { Container, Row, Col, Image } from 'react-bootstrap';
 import "../../pages/ProductDetailPage.css"
-import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 const ProductBody = ({productId}) => {
     const [imageUrl, setImageUrl] = useState([]);
+    const { api } = useAuth();
 
     useEffect(() => {
         const findProduct = async () => {
             try {
-                const response = await axios.get(`/api/product/body/${productId}`);
+                const response = await api.get(`/product/body/${productId}`);
                 setImageUrl(response.data); // DTO로 받은 데이터를 상태에 저장
             } catch (error) {
                 console.error('Error fetching product data:', error);

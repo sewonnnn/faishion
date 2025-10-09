@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 import "./AdminCategoryPage.css";
+import { Row, Col, Container } from "react-bootstrap";
 
 const AdminCategoryPage = () => {
     const [groups, setGroups] = useState([]);
@@ -10,10 +11,11 @@ const AdminCategoryPage = () => {
     const [loading, setLoading] = useState(false);
     const [groupError, setGroupError] = useState("");
     const [categoryError, setCategoryError] = useState("");
+    const { api } = useAuth();
 
     const fetchGroups = async () => {
         try {
-            const response = await axios.get("/api/category/groups");
+            const response = await api.get("/category/groups");
             const data = Array.isArray(response.data) ? response.data : [];
             setGroups(data);
             if (!selectedGroup && data.length > 0) {
@@ -37,7 +39,7 @@ const AdminCategoryPage = () => {
         setLoading(true);
         setGroupError("");
         try {
-            await axios.post("/api/category/group", { name: newGroupName });
+            await api.post("/category/group", { name: newGroupName });
             setNewGroupName("");
             await fetchGroups();
         } catch {
@@ -57,7 +59,7 @@ const AdminCategoryPage = () => {
         setLoading(true);
         setCategoryError("");
         try {
-            await axios.post("/api/category", {
+            await api.post("/category", {
                 name: newCategoryName,
                 categoryGroup: { id: selectedGroup.id },
             });
@@ -69,59 +71,67 @@ const AdminCategoryPage = () => {
     };
 
     return (
+        <Container>
         <div className="admin-category">
             {/* 좌측: 그룹 */}
-            <div className="admin-panel">
-                <h2>카테고리 그룹</h2>
-                <ul className="admin-list">
-                    {groups.map((group) => (
-                        <li
-                            key={group.id}
-                            className={selectedGroup?.id === group.id ? "active" : ""}
-                            onClick={() => setSelectedGroup(group)}
-                        >
-                            {group.name}
-                        </li>
-                    ))}
-                </ul>
+            <Row>
+                <Col md={6}>
+                <div className="admin-panel">
+                    <h2>카테고리 그룹</h2>
+                    <ul className="admin-list">
+                        {groups.map((group) => (
+                            <li
+                                key={group.id}
+                                className={selectedGroup?.id === group.id ? "active" : ""}
+                                onClick={() => setSelectedGroup(group)}
+                            >
+                                {group.name}
+                            </li>
+                        ))}
+                    </ul>
 
-                <div className="input-row">
-                    <input
-                        type="text"
-                        value={newGroupName}
-                        onChange={(e) => { setNewGroupName(e.target.value); setGroupError(""); }}
-                        placeholder="카테고리 그룹 추가"
-                        disabled={loading}
-                    />
-                    <button onClick={handleAddGroup} disabled={loading}>추가</button>
+                    <div className="input-row">
+                        <input
+                            type="text"
+                            value={newGroupName}
+                            onChange={(e) => { setNewGroupName(e.target.value); setGroupError(""); }}
+                            placeholder="카테고리 그룹 추가"
+                            disabled={loading}
+                        />
+                        <button onClick={handleAddGroup} disabled={loading}>추가</button>
+                    </div>
+                    {groupError && <p className="error-text">{groupError}</p>}
                 </div>
-                {groupError && <p className="error-text">{groupError}</p>}
-            </div>
+                </Col>
 
-            {/* 우측: 카테고리 */}
-            <div className="admin-panel">
-                <h2>카테고리</h2>
-                <ul className="admin-list">
-                    {selectedGroup?.categories?.map((c) => (
-                        <li key={c.id}>{c.name}</li>
-                    ))}
-                </ul>
+                <Col md={6}>
+                {/* 우측: 카테고리 */}
+                <div className="admin-panel">
+                    <h2>카테고리</h2>
+                    <ul className="admin-list">
+                        {selectedGroup?.categories?.map((c) => (
+                            <li key={c.id}>{c.name}</li>
+                        ))}
+                    </ul>
 
-                <div className="input-row">
-                    <input
-                        type="text"
-                        value={newCategoryName}
-                        onChange={(e) => { setNewCategoryName(e.target.value); setCategoryError(""); }}
-                        placeholder="카테고리 추가"
-                        disabled={loading || !selectedGroup}
-                    />
-                    <button onClick={handleAddCategory} disabled={loading || !selectedGroup}>
-                        추가
-                    </button>
+                    <div className="input-row">
+                        <input
+                            type="text"
+                            value={newCategoryName}
+                            onChange={(e) => { setNewCategoryName(e.target.value); setCategoryError(""); }}
+                            placeholder="카테고리 추가"
+                            disabled={loading || !selectedGroup}
+                        />
+                        <button onClick={handleAddCategory} disabled={loading || !selectedGroup}>
+                            추가
+                        </button>
+                    </div>
+                    {categoryError && <p className="error-text">{categoryError}</p>}
                 </div>
-                {categoryError && <p className="error-text">{categoryError}</p>}
-            </div>
+                </Col>
+            </Row>
         </div>
+        </Container>
     );
 };
 

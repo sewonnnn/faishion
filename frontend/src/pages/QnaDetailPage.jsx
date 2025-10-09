@@ -186,7 +186,7 @@ const QnaDetailPage = () => {
                                 </button>
                                 <button
                                     className="btn btn-secondary"
-                                    onClick={() => navigate("/qna/list")}
+                                    onClick={() => navigate(`${isAdmin ? "/admin" : ""}/qna/list`)}
                                 >
                                     목록
                                 </button>
@@ -195,7 +195,7 @@ const QnaDetailPage = () => {
                     ) : (
                         <button
                             className="btn btn-secondary"
-                            onClick={() => navigate("/qna/list")}
+                            onClick={() => navigate(`${isAdmin ? "/admin" : ""}/qna/list`)}
                         >
                             목록
                         </button>

@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 // 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
 const createFileImageObj = (file) => ({ id: null, file: file, url: null });
 const updateFileImageObj = (id, file) => ({ id : id, file : file, url : null});
-const createUrlImageObj = (id) => ({ id: id, file: null, url: `http://localhost:8080/image/${id}` });
+const createUrlImageObj = (id) => ({ id: id, file: null, url: `${api.defaults.baseURL}/image/${id}` });
 const createStockImageObj = (stock) => ({
     id: stock.id || null, // 재고 ID
     quantity: stock.quantity || 0,
@@ -35,7 +35,7 @@ const SellerProductFormPage = () => {
         discountPrice: initialProduct?.discountPrice || '',
         discountStartDate: initialProduct?.discountStartDate || '',
         discountEndDate: initialProduct?.discountEndDate || '',
-        type: initialProduct?.type || '',
+        type: initialProduct?.type || 'man',
         // 이미지 목록 초기화: 기존 URL/ID를 객체 형태로 변환
         mainImages: (initialProduct?.mainImageList || []).map(img => createUrlImageObj(img)),
         detailImages: (initialProduct?.detailImageList || []).map(img => createUrlImageObj(img)),
@@ -380,6 +380,7 @@ const SellerProductFormPage = () => {
             }
             console.log('Product registered successfully:', response.data);
             alert('상품이 성공적으로 등록되었습니다.');
+            navigate('/seller');
         } catch (error) {
             console.error('Error registering product:', error.response ? error.response.data : error.message);
             alert('상품 등록 중 오류가 발생했습니다.');

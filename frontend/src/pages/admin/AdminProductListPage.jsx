@@ -74,7 +74,7 @@ const AdminProductListPage = () => {
             ) : (
                 <>
                     <Table bordered hover responsive className="admin-table text-center align-middle">
-                        <thead s>
+                        <thead>
                             <tr className="text-center">
                                 <th>브랜드명</th>
                                 <th>상품명</th>
@@ -93,7 +93,7 @@ const AdminProductListPage = () => {
                                     </td>
                                     <td className="d-flex align-items-center">
                                         <img
-                                            src={`http://localhost:8080/image/${product.mainImageList[0]}`}
+                                            src={`${api.defaults.baseURL}/image/${product.mainImageList[0]}`}
                                             style={{
                                                 width: "50px",
                                                 height: "50px",

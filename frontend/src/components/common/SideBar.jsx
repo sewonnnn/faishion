@@ -42,7 +42,7 @@ const SideBar = ({ menuItems = [] }) => {
                 className="sidebar-container d-none d-md-flex flex-column vh-100 p-0 position-sticky top-0"
             >
                 <div className="p-3 text-center ">
-                    <h2 className="mb-0 text-white">fAIshion</h2>
+                    <h2 className="mb-0 text-white logo">fAIshion</h2>
                 </div>
                 <MenuContent />
             </Container>

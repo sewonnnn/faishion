@@ -49,6 +49,7 @@
 
 /* 검색창 래퍼 */
 .search-bar-wrapper {
+
     order: 2; /* 검색창이 두 번째 줄에 위치 */
     width: 100%; /* 모바일에서 전체 너비 사용 */
     padding-top: 10px; /* 링크와의 간격 */
@@ -94,6 +95,12 @@
     border: 1px solid #ccc;
     border-right: none;
     border-radius: 20px 0 0 20px;
+}
+
+.search-bar .form-control:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: #ccc !important;
 }
 
 .search-bar .btn {

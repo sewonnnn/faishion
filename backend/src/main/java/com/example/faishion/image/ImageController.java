@@ -1,18 +1,23 @@
 package com.example.faishion.image;
 
 import lombok.RequiredArgsConstructor;
+import okhttp3.Response;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/image")
+@RequestMapping("/api/image")
 public class ImageController {
     private final ImageService imageService;
 
@@ -41,14 +46,16 @@ public class ImageController {
         }
     }
 
-    /*
     @PostMapping("/generate")
-    public void generateFashionImage(
-            @RequestParam("dressId") Long dressId,
-            @RequestParam("modelId") Long modelId) throws IOException {
-        List<Long> imageIds = List.of(dressId, modelId);
-        Image generatedImage = imageService.generateImage(imageIds,
-                "Create a professional e-commerce fashion photo. Take the blue floral dress from the first image and let the woman from the second image wear it. Generate a realistic, full-body shot of the woman wearing the dress, with the lighting and shadows adjusted to match the outdoor environment.");
+    public ResponseEntity<Image> generateImage(@RequestBody ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        try {
+            CompletableFuture<Image> futureImage = imageService.generateImage(imageGenerationRequestDTO.getImageIds(), imageGenerationRequestDTO.getCustomPrompt());
+            Image generatedImage = futureImage.get();
+            return ResponseEntity.ok(generatedImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Return 500 Internal Server Error
+            return ResponseEntity.status(500).build();
+        }
     }
-     */
 }

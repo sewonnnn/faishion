@@ -151,8 +151,6 @@ public class ImageService {
         for (Long id : imageIds) {
             String imgBase64 = getImageBase64(id);
             String mimeType = getMediaType(id).toString();
-            // 주의: 모든 입력 이미지를 PNG로 가정하고 처리합니다.
-            // 실제로는 getImageBase64와 getMediaType을 조합하여 동적으로 MIME 타입을 가져와야 합니다.
             parts.add(Map.of("inline_data", Map.of(
                     "mime_type", mimeType,
                     "data", imgBase64
@@ -160,10 +158,21 @@ public class ImageService {
         }
         // 텍스트 프롬프트
         parts.add(Map.of("text", customPrompt));
-        Map<String, List<Map<String, List<Map<String, Object>>>>> body = Map.of(
+        //Generation Config
+        Map<String, Object> imageConfig = Map.of(
+                "aspectRatio", "1:1"
+        );
+        Map<String, Object> generationConfig = Map.of(
+                "temperature", 0, // AI 창의성 레벨 0~1
+                "responseModalities", List.of("IMAGE"), // IMAGE 응답을 요청
+                "imageConfig", imageConfig
+        );
+        // 최종 요청 본문 구조
+        Map<String, Object> body = Map.of(
                 "contents", List.of(
                         Map.of("parts", parts)
-                )
+                ),
+                "generationConfig", generationConfig // **generationConfig 추가**
         );
         HttpEntity<Map<String, ?>> entity = new HttpEntity<>(body, headers);
         // Gemini API 요청 URL

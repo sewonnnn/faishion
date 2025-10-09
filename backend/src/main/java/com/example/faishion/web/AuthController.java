@@ -2,6 +2,7 @@ package com.example.faishion.web;
 
 import com.example.faishion.admin.Admin;
 import com.example.faishion.admin.AdminRepository;
+import com.example.faishion.admin.AdminService;
 import com.example.faishion.security.JwtTokenProvider;
 import com.example.faishion.seller.Seller;
 import com.example.faishion.seller.SellerDTO;
@@ -23,16 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
     private final SellerService sellerService;
-    private final SellerRepository sellerRepo;
-    private final AdminRepository adminRepo;
-    private final UserRepository userRepo;
     private final JwtTokenProvider jwt;
+    private final AdminService adminService;
 
     // 로컬 회원가입
     @PostMapping("/register")
@@ -98,6 +96,18 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(Map.of("accessToken", accessToken));
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> dto) {
+        System.out.println("로그인 시도");
+        String id = dto.get("id");
+        String password = dto.get("password");
+        System.out.println(id + ", " + password);
+
+        Admin admin = adminService.loginAdmin(id, password);
+
+        return token(admin.getId(), "ADMIN");
     }
 
     // 네이버 로그인
@@ -166,6 +176,7 @@ public class AuthController {
 
     }
 
+    /*
     // 임시 토큰 발급
     @PostMapping("/temp/token")
     public ResponseEntity<String> tempLogin(@RequestBody Map<String, String> req){
@@ -209,6 +220,8 @@ public class AuthController {
         }
         return token(id, role);
     }
+
+     */
 
     private ResponseEntity<String> token(String id, String role){
         String accessToken = jwt.generateAccess(id, List.of(role));

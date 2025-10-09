@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/wish")
+@RequestMapping("/api/wish")
 public class WishController {
     private final ProductService productService;
     private final WishService wishService;

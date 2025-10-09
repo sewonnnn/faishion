@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List; // PaymentDTO에서 List를 사용하므로 필요
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/payments")
 @RequiredArgsConstructor
 @Slf4j // Logger를 직접 선언하는 대신 사용
 public class PaymentController {

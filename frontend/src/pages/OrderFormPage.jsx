@@ -321,7 +321,7 @@ const OrderFormPage = () => {
                                             {/* 이미지 */}
                                             <Col xs={4} md={3}>
                                                 <Image
-                                                    src={`http://localhost:8080/image/${item.productImageId}`}
+                                                    src={`${api.defaults.baseURL}/image/${item.productImageId}`}
                                                     alt={item.productName}
                                                     fluid
                                                     rounded

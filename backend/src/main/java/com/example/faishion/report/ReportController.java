@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/report")
+@RequestMapping("/api/report")
 public class ReportController {
     private final ReportService reportService;
     private final ReviewService reviewService;
