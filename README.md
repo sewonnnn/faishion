@@ -1,7 +1,7 @@
 <img width="1147" height="270" alt="image" src="https://github.com/user-attachments/assets/17863a83-525e-42fb-9f79-fadebcfe4f83" />
 
 
-# AI 가상 피팅 쇼핑몰
+# AI 가상 피팅 쇼핑몰, fAIshion
 
 AI 기반 가상 피팅 기능이 포함된 풀스택 쇼핑몰 프로젝트입니다.  
 일반 사용자, 판매자, 관리자 권한에 따라 각각 다른 화면과 기능을 제공합니다.
@@ -96,5 +96,6 @@ AI 가상 피팅 기능은 추후 고도화 예정입니다.
 📧 Contact
 
 👤 팀 구성: [박세원, 유부미, 이현호, 권택준]
+
 
 
