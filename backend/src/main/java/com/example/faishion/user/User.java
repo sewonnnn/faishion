@@ -2,7 +2,6 @@ package com.example.faishion.user;
 
 import com.example.faishion.address.Address;
 import com.example.faishion.cart.Cart;
-import com.example.faishion.coupon.Coupon;
 import com.example.faishion.image.Image;
 import com.example.faishion.notification.Notification;
 import com.example.faishion.order.Order;
@@ -73,9 +72,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orderList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Coupon> couponList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cart> cartList = new ArrayList<>();

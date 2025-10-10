@@ -168,15 +168,14 @@ const SellerRegisterPage = () => {
         // 2) 서버/공공 API 조회
         try {
             // 응답 예시: { exists: true/false, status: "ACTIVE"|"CLOSED"|... }
-            /*
             const res = await api.post("${api.defaults.baseURL}/auth/seller/check-business", {
                 businessNumber: digits,
             });
-
             const { exists, status } = res.data || {};
-            */
+            /*
             const exists = true;
             const status = "ACTIVE";
+            */
             if (!exists) {
                 setBusinessMessage({ text: "조회되지 않는 번호입니다.", color: "red" });
                 setIsBusinessValid(false);

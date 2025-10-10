@@ -1,7 +1,5 @@
 package com.example.faishion.order;
 
-import com.example.faishion.address.Address;
-import com.example.faishion.coupon.Coupon;
 import com.example.faishion.delivery.Delivery;
 import com.example.faishion.user.User;
 import jakarta.persistence.*;
