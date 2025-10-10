@@ -36,7 +36,7 @@ public class ImageService {
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
         this.restTemplate = new RestTemplate();
-        this.uploadDir = "C:/upload/";
+        this.uploadDir = "/home/ubuntu/upload/";
     }
 
     // 이미지 저장
