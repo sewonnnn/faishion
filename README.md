@@ -10,6 +10,12 @@ AI 기반 가상 피팅 기능이 포함된 풀스택 쇼핑몰 프로젝트입�
 
 ---
 
+## 📺 시연 영상
+👉
+
+[📄 프로젝트 문서 (PDF 보기)](https://github.com/sewonnnn/faishion/blob/master/fAIshion_Team_Project.pdf)
+
+
 ## 📌 주요 기능
 - 회원 관리(일반·소셜 로그인, 권한 제어)
 - AI 기반 가상 피팅 및 스타일 추천
@@ -102,6 +108,7 @@ AI 가상 피팅 기능은 추후 고도화 예정입니다.
 
 📧 Contact
 👤 팀 구성: [박세원, 유부미, 이현호, 권택준]
+
 
 
 
