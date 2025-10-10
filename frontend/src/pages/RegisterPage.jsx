@@ -1,11 +1,12 @@
-import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RegisterPage.css" ;
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 export default function RegisterPage() {
     const nav = useNavigate();
+    const { api } = useAuth();
     const [form, setForm] = useState({
         id: "",
         password: "",
@@ -66,7 +67,7 @@ export default function RegisterPage() {
     const checkId = async () => {
         if (!validateId()) return;
         try {
-            const res = await axios.post("http://localhost:8080/auth/check-id", { id: form.id });
+            const res = await api.post("/auth/check-id", { id: form.id });
             setIdMessage({ text: res.data, color: "green" });
         } catch (err) {
             setIdMessage({ text: err.response?.data || "중복검사 실패", color: "red" });
@@ -106,7 +107,7 @@ export default function RegisterPage() {
         const email =
             form.emailLocal + "@" + (form.emailDomain === "custom" ? form.customDomain : form.emailDomain);
         try {
-            const res = await axios.post("http://localhost:8080/auth/check-email", { email });
+            const res = await api.post("/auth/check-email", { email });
             setEmailMessage({ text: res.data, color: "green" });
         } catch (err) {
             setEmailMessage({ text: err.response?.data || "중복검사 실패", color: "red" });
@@ -119,7 +120,7 @@ export default function RegisterPage() {
         const email =
             form.emailLocal + "@" + (form.emailDomain === "custom" ? form.customDomain : form.emailDomain);
         try {
-            await axios.post("http://localhost:8080/auth/register", {
+            await api.post("/auth/register", {
                 id: form.id,
                 password: form.password,
                 email,

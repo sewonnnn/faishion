@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import {useAuth} from "../contexts/AuthContext.jsx";
 // react-bootstrap 컴포넌트 임포트
 import { Container, Row, Col, Card, Button, Image, Form, Spinner, Alert } from 'react-bootstrap';
 // 기존 훅 및 CSS 임포트 (확장자 제거 및 경로 조정)
@@ -22,7 +22,7 @@ const CartPage = () => {
     const [message, setMessage] = useState(null);
     // 이미지 로드 오류 상태 관리
     const [imageError, setImageError] = useState({});
-
+    const { api } = useAuth();
     // 1. 장바구니 데이터 및 전체 목록 가져오기
     const { cartList, fetchCartData } = useCart();
 
@@ -71,7 +71,7 @@ const CartPage = () => {
 
         try {
             // 백엔드 API 호출
-            const res = await axios.get("http://localhost:8080/order/new", {
+            const res = await api.get("/order/new", {
                 params: { ids: cartIds },
             });
             console.log("주문서 데이터 불러오기 성공:", res.data);
@@ -204,7 +204,7 @@ const CartPage = () => {
                                                     </div>
                                                 ) : (
                                                     <Image
-                                                        src={`http://localhost:8080/image/${item.productImageId}`}
+                                                        src={`${api.defaults.baseURL}/image/${item.productImageId}`}
                                                         alt={item.productName}
                                                         fluid
                                                         rounded

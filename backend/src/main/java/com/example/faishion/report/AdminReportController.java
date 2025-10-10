@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/reports")
+@RequestMapping("/api/admin/reports")
 public class AdminReportController {
     // ReportService는 findAllReports(Pageable)을 가지고 있다고 가정
     private final ReportService reportService;

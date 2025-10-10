@@ -52,7 +52,7 @@ public class ProductDetailDTO {
 
         // 이미지 URL 설정
         this.imageUrls = product.getMainImageList().stream()
-                .map(image -> domain + "/image/" + image.getId())
+                .map(image -> domain + "/api/image/" + image.getId())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         // ✨ 추가된 재고 정보 매핑 로직

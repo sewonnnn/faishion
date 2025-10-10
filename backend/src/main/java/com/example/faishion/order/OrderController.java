@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/api/order")
 public class OrderController {
 
     private final OrderService orderService;
@@ -102,17 +103,24 @@ public class OrderController {
 
         //  주문 상품 생성 및 재고 차감
         for (OrderCreateRequestDTO.OrderItemDTO itemDTO : request.getItems()) {
-
-            // Stock 조회 (이 부분이 이전의 "stock이 안 잡혀" 오류를 해결합니다.)
-            Stock stock = stockRepository.findById(itemDTO.getStockId())
-                    .orElseThrow(() -> new IllegalArgumentException("재고를 찾을 수 없습니다: " + itemDTO.getStockId()));
-
-            // 재고 확인 및 차감 로직
+            Stock stock;
+            try {
+                stock = stockRepository.findByIdForUpdate(itemDTO.getStockId()) // 락이 걸린 메서드 사용
+                        .orElseThrow(() -> new IllegalArgumentException("재고를 찾을 수 없습니다: " + itemDTO.getStockId()));
+            } catch (PessimisticLockingFailureException e) {
+                // 락 획득 실패 시 (동시성 충돌 발생)
+                throw new RuntimeException("동시 주문 충돌로 인해 주문 처리에 실패했습니다. 다시 시도해 주세요.");
+            }
+            // 재고 확인 및 차감 로직 (락이 걸린 상태에서 안전하게 처리)
             if (stock.getQuantity() < itemDTO.getQuantity()) {
+                // 재고 부족 시 트랜잭션 롤백
                 throw new IllegalArgumentException("상품 " + stock.getProduct().getName() + "의 재고가 부족합니다.");
             }
+            // 재고 차감 (수정)
             stock.setQuantity(stock.getQuantity() - itemDTO.getQuantity());
-            stockRepository.save(stock); // 재고 업데이트
+            stockRepository.save(stock);
+
+            System.out.println("락 획득 후 주문 완료");
 
             // OrderItem 엔티티 생성
             OrderItem orderItem = new OrderItem();

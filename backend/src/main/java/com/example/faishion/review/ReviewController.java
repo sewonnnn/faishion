@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/review")
+@RequestMapping("/api/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -96,7 +96,7 @@ public class ReviewController {
                     review.getRating(),
                     review.getCreatedAt().format(formatter),
                     review.getImageList().stream()
-                            .map(image -> domain + "/image/" + image.getId())
+                            .map(image -> domain + "/api/image/" + image.getId())
                             .collect(Collectors.toList()),
                     productName
             );
@@ -152,7 +152,7 @@ public class ReviewController {
                     review.getRating(),
                     review.getCreatedAt().format(formatter),
                     review.getImageList().stream()
-                            .map(image -> domain + "/image/" + image.getId())
+                            .map(image -> domain + "/api/image/" + image.getId())
                             .collect(Collectors.toList()),
                     productName, // ReviewResponseDTO에 productName 필드가 추가되어야 합니다.
                     review.getProduct().getId()
@@ -161,7 +161,7 @@ public class ReviewController {
 
         return ResponseEntity.ok(responsePage);
     }
-    // 🎯 리뷰 삭제 (DELETE)
+    // 리뷰 삭제 (DELETE)
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<String> deleteReview(
             @PathVariable Long reviewId,

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 const useCartSelection = (cartList, fetchCartData) => {
     // 선택된 상품 ID
     const [selectedItems, setSelectedItems] = useState([]);
 
+    const {api} = useAuth();
     // 전체 선택 체크박스 상태
     const [isAllSelected, setIsAllSelected] = useState(false);
 
@@ -33,7 +34,7 @@ const useCartSelection = (cartList, fetchCartData) => {
     // 개별 상품 삭제
     const handleDelete = async (itemId) => {
         try {
-            await axios.delete(`http://localhost:8080/cart/delete/${itemId}`);
+            await api.delete(`${api.defaults.baseURL}/cart/delete/${itemId}`);
             alert('상품이 삭제되었습니다.');
             fetchCartData(); // 삭제 후 데이터 새로고침
         } catch (error) {
@@ -50,7 +51,7 @@ const useCartSelection = (cartList, fetchCartData) => {
         }
 
         try {
-            await axios.post('http://localhost:8080/cart/deletePickAll', { cartIds: selectedItems });
+            await api.post(`${api.defaults.baseURL}/cart/deletePickAll`, { cartIds: selectedItems });
             alert('선택된 상품들이 삭제되었습니다.');
             setSelectedItems([]); // 선택 상태 초기화
             setIsAllSelected(false);

@@ -94,7 +94,7 @@ const SellerProductListPage = () => {
                                 <td>
                                     <div className="seller-image-placeholder">
                                         <img
-                                            src={`http://localhost:8080/image/${product.mainImageList[0]}`}
+                                            src={`${api.defaults.baseURL}/image/${product.mainImageList[0]}`}
                                             alt="상품"
                                             className="seller-product-image"
                                         />

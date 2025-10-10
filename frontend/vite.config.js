@@ -9,15 +9,6 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     plugins: [react()],
-    server: {
-        proxy: {
-            '/api': {
-                target: 'http://localhost:8080', // 백엔드 주소
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ''),
-            },
-        },
-    },
     // SCSS/Bootstrap 경로 해석을 위한 alias 추가
     resolve: {
         alias: {

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 import "./AdminCategoryPage.css";
 import { Row, Col, Container } from "react-bootstrap";
 
@@ -11,10 +11,11 @@ const AdminCategoryPage = () => {
     const [loading, setLoading] = useState(false);
     const [groupError, setGroupError] = useState("");
     const [categoryError, setCategoryError] = useState("");
+    const { api } = useAuth();
 
     const fetchGroups = async () => {
         try {
-            const response = await axios.get("/api/category/groups");
+            const response = await api.get("/category/groups");
             const data = Array.isArray(response.data) ? response.data : [];
             setGroups(data);
             if (!selectedGroup && data.length > 0) {
@@ -38,7 +39,7 @@ const AdminCategoryPage = () => {
         setLoading(true);
         setGroupError("");
         try {
-            await axios.post("/api/category/group", { name: newGroupName });
+            await api.post("/category/group", { name: newGroupName });
             setNewGroupName("");
             await fetchGroups();
         } catch {
@@ -58,7 +59,7 @@ const AdminCategoryPage = () => {
         setLoading(true);
         setCategoryError("");
         try {
-            await axios.post("/api/category", {
+            await api.post("/category", {
                 name: newCategoryName,
                 categoryGroup: { id: selectedGroup.id },
             });

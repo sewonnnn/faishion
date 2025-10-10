@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/delivery")
+@RequestMapping("/api/delivery")
 public class DeliveryController {
     private final DeliveryService deliveryService;
     private final SellerRepository sellerRepository;

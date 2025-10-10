@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import './Header.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Link 추가
 import { useAuth } from '../../contexts/AuthContext';
 
 
@@ -24,6 +24,7 @@ const Header = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
+                // api 사용 시, categoryList 대신 categories를 사용하도록 가정하고 수정
                 const response = await api.get('/category/groups');
                 setCategories(response.data);
             } catch (error) {
@@ -34,11 +35,13 @@ const Header = () => {
         fetchCategories();
     }, [api]);
 
+    // 카테고리 클릭 핸들러: useNavigate 사용
     const handleCategoryClick = (id) => {
         navigate(`/product/list?categoryId=${id}`);
         setIsMenuOpen(false); // 메뉴 닫기
     };
 
+    // 하위 카테고리 렌더링
     const renderSubCategories = (subCategories) => {
         return (
             <div className="row">
@@ -47,16 +50,15 @@ const Header = () => {
                         {subCategories.map((item) => {
                             return (
                                 <li key={item.id}>
-                                    {/* Link 컴포넌트나 useNavigate를 사용해 URL 이동 */}
-                                    <a
-                                        href={`/product/list?categoryId=${item.id}`}
-                                        onClick={(e) => {
-                                            e.preventDefault(); // 기본 링크 동작 방지
+                                    {/* 📌 수정: <Link> 컴포넌트로 변경 */}
+                                    <Link
+                                        to={`/product/list?categoryId=${item.id}`}
+                                        onClick={() => {
                                             handleCategoryClick(item.id);
                                         }}
                                     >
                                         {item.name}
-                                    </a>
+                                    </Link>
                                 </li>
                             );
                         })}
@@ -72,9 +74,7 @@ const Header = () => {
             <div className="row g-0 full-menu">
                 {categories.map(group => (
                     <div className="col-2 category-col" key={group.id}>
-                        {/* group.name을 제목으로 사용합니다. */}
                         <h5 className="category-title">{group.name}</h5>
-                        {/* group.categoryList를 하위 카테고리 데이터로 전달합니다. */}
                         {renderSubCategories(group.categories)}
                     </div>
                 ))}
@@ -113,31 +113,26 @@ const Header = () => {
         <>
             <Navbar className="top-nav">
                 <Container fluid>
-                    <Navbar.Brand href="/">
+                    {/* 📌 수정: Navbar.Brand의 href 대신 <Link>와 useNavigate 사용 */}
+                    <Navbar.Brand
+                        as={Link}
+                        to="/"
+                    >
                         <h1 className="logo">fAIshion</h1>
                     </Navbar.Brand>
                     <Nav className="ms-auto">
                         {user ? (
                             <>
                                 <Nav.Link onClick={logout} style={{ cursor: 'pointer' }}>logout</Nav.Link>
-                                <Nav.Link href="/wishlist"><i className="bi bi-heart"></i></Nav.Link>
-                                <Nav.Link href="/mypage"><i className="bi bi-person"></i></Nav.Link>
-                                <Nav.Link href="/cart"><i className="bi bi-bag"></i></Nav.Link>
+                                {/* 📌 수정: Nav.Link의 href 대신 as={Link}와 to 사용 */}
+                                <Nav.Link as={Link} to="/wishlist"><i className="bi bi-heart"></i></Nav.Link>
+                                <Nav.Link as={Link} to="/mypage"><i className="bi bi-person"></i></Nav.Link>
+                                <Nav.Link as={Link} to="/cart"><i className="bi bi-bag"></i></Nav.Link>
                             </>
                         ) : (
                             <>
-{/*                                 <Form.Select */}
-{/*                                     aria-label="Select Role" */}
-{/*                                     value={selectedRole} */}
-{/*                                     onChange={(e) => setSelectedRole(e.target.value)} */}
-{/*                                     style={{ width: '120px', marginRight: '10px' }} */}
-{/*                                 > */}
-{/*                                     <option value="USER">구매자</option> */}
-{/*                                     <option value="SELLER">판매자</option> */}
-{/*                                     <option value="ADMIN">운영자</option> */}
-{/*                                 </Form.Select> */}
-{/*                                 <Nav.Link onClick={createTempToken} style={{ cursor: 'pointer' }}>임시 토큰 발급</Nav.Link> */}
-                                <Nav.Link href="/login">login</Nav.Link>
+                                {/* 📌 수정: Nav.Link의 href 대신 as={Link}와 to 사용 */}
+                                <Nav.Link as={Link} to="/login">login</Nav.Link>
                             </>
                         )}
                     </Nav>
@@ -145,7 +140,6 @@ const Header = () => {
             </Navbar>
             <hr className="header-divider" />
 
-            {/* **수정된 메인 헤더 부분:** Navbar 대신 div와 Container fluid를 사용하여 레이아웃 제어 */}
             <div
                 className="main-header-wrapper"
                 onMouseOver={(e) => {
@@ -161,13 +155,14 @@ const Header = () => {
             >
                 <Container fluid className="main-header-content">
                     <Nav className="main-nav-links">
-                        <Nav.Link href="/product/list?type=best">베스트</Nav.Link>
-                        <Nav.Link href="/product/list?type=sale">세일</Nav.Link>
-                        <Nav.Link href="/product/list?type=new">신상품</Nav.Link>
-                        <Nav.Link href="/product/list?type=pick">추천</Nav.Link>
-                        <Nav.Link href="/product/list?type=common">공용</Nav.Link>
-                        <Nav.Link href="/product/list?type=man">남성</Nav.Link>
-                        <Nav.Link href="/product/list?type=woman">여성</Nav.Link>
+                        {/* 📌 수정: Nav.Link의 href 대신 as={Link}와 to 사용 */}
+                        <Nav.Link as={Link} to="/product/list?type=best">베스트</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=sale">세일</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=new">신상품</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=pick">추천</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=common">공용</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=man">남성</Nav.Link>
+                        <Nav.Link as={Link} to="/product/list?type=woman">여성</Nav.Link>
                     </Nav>
 
                     {/* 2. 검색창: 모바일에서 별도의 줄로 내려가도록 CSS 조정 */}
