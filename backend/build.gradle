@@ -50,6 +50,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
+bootJar {
+    archiveFileName = "app.jar"
+}
+
+/*
 def frontendDir = "../frontend"
 
 processResources {
@@ -86,3 +91,4 @@ task copyReactBuildFiles(type: Copy) {
     from "$frontendDir/dist"
     into "$projectDir/src/main/resources/static"
 }
+ */
