@@ -75,12 +75,12 @@ AI 기반 가상 피팅 기능이 포함된 풀스택 쇼핑몰 프로젝트입�
 
 ### 🔑 API
 - [인증/보안: 네이버 OAuth2, 카카오 OAuth2]
-- [결제/배송: 토스페이먼츠]
+- [결제/배송: 토스페이먼츠,우편번호 API]
 - [회원·사업자 관리: Kakao 주소 API, 국세청 사업자 등록 조회 API]
 
 ### 🖥️ Frontend
 - HTML5, CSS3, JavaScript 
-- [React.js] *(사용한 템플릿 엔진 또는 프레임워크)*
+-  React, React-Bootstarp
 - Axios (API 통신)
 
 ### 🖥️ Backend
@@ -90,10 +90,9 @@ AI 기반 가상 피팅 기능이 포함된 풀스택 쇼핑몰 프로젝트입�
 
 ### 🗄️ Database
 - MySQL / JPA
-- Redis (세션 캐싱, 선택사항)
 
 ### 🔐 Cloud & Deployment
-- AWS (EC2, S3), GitHub Actions (CI/CD), 
+- AWS (EC2, S3), GitHub, 
 IntelliJ IDEA, VSCode
 
 ---
@@ -108,6 +107,7 @@ AI 가상 피팅 기능은 추후 고도화 예정입니다.
 
 📧 Contact
 👤 팀 구성: [박세원, 유부미, 이현호, 권택준]
+
 
 
 
