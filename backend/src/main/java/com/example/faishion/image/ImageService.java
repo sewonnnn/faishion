@@ -28,7 +28,9 @@ import java.util.concurrent.CompletableFuture;
 public class ImageService {
     private final RestTemplate restTemplate;
     private final ImageRepository imageRepository;
-    private final String uploadDir; // 환경변수로 변경 가능
+
+    @Value("${image.upload.dir}") // 환경변수 없으면 기본값 사용
+    private String uploadDir;
 
     @Value("${google.api.key}")
     private String googleApiKey;
@@ -36,7 +38,6 @@ public class ImageService {
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
         this.restTemplate = new RestTemplate();
-        this.uploadDir = "/home/ubuntu/upload/";
     }
 
     // 이미지 저장

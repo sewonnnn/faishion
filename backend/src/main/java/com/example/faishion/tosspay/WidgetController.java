@@ -6,9 +6,8 @@ import com.example.faishion.order.OrderItem;
 import com.example.faishion.order.OrderService;
 import com.example.faishion.payment.Payment;
 import com.example.faishion.user.User;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +19,14 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 public class WidgetController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final OrderService orderService;
     private final CartService cartService; // ⭐ CartService 필드 추가
 
@@ -43,11 +40,9 @@ public class WidgetController {
     public ResponseEntity<?> confirmPayment(
             @RequestBody String jsonBody
     ) {
-        JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
-
         try {
             // --- 1) 요청 파싱 (안전 캐스팅) ---
-            JSONObject req = (JSONObject) parser.parse(jsonBody);
+            Map<String, Object> req = objectMapper.readValue(jsonBody, Map.class);
             String orderId = asString(req.get("orderId"));
             String paymentKey = asString(req.get("paymentKey"));
             long amount = asLong(req.get("amount"));
@@ -57,7 +52,7 @@ public class WidgetController {
             }
 
             // --- 2) Toss 승인 호출 ---
-            JSONObject tossReq = new JSONObject();
+            Map<String, Object> tossReq = new HashMap<>(); // ⭐ HashMap 사용
             tossReq.put("orderId", orderId);
             tossReq.put("amount", amount);
             tossReq.put("paymentKey", paymentKey);
@@ -79,7 +74,7 @@ public class WidgetController {
 
             int code = conn.getResponseCode();
             InputStream is = (code == 200) ? conn.getInputStream() : conn.getErrorStream();
-            JSONObject tossRes = (JSONObject) parser.parse(new InputStreamReader(is, StandardCharsets.UTF_8));
+            Map<String, Object> tossRes = objectMapper.readValue(is, Map.class); // Map.class로 파싱
             if (is != null) is.close();
 
             if (code != 200) {
@@ -110,7 +105,7 @@ public class WidgetController {
                 return ResponseEntity.status(404).body(error("ORDER_NOT_FOUND", "주문을 찾을 수 없습니다: " + orderId));
             }
 
-            JSONObject result = new JSONObject();
+            Map<String, Object> result = new HashMap();
             result.put("orderId", order.getId());               // 내부 PK
             result.put("clientOrderId", order.getClientOrderId());
             result.put("orderName", order.getOrderName());
@@ -152,9 +147,9 @@ public class WidgetController {
             }
 
             /* 상품 목록 */
-            List<JSONObject> items = new ArrayList<>();
+            List<Map<String, Object>> items = new ArrayList<>();
             for (OrderItem item : order.getOrderItemList()) {
-                JSONObject ji = new JSONObject();
+                Map<String, Object> ji = new HashMap<>();
 
                 String productName = null;
                 String brand = null;
@@ -186,7 +181,7 @@ public class WidgetController {
 
             return ResponseEntity.ok(result);
 
-        } catch (ParseException e) {
+        } catch (JsonProcessingException e) {
             log.error("JSON 파싱 실패", e);
             return ResponseEntity.badRequest().body(error("INVALID_JSON", "요청 본문 파싱 실패"));
         } catch (Exception e) {
@@ -203,8 +198,8 @@ public class WidgetController {
         if (v instanceof Number) return ((Number) v).longValue();
         return Long.parseLong(String.valueOf(v));
     }
-    private static JSONObject error(String code, String message) {
-        JSONObject o = new JSONObject();
+    private static Map<String, Object> error(String code, String message) {
+        Map<String, Object> o = new HashMap();
         o.put("code", code);
         o.put("message", message);
         return o;
@@ -219,7 +214,7 @@ public class WidgetController {
     }
 
     // Toss 응답에서 결제수단(method) 안전하게 추출
-    private static String safeExtractPaymentMethod(JSONObject tossRes) {
+    private static String safeExtractPaymentMethod(Map<String, Object> tossRes) {
         String method = asString(tossRes.get("method"));
         if (method != null && !method.isBlank()) return method;
 

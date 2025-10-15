@@ -49,8 +49,9 @@ export const AuthProvider = ({ children }) => {
     // axios API 인스턴스
     const api = useMemo(() => {
         const instance = axios.create({
-            baseURL: "/api", //개발환경
-            //baseURL: "http://52.79.233.35:8080/api", //AWS 인스턴스 IP
+            //baseURL: "/api",
+            baseURL: "https://www.faishion.store/api",
+
             withCredentials: true
         });
 

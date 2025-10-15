@@ -12,7 +12,6 @@ import com.example.faishion.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,7 +68,7 @@ public class OrderController {
     // 주문 저장
     @Transactional
     @PostMapping("/create")
-    public ResponseEntity<JSONObject> createPendingOrder(
+    public ResponseEntity<Map<String, Object>> createPendingOrder(
             @RequestBody OrderCreateRequestDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
         //  사용자 엔티티 조회
@@ -140,7 +139,7 @@ public class OrderController {
             orderItemRepository.save(orderItem);
         }
 
-        JSONObject response = new JSONObject();
+        Map<String, Object> response = new HashMap<>();
         response.put("clientOrderId", clientOrderId);  // 키 통일
         return ResponseEntity.ok(response);
     }

@@ -1,8 +1,6 @@
 package com.example.faishion.config;
 
-import com.example.faishion.security.CustomOAuth2UserService;
 import com.example.faishion.security.JwtAuthenticationFilter;
-import com.example.faishion.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +11,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -69,7 +66,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var c = new CorsConfiguration();
-        c.setAllowedOrigins(List.of("*"));
+        c.setAllowedOrigins(List.of("http://localhost:5173", "https://www.faishion.store"));
         c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         // 'Cookie' 헤더 추가
         c.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Cookie"));
