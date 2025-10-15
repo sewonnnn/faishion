@@ -29,8 +29,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     //private final UserDetailsService userDetailsService;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    //private final CustomOAuth2UserService customOAuth2UserService;
+    //private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     // 비밀번호 단방향(BCrypt) 암호화용 Bean
     @Bean
