@@ -6,21 +6,23 @@ import MultipleImageUploader from "../../components/seller/productform/MultipleI
 import MultipleStockImageUploader from "../../components/seller/productform/MultipleStockImageUploader.jsx";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 
-// 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
-const createFileImageObj = (file) => ({ id: null, file: file, url: null });
-const updateFileImageObj = (id, file) => ({ id : id, file : file, url : null});
-const createUrlImageObj = (id) => ({ id: id, file: null, url: `${api.defaults.baseURL}/image/${id}` });
-const createStockImageObj = (stock) => ({
-    id: stock.id || null, // 재고 ID
-    quantity: stock.quantity || 0,
-    color: stock.color || '',
-    size: stock.size || '',
-    image: createUrlImageObj(stock.image)
-});
-
 const SellerProductFormPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { api } = useAuth();
+
+    // 이미지 객체를 생성하는 헬퍼 함수 (등록 페이지에서는 항상 ID/URL이 null)
+    const createFileImageObj = (file) => ({ id: null, file: file, url: null });
+    const updateFileImageObj = (id, file) => ({ id : id, file : file, url : null});
+    const createUrlImageObj = (id) => ({ id: id, file: null, url: `${api.defaults.baseURL}/image/${id}` });
+    const createStockImageObj = (stock) => ({
+        id: stock.id || null, // 재고 ID
+        quantity: stock.quantity || 0,
+        color: stock.color || '',
+        size: stock.size || '',
+        image: createUrlImageObj(stock.image)
+    });
+
 
     // 백엔드에서 받은 데이터 구조에 맞춰 product, imageList, stockList를 가져옵니다.
     const { product: initialProduct } = location.state || {};
@@ -46,7 +48,6 @@ const SellerProductFormPage = () => {
     const [categoryGroups, setCategoryGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(String(initialProduct?.category?.categoryGroup?.id || ''));
     const [selectedCategory, setSelectedCategory] = useState(String(initialProduct?.category?.id || ''));
-    const { api } = useAuth();
 
     const [deletedImageIds, setDeletedImageIds] = useState({
         main: [],
