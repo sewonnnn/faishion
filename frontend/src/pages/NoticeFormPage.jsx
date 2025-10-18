@@ -33,7 +33,7 @@ const NoticeFormPage = () => {
         if (!title.trim() || !content.trim()) return;
         try {
             setLoading(true);
-            await api.post(`${api.defaults.baseURL}/notice`, {
+            await api.post('/notice', {
                 title: title.trim(),
                 content: content.trim(),
             });

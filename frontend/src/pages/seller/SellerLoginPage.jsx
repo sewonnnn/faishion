@@ -15,7 +15,7 @@ const SellerLoginPage = () => {
         e.preventDefault();
         try {
             //엔드포인트 수정
-            const res = await api.post(`{${api.defaults.baseURL}}/auth/seller/login`, form, {
+            const res = await api.post('/auth/seller/login', form, {
                 headers: { "Content-Type": "application/json" },
             });
 

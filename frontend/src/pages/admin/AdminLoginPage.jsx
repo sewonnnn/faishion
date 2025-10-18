@@ -18,8 +18,7 @@ const AdminLoginPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            console.log(`${api.defaults.baseURL}/auth/admin/login`);
-            const res = await api.post(`${api.defaults.baseURL}/auth/admin/login`, form, {
+            const res = await api.post('/auth/admin/login', form, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });

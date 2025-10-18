@@ -27,6 +27,7 @@ export default defineConfig({
             },
         },
     },
+    /*
     server: {
         proxy: {
             '/api': {
@@ -35,4 +36,5 @@ export default defineConfig({
             },
         },
     },
+    */
 })

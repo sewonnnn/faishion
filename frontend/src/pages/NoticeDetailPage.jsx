@@ -42,7 +42,7 @@ const NoticeDetailPage = () => {
         (async () => {
             try {
                 setLoading(true);
-                const res = await api.get(`${api.defaults.baseURL}/notice/${noticeId}`);
+                const res = await api.get(`/notice/${noticeId}`);
                 if (ignore) return;
                 setNotice(res.data);
                 setEditedTitle(res.data.title ?? "");
@@ -72,11 +72,11 @@ const NoticeDetailPage = () => {
         }
         try {
             setSaving(true);
-            await api.put(`${api.defaults.baseURL}/notice/${noticeId}`, { title, content });
+            await api.put(`/notice/${noticeId}`, { title, content });
             alert("공지사항이 수정되었습니다.");
             setIsEditing(false);
             // 갱신
-            const res = await api.get(`${api.defaults.baseURL}/notice/${noticeId}`);
+            const res = await api.get(`/notice/${noticeId}`);
             setNotice(res.data);
         } catch (e) {
             setError(e);
@@ -89,7 +89,7 @@ const NoticeDetailPage = () => {
     const handleDelete = async () => {
         if (!confirm("정말 삭제하시겠습니까?")) return;
         try {
-            await api.delete(`${api.defaults.baseURL}/notice/${noticeId}`);
+            await api.delete(`/notice/${noticeId}`);
             alert("삭제가 완료되었습니다.");
             navigate("/admin/notice/list");
         } catch (e) {
