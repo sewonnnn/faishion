@@ -1,19 +1,34 @@
-// QuestionForm.jsx
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import {useAuth} from "../../contexts/AuthContext.jsx";
+import { useNavigate } from "react-router-dom"; // useNavigate 추가
+
+const showMessage = (message) => {
+    console.log(message);
+    alert(message);
+};
 
 const QuestionForm = ({ productId, onQuestionSubmitted }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [isSecret, setIsSecret] = useState(false);
-    const {api} = useAuth();
+
+    const {api, user} = useAuth();
+    const navigate = useNavigate(); // useNavigate 훅 사용
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!user) {
+            showMessage("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
+            navigate('/login'); // 로그인 페이지 경로로 리다이렉션
+            return;
+        }
+
         try {
             const newQuestion = { productId, title, content, isSecret };
             await api.post('/qna/save', newQuestion);
-            alert('문의가 성공적으로 등록되었습니다.');
+            showMessage('문의가 성공적으로 등록되었습니다.');
             setTitle('');
             setContent('');
             setIsSecret(false);
@@ -22,12 +37,16 @@ const QuestionForm = ({ productId, onQuestionSubmitted }) => {
             }
         } catch (error) {
             console.error('문의 등록에 실패했습니다:', error);
-            alert('문의 등록 중 오류가 발생했습니다.');
+            // 서버 측에서 권한 에러(401)를 별도 처리하는 로직이 useAuth.api에 있다면
+            // 이 alert은 다른 에러에 대해서만 발생할 수 있습니다.
+            showMessage('문의 등록 중 오류가 발생했습니다.');
         }
     };
 
     return (
         <Form onSubmit={handleSubmit} className="mb-4">
+            <h5 className="mb-3">상품 문의 작성</h5>
+
             <Form.Group className="mb-3">
                 <Form.Control
                     type="text"
@@ -58,7 +77,11 @@ const QuestionForm = ({ productId, onQuestionSubmitted }) => {
                 />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="w-100">
+            <Button
+                variant="primary"
+                type="submit"
+                className="w-100"
+            >
                 문의하기
             </Button>
         </Form>

@@ -62,7 +62,7 @@ const LoginPage = () => {
     };
 
     const handleNaverLogin = () => {
-        const naverClientId = "UbIrUTt9yAJ42TARcJC5";
+        const naverClientId = "t8gB3JPwbhXc4KLuGgx6";
         const naverRedirectUri = encodeURIComponent(
             `${window.location.origin}/oauthcallback/naver`
         );

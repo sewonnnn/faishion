@@ -34,7 +34,7 @@ const useCartSelection = (cartList, fetchCartData) => {
     // 개별 상품 삭제
     const handleDelete = async (itemId) => {
         try {
-            await api.delete(`${api.defaults.baseURL}/cart/delete/${itemId}`);
+            await api.delete(`/cart/delete/${itemId}`);
             alert('상품이 삭제되었습니다.');
             fetchCartData(); // 삭제 후 데이터 새로고침
         } catch (error) {
@@ -51,7 +51,7 @@ const useCartSelection = (cartList, fetchCartData) => {
         }
 
         try {
-            await api.post(`${api.defaults.baseURL}/cart/deletePickAll`, { cartIds: selectedItems });
+            await api.post('/cart/deletePickAll', { cartIds: selectedItems });
             alert('선택된 상품들이 삭제되었습니다.');
             setSelectedItems([]); // 선택 상태 초기화
             setIsAllSelected(false);

@@ -32,6 +32,13 @@ public class AuthController {
     private final JwtTokenProvider jwt;
     private final AdminService adminService;
 
+    // 네이버 로그인
+    @Value("${naver.client.id}")
+    private String clientId;
+
+    @Value("${naver.client.secret}")
+    private String clientSecret;
+
     // 로컬 회원가입
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthDto.RegisterLocalReq req) {
@@ -109,13 +116,6 @@ public class AuthController {
 
         return token(admin.getId(), "ADMIN");
     }
-
-    // 네이버 로그인
-    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
-    private String clientId;
-
-    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-    private String clientSecret;
 
     @PostMapping("/login/naver")
     public ResponseEntity<?> loginNaver(@RequestBody Map<String, String> body) {

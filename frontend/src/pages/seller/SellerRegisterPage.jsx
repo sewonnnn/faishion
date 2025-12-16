@@ -82,7 +82,7 @@ const SellerRegisterPage = () => {
     const checkId = async () => {
         if (!validateId()) return;
         try {
-            const res = await api.post(`${api.defaults.baseURL}/auth/check-id`, { id: form.id });
+            const res = await api.post('/auth/check-id', { id: form.id });
             setIdMessage({ text: res.data, color: "green" });
         } catch (err) {
             setIdMessage({
@@ -122,7 +122,7 @@ const SellerRegisterPage = () => {
         const email =
             form.emailLocal + "@" + (form.emailDomain === "custom" ? form.customDomain : form.emailDomain);
         try {
-            const res = await api.post(`${api.defaults.baseURL}/auth/check-email`, { email });
+            const res = await api.post('/auth/check-email', { email });
             setEmailMessage({ text: res.data, color: "green" });
         } catch (err) {
             setEmailMessage({
@@ -168,7 +168,7 @@ const SellerRegisterPage = () => {
         // 2) 서버/공공 API 조회
         try {
             // 응답 예시: { exists: true/false, status: "ACTIVE"|"CLOSED"|... }
-            const res = await api.post("${api.defaults.baseURL}/auth/seller/check-business", {
+            const res = await api.post("/auth/seller/check-business", {
                 businessNumber: digits,
             });
             const { exists, status } = res.data || {};
@@ -223,7 +223,7 @@ const SellerRegisterPage = () => {
                 ownerName: form.ownerName,
             };
 
-            await api.post(`${api.defaults.baseURL}/auth/seller/register`, payload, {
+            await api.post('/auth/seller/register', payload, {
                 headers: { "Content-Type": "application/json" },
             });
 
