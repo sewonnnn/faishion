@@ -6,16 +6,15 @@ import {
     InputGroup,
     Col,
     Card,
-    Row // Row 컴포넌트 추가
+    Row
 } from "react-bootstrap";
 import {FaHeart, FaTimes} from 'react-icons/fa';
 import "../../pages/ProductDetailPage.css"
 import {useAuth} from "../../contexts/AuthContext.jsx";
 
-// 참고: alert() 대신 메시지 표시를 위한 임시 함수 (Canvas 제약사항 때문)
+// 참고: alert() 대신 메시지 표시를 위한 임시 함수
 const showMessage = (message) => {
     console.log(message);
-    // 실제 환경에서는 모달이나 토스트 알림을 사용해야 합니다.
     alert(message);
 };
 
@@ -26,26 +25,39 @@ const ProductRightInfo = ({productId, product}) => {
     const [selectedSize, setSelectedSize] = useState("");
     const [availableSizes, setAvailableSizes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const {api} = useAuth();
+
+    // ⭐️ 수정: useAuth에서 api와 함께 user 객체를 가져옵니다.
+    const {api, user} = useAuth();
+
     // 찜 상태를 추적하기 위한 state 추가
     const [isWished, setIsWished] = useState(null);
 
+    // user 객체의 존재 여부를 로그인 상태로 간주
+    const isUserLoggedIn = !!user;
+
+    // 찜 상태 확인 로직: user 객체가 있을 때만 실행
     useEffect(() => {
-        if (!productId) return;
+        // user가 없거나 productId가 없으면 찜 상태 확인 API 호출을 스킵합니다.
+        if (!productId || !isUserLoggedIn) {
+            setIsWished(false);
+            return;
+        }
 
         let canceled = false;
         (async () => {
             try {
+                // 로그인 상태일 때만 찜 상태 확인 요청
                 const { data } = await api.get(`/wish/check/${productId}`);
-                if (!canceled) setIsWished(Boolean(data));   // true/false로 세팅
+                if (!canceled) setIsWished(Boolean(data));
             } catch (e) {
                 console.error("찜 상태 확인 실패:", e);
-                if (!canceled) setIsWished(false);          // 실패 시 기본값
+                if (!canceled) setIsWished(false);
             }
         })();
 
+        // user 객체 또는 productId가 변경될 때마다 재실행
         return () => { canceled = true; };
-    }, [productId, api]);
+    }, [productId, api, user, isUserLoggedIn]);
 
     useEffect(() => {
         if (product && product.stockByColorAndSize) {
@@ -124,21 +136,34 @@ const ProductRightInfo = ({productId, product}) => {
         setSelectedOptions(updatedOptions);
     };
 
+    // ⭐️ AI로 입어보기 함수: user 체크 로직 추가
     const onAIForm = async () => {
+        if (!user) { // user 객체가 없으면 로그인 페이지로 리다이렉션
+            showMessage("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
         const response = await api.get(`/product/stockImageIds/${productId}`);
         navigate('/gemini', { state : response.data });
     };
 
-    // 바로가기 클릭 시 주문서 이동
+    // ⭐️ 바로 구매 함수: user 체크 로직 추가
     const onOrderForm = async () => {
+        if (!user) { // user 객체가 없으면 로그인 페이지로 리다이렉션
+            showMessage("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
         if (selectedOptions.length === 0) {
             showMessage("상품 옵션을 선택해 주세요.");
             return;
         }
 
         const requestBody = {
-            productId: productId, // 상품 ID (DirectOrderRequestDTO.productId)
-            items: selectedOptions.map(opt => ({ // OrderItemRequestDTO 리스트
+            productId: productId,
+            items: selectedOptions.map(opt => ({
                 color: opt.color,
                 size: opt.size,
                 quantity: opt.quantity
@@ -147,11 +172,9 @@ const ProductRightInfo = ({productId, product}) => {
 
         try {
             const response = await api.post('/order/newdirect', requestBody);
-
-            // ⭐️ 2. 응답으로 받은 주문 상품 목록(CartProductDTO 리스트)을 'directItems' 키로 전달
             navigate(`/order/new`, {
                 state: {
-                    directItems: response.data // ⭐️ 키 이름을 명확히 변경
+                    directItems: response.data
                 }
             });
 
@@ -161,7 +184,14 @@ const ProductRightInfo = ({productId, product}) => {
         }
     };
 
+    // ⭐️ 장바구니 담기 함수: user 체크 로직 추가
     const onCartSave = async () => {
+        if (!user) { // user 객체가 없으면 로그인 페이지로 리다이렉션
+            showMessage("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
         if (selectedOptions.length === 0) {
             showMessage("상품 옵션을 선택해 주세요.");
             return;
@@ -190,7 +220,6 @@ const ProductRightInfo = ({productId, product}) => {
             }
         } catch (error) {
             console.error('Error fetching banner data:', error);
-            // 에러 처리 메시지 추가
             showMessage("장바구니 담기에 실패했습니다.");
         }
     };
@@ -205,24 +234,29 @@ const ProductRightInfo = ({productId, product}) => {
     /**
      * 찜하기 상태에 따라 찜 추가 또는 취소 요청을 처리하는 통합 함수
      */
+    // ⭐️ 찜하기 클릭 함수: user 체크 로직 추가
     const handleWishClick = async () => {
+        if (!user) { // user 객체가 없으면 로그인 페이지로 리다이렉션
+            showMessage("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
         if (isWished) {
-            // 이미 찜한 상태일 경우, 취소 로직 실행
             await onWishCancel();
         } else {
-            // 찜하지 않은 상태일 경우, 추가 로직 실행
             await onWishSave();
         }
     };
 
     /**
-     * 찜하기 (위시리스트에 상품 추가)
+     * 찜하기 (위시리스트에 상품 추가) - 로그인 체크는 handleWishClick에서 처리
      */
     const onWishSave = async () => {
         try {
             const response = await api.post(`/wish/save/${productId}`);
-            showMessage(response.data); // "위시리스트에 추가되었습니다."
-            setIsWished(true); // 찜 상태를 true로 변경
+            showMessage(response.data);
+            setIsWished(true);
         } catch (error) {
             console.error('찜 추가 실패:', error);
             showMessage("위시리스트 추가에 실패했습니다.");
@@ -230,14 +264,13 @@ const ProductRightInfo = ({productId, product}) => {
     };
 
     /**
-     * 찜 취소 (위시리스트에서 상품 제거)
+     * 찜 취소 (위시리스트에서 상품 제거) - 로그인 체크는 handleWishClick에서 처리
      */
     const onWishCancel = async () => {
         try {
-            // DELETE 요청으로 찜 취소 API 호출
             const response = await api.delete(`/wish/delete/${productId}`);
-            showMessage(response.data); // "위시리스트에서 삭제되었습니다."
-            setIsWished(false); // 찜 상태를 false로 변경
+            showMessage(response.data);
+            setIsWished(false);
         } catch (error) {
             console.error('찜 취소 실패:', error);
             showMessage("위시리스트 취소에 실패했습니다.");
@@ -311,7 +344,7 @@ const ProductRightInfo = ({productId, product}) => {
             <div className="d-flex justify-content-end mb-3">
                 <Button
                     variant="outline-primary"
-                    onClick={onAIForm}
+                    onClick={onAIForm} // ⭐️ 클릭 시 user 체크
                     className="fw-bold"
                     style={{
                         backgroundColor: '#FFF',
@@ -433,9 +466,9 @@ const ProductRightInfo = ({productId, product}) => {
                         <Button
                             variant="secondary"
                             size="lg"
-                            onClick={handleWishClick}
+                            onClick={handleWishClick} // ⭐️ 클릭 시 user 체크
                             className="w-100 border-0"
-                            disabled={isWished === null}   // ← 서버 응답 오기 전 클릭 방지 (선택)
+                            disabled={isWished === null && isUserLoggedIn}   // user가 로그인 중일 때만 로딩 중 비활성화
                             style={{
                                 backgroundColor: 'white',
                                 height: '56px',
@@ -445,7 +478,8 @@ const ProductRightInfo = ({productId, product}) => {
                                 border: '1px solid #ced4da'
                             }}
                         >
-                            <FaHeart color={isWished ? "red" : "lightgray"} size={20}/>
+                            {/* user가 없을 땐 회색, user가 있고 찜 상태에 따라 색상 변경 */}
+                            <FaHeart color={!isUserLoggedIn ? "lightgray" : (isWished ? "red" : "lightgray")} size={20}/>
                         </Button>
 
                     </div>
@@ -453,7 +487,7 @@ const ProductRightInfo = ({productId, product}) => {
                     <Button
                         variant="dark"
                         size="lg"
-                        onClick={onCartSave}
+                        onClick={onCartSave} // ⭐️ 클릭 시 user 체크
                         className="w-100"
                         style={{height: '56px', fontSize: '1.1rem'}}
                     >
@@ -464,7 +498,7 @@ const ProductRightInfo = ({productId, product}) => {
                 <Button
                     variant="primary"
                     size="lg"
-                    onClick={onOrderForm}
+                    onClick={onOrderForm} // ⭐️ 클릭 시 user 체크
                     className="w-100"
                     style={{
                         height: '56px',
