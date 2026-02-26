@@ -3,7 +3,8 @@
 # =============================================================
 # Faishion 서버 최초 세팅 스크립트 (Ubuntu 기준)
 # 서버에서 실행:
-#   sudo bash <(curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh)
+#   curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh -o init.sh
+#   sudo bash init.sh
 # =============================================================
 
 set -e  # 에러 발생 시 즉시 중단
@@ -32,7 +33,7 @@ apt-get upgrade -y
 # 2. Docker 설치
 # ------------------------------------------
 echo "[2/6] Docker 설치..."
-apt-get install -y docker.io docker-compose-plugin curl
+apt-get install -y docker.io docker-compose curl
 systemctl enable docker
 systemctl start docker
 
@@ -88,5 +89,5 @@ chmod 600 /home/ubuntu/.env
 echo ""
 echo "======================================"
 echo " 세팅 완료!"
-echo " 다음 단계: docker compose up -d"
+echo " 다음 단계: docker-compose up -d"
 echo "======================================"

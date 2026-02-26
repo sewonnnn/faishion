@@ -128,13 +128,14 @@ npm run dev
 서버에서 아래 명령어를 실행하면 Docker, Swap, SSL 인증서 설치 및 .env 생성까지 자동으로 진행됩니다.
 
 ```bash
-sudo bash <(curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh)
+curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh -o init.sh
+sudo bash init.sh
 ```
 
 세팅 완료 후 `/home/ubuntu`로 이동해 컨테이너를 실행합니다.
 
 ```bash
-cd /home/ubuntu && docker compose up -d
+docker-compose up -d
 ```
 
 **이후 배포**
@@ -143,7 +144,7 @@ cd /home/ubuntu && docker compose up -d
 서버에서 아래 명령어로 최신 이미지를 반영합니다.
 
 ```bash
-docker compose pull && docker compose up -d
+docker-compose pull && docker-compose up -d
 ```
 
 ---
