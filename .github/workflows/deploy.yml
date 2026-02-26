@@ -1,0 +1,36 @@
+name: Build and Push
+
+on:
+  push:
+    branches:
+      - master  # master 브랜치에 push 시 실행
+
+env:
+  FRONTEND_IMAGE: ghcr.io/sewonnnn/faishion-frontend
+  BACKEND_IMAGE: ghcr.io/sewonnnn/faishion-backend
+
+jobs:
+  # =============================================================
+  # 이미지 빌드 & GHCR push
+  # =============================================================
+  build:
+    permissions:
+      packages: write  # GHCR push 권한
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        run: git clone ${{ github.server_url }}/${{ github.repository }} . && git checkout ${{ github.sha }}
+
+      - name: GHCR 로그인
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: 프론트엔드 이미지 빌드 & push
+        run: |
+          docker build -t ${{ env.FRONTEND_IMAGE }}:latest ./frontend
+          docker push ${{ env.FRONTEND_IMAGE }}:latest
+
+      - name: 백엔드 이미지 빌드 & push
+        run: |
+          docker build -t ${{ env.BACKEND_IMAGE }}:latest ./backend
+          docker push ${{ env.BACKEND_IMAGE }}:latest

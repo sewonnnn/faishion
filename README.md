@@ -97,6 +97,57 @@ IntelliJ IDEA, VSCode
 
 ---
 
+---
+
+## 🚀 실행 방법
+
+### 로컬 개발
+
+MySQL만 Docker로 실행하고, 프론트엔드와 백엔드는 직접 실행합니다.
+
+```bash
+# 1. MySQL 실행
+docker compose -f docker-compose.local.yml up -d
+
+# 2. 백엔드 실행
+cd backend
+./gradlew bootRun
+
+# 3. 프론트엔드 실행
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+### 서버 배포
+
+**최초 1회 - 서버 세팅**
+
+서버에서 아래 명령어를 실행하면 Docker, Swap, SSL 인증서 설치 및 .env 생성까지 자동으로 진행됩니다.
+
+```bash
+sudo bash <(curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh)
+```
+
+세팅 완료 후 `/home/ubuntu`로 이동해 컨테이너를 실행합니다.
+
+```bash
+cd /home/ubuntu && docker compose up -d
+```
+
+**이후 배포**
+
+`master` 브랜치에 push하면 GitHub Actions가 자동으로 이미지를 빌드해 GHCR에 push합니다.
+서버에서 아래 명령어로 최신 이미지를 반영합니다.
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+---
+
 ### 📌 개발자 노트
 
 사용자 권한 별 기능을 구분하고, 실제 쇼핑몰과 유사한 흐름을 구현했습니다.
