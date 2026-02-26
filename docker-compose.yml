@@ -60,8 +60,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # Let's Encrypt 인증서 마운트 (certbot이 서버에서 발급한 경로)
+      # Let's Encrypt 인증서 마운트 (live: 심볼릭 링크, archive: 실제 파일)
       - /etc/letsencrypt/live/${DOMAIN}:/etc/nginx/ssl:ro
+      - /etc/letsencrypt/archive/${DOMAIN}:/etc/letsencrypt/archive/${DOMAIN}:ro
     depends_on:
       - backend
     restart: unless-stopped

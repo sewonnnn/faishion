@@ -135,7 +135,8 @@ sudo bash init.sh
 세팅 완료 후 `/home/ubuntu`로 이동해 컨테이너를 실행합니다.
 
 ```bash
-docker-compose up -d
+# sudo 필요: certbot 인증서(/etc/letsencrypt/)가 root 소유이므로 Docker가 읽으려면 root 권한이 필요합니다.
+sudo docker-compose up -d
 ```
 
 **이후 배포**
@@ -144,7 +145,7 @@ docker-compose up -d
 서버에서 아래 명령어로 최신 이미지를 반영합니다.
 
 ```bash
-docker-compose pull && docker-compose up -d
+sudo docker-compose pull && sudo docker-compose up -d
 ```
 
 ---
