@@ -89,5 +89,6 @@ chmod 600 /home/ubuntu/.env
 echo ""
 echo "======================================"
 echo " 세팅 완료!"
-echo " 다음 단계: docker-compose up -d"
+echo " 다음 단계: sudo docker-compose up -d"
+echo " (certbot 인증서가 root 소유이므로 sudo 필요)"
 echo "======================================"
