@@ -1,0 +1,20 @@
+services:
+
+  # =============================================================
+  # 로컬 개발용 MySQL
+  #   - 포트를 호스트에 노출해서 로컬 Spring Boot에서 직접 접근
+  #   - 기본값: application.properties의 기본값과 맞춤 (password: 0000)
+  # =============================================================
+  mysql:
+    image: mysql:8.0
+    container_name: faishion-mysql-local
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: faishion_db
+      MYSQL_ROOT_PASSWORD: "0000"
+    volumes:
+      - mysql-local-data:/var/lib/mysql
+
+volumes:
+  mysql-local-data:
