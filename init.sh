@@ -2,6 +2,19 @@
 
 # =============================================================
 # Faishion 서버 최초 세팅 스크립트 (Ubuntu 기준)
+#
+# [사전 준비] 이 스크립트 실행 전에 아래 사항을 먼저 확인하세요.
+#
+# 1. 가비아 DNS 설정
+#    - 새 EC2 인스턴스의 퍼블릭 IP로 A 레코드를 업데이트합니다.
+#    - nslookup <도메인> 으로 새 IP가 반영됐는지 확인 후 진행합니다.
+#
+# 2. 초기 데이터 준비 (스크립트 실행 후, docker-compose up 전에 복사)
+#    - dump.sql → /home/ubuntu/mysql-init/dump.sql
+#    - upload/  → /home/ubuntu/upload/
+#    (로컬에서: scp -i <키파일.pem> dump.sql ubuntu@<서버IP>:/home/ubuntu/mysql-init/)
+#    (로컬에서: scp -i <키파일.pem> -r upload/ ubuntu@<서버IP>:/home/ubuntu/upload/)
+#
 # 서버에서 실행:
 #   curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh -o init.sh
 #   sudo bash init.sh
@@ -89,6 +102,11 @@ chmod 600 /home/ubuntu/.env
 echo ""
 echo "======================================"
 echo " 세팅 완료!"
-echo " 다음 단계: sudo docker-compose up -d"
-echo " (certbot 인증서가 root 소유이므로 sudo 필요)"
+echo ""
+echo " [다음 단계]"
+echo " 1. dump.sql, upload/ 폴더를 서버에 복사"
+echo "    - /home/ubuntu/mysql-init/dump.sql"
+echo "    - /home/ubuntu/upload/"
+echo " 2. cd /home/ubuntu && sudo docker-compose up -d"
+echo "    (certbot 인증서가 root 소유이므로 sudo 필요)"
 echo "======================================"

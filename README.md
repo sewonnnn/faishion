@@ -125,12 +125,43 @@ npm run dev
 
 **최초 1회 - 서버 세팅**
 
-서버에서 아래 명령어를 실행하면 Docker, Swap, SSL 인증서 설치 및 .env 생성까지 자동으로 진행됩니다.
+#### 1. 도메인 설정 (가비아)
+
+새 EC2 인스턴스를 생성한 후, 가비아 DNS 관리 페이지에서 A 레코드를 새 인스턴스의 퍼블릭 IP로 업데이트합니다.
+
+DNS 전파가 완료될 때까지 아래 명령어로 확인합니다.
+
+```bash
+# 새 IP로 바뀔 때까지 반복 확인
+nslookup 도메인명
+```
+
+#### 2. 서버 초기화
+
+DNS가 새 IP로 반영된 것을 확인한 후 SSH로 접속해 init.sh를 실행합니다.
+Docker, Swap, SSL 인증서 설치 및 .env 생성까지 자동으로 진행됩니다.
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/sewonnnn/faishion/master/init.sh -o init.sh
 sudo bash init.sh
 ```
+
+#### 3. 초기 데이터 준비
+
+컨테이너 실행 전, 초기 DB 데이터와 업로드 이미지를 서버에 배치해야 합니다.
+
+```bash
+# dump.sql을 /home/ubuntu/mysql-init/ 에 복사 (로컬 → 서버)
+scp -i <키파일.pem> dump.sql ubuntu@<서버IP>:/home/ubuntu/mysql-init/dump.sql
+
+# 업로드 이미지 폴더를 /home/ubuntu/upload/ 에 복사 (로컬 → 서버)
+scp -i <키파일.pem> -r upload/ ubuntu@<서버IP>:/home/ubuntu/upload/
+```
+
+> `dump.sql`은 MySQL 컨테이너 초기화 시 자동으로 실행됩니다.
+> `upload/` 폴더는 컨테이너와 bind mount되어 업로드 이미지를 영속적으로 유지합니다.
+
+#### 4. 컨테이너 실행
 
 세팅 완료 후 `/home/ubuntu`로 이동해 컨테이너를 실행합니다.
 
