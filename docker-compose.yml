@@ -4,6 +4,7 @@ services:
   # MySQL 데이터베이스
   #   - 데이터는 볼륨에 영구 저장
   #   - healthcheck로 DB 준비 완료 후 backend 시작
+  #   - dump.sql이 있으면 최초 실행 시 자동 import (볼륨이 비어있을 때만)
   # =============================================================
   mysql:
     image: mysql:8.0
@@ -13,6 +14,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD}"]
       interval: 10s
@@ -40,7 +42,7 @@ services:
       BIZ_API_KEY: ${BIZ_API_KEY}
       IMAGE_UPLOAD_DIR: /upload/
     volumes:
-      - upload-data:/upload
+      - ./upload:/upload
     depends_on:
       mysql:
         condition: service_healthy
@@ -72,4 +74,3 @@ services:
 # =============================================================
 volumes:
   mysql-data:   # MySQL 데이터 영구 저장
-  upload-data:  # 이미지 업로드 파일 영구 저장
