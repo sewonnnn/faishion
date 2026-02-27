@@ -74,7 +74,8 @@ certbot certonly \
   --non-interactive \
   --agree-tos \
   --email $EMAIL \
-  -d $DOMAIN
+  -d $DOMAIN \
+  -d www.$DOMAIN
 
 # ------------------------------------------
 # 5. docker-compose.yml 다운로드
