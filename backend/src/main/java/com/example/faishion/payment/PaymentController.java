@@ -26,12 +26,9 @@ public class PaymentController {
     @PostMapping("/confirm")
     public ResponseEntity<String> confirmPayment(@RequestBody Payment payment, @AuthenticationPrincipal UserDetails userDetails ) {
 
-        System.out.println(userDetails == null);
+        log.debug("userDetails is null: {}", userDetails == null);
         String userId = userDetails.getUsername();
-        System.out.println("주문ID : " + payment.getOrder().getId());
-        System.out.println("결제 금액 : " + payment.getAmount());
-        System.out.println("결제 고유번호 : " + payment.getPaymentKey());
-        System.out.println("결제 방식 : " + payment.getPaymentType());
+        log.info("결제 확인 요청 - 주문ID: {}, 금액: {}, 방식: {}", payment.getOrder().getId(), payment.getAmount(), payment.getPaymentType());
         User user = new User();
         user.setId(userId);
         payment.setUser(user);

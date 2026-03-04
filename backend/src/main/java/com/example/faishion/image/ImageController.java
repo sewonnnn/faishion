@@ -1,6 +1,7 @@
 package com.example.faishion.image;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/image")
@@ -53,8 +55,7 @@ public class ImageController {
             Image generatedImage = futureImage.get();
             return ResponseEntity.ok(generatedImage);
         } catch (Exception e) {
-            e.printStackTrace();
-            // Return 500 Internal Server Error
+            log.error("이미지 생성 중 오류 발생", e);
             return ResponseEntity.status(500).build();
         }
     }

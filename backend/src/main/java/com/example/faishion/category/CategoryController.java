@@ -1,12 +1,14 @@
 package com.example.faishion.category;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/category")
@@ -17,8 +19,7 @@ public class CategoryController {
     @GetMapping("/groups")
     public List<CategoryGroupDTO> getAllGroups(@AuthenticationPrincipal UserDetails userDetails) {
         if(userDetails != null) {
-            System.out.println(userDetails.getUsername()); // 아이디
-            System.out.println(userDetails.getAuthorities()); // 권한
+            log.debug("카테고리 조회 요청 사용자: {}, 권한: {}", userDetails.getUsername(), userDetails.getAuthorities());
         }
         return categoryService.getAllGroupsWithCategories();
     }

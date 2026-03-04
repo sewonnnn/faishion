@@ -5,6 +5,7 @@ import com.example.faishion.address.AddressService;
 import com.example.faishion.image.Image;
 import com.example.faishion.image.ImageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
@@ -80,7 +82,7 @@ public class UserController {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
-        System.out.println("유저 비밀번호 수정 : "+userUpdateDTO.getPassword());
+        log.info("유저 정보 수정 요청: {}", id);
         // DTO에 비밀번호가 존재하고 비어있지 않은 경우에만 암호화하여 저장
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());

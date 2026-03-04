@@ -2,9 +2,11 @@ package com.example.faishion.admin;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminService {
@@ -20,7 +22,7 @@ public class AdminService {
             admin.setName("슈퍼관리자");
             admin.setPwHash(encoder.encode("admin1234")); // 기본 비번
             adminRepository.save(admin);
-            System.out.println(" 기본 관리자 계정 생성: id=admin / pw=admin1234");
+            log.info("기본 관리자 계정 생성 완료: id=admin");
         }
     }
 
