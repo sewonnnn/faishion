@@ -189,6 +189,37 @@ AI 가상 피팅 기능은 추후 고도화 예정입니다.
 
 토스페이먼츠 테스트 결제는 실제 결제 연동 전 테스트용으로 활용하였습니다.
 
+---
+
+### ⚡ 성능 최적화
+
+#### N+1 쿼리 문제 해결
+
+**문제**
+상품 목록 API(`GET /api/product/list`) 호출 시 상품 20개 조회에 **64개 쿼리** 발생
+
+원인: JPA LAZY 로딩으로 인해 루프마다 seller, reviewList, mainImageList, wish count 쿼리가 개별 실행
+
+```
+메인 쿼리:        1개
+reviewList 조회: 20개  ← 상품마다 개별 실행
+wish count 조회: 20개  ← 상품마다 개별 실행
+mainImageList:   20개  ← 상품마다 개별 실행
+seller 조회:      2개  ← unique seller 수만큼
+─────────────────────
+합계:            63~64개
+```
+
+**해결**
+
+| 방법 | 내용 |
+|------|------|
+| JPQL 집계 쿼리 개선 | wish count를 `COUNT(DISTINCT w)`로 메인 쿼리에 포함 → wish count 쿼리 20개 제거 |
+| 집계 결과 재사용 | avg rating으로 isBest 계산 → reviewList lazy load 20개 제거 |
+| `@BatchSize(size=20)` | mainImageList, seller를 IN 쿼리 1번으로 배치 처리 → 개별 쿼리 40개 → 2개 |
+
+**결과: 64쿼리 → 4쿼리 (93% 감소)**
+
 📧 Contact
 👤 팀 구성: [박세원, 유부미, 이현호, 권택준]
 
