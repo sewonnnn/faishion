@@ -35,13 +35,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // id 일치 하는 상품 가져오기 ho
     Product findById(long id);
 
-    @Query("SELECT p, COALESCE(AVG(r.rating), 0), COALESCE(COUNT(r), 0) " +
+    @Query("SELECT p, COALESCE(AVG(r.rating), 0.0), COALESCE(COUNT(DISTINCT r), 0L), COALESCE(COUNT(DISTINCT w), 0L) " +
             "FROM Product p " +
             "LEFT JOIN p.reviewList r " +
+            "LEFT JOIN Wish w ON w.product = p " +
             "WHERE (:categoryId IS NULL OR p.category.id = :categoryId) " +
             "AND (:searchQuery IS NULL OR p.name LIKE %:searchQuery%) " +
             "AND p.status = 1 " +
-            "GROUP BY p.id, p.createdAt " + // You must group by createdAt too since you're ordering by it
+            "GROUP BY p.id, p.createdAt " +
             "ORDER BY p.createdAt DESC")
     Page<Object[]> findProductsBySearch(@Param("searchQuery")String searchQuery, @Param("categoryId") Long categoryId, Pageable pageable);
 
