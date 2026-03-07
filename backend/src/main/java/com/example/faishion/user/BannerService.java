@@ -6,6 +6,7 @@ import com.example.faishion.product.Product;
 import com.example.faishion.product.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BannerService {
@@ -72,7 +74,7 @@ public class BannerService {
                         personalBannerMap.put(product.getId(), updatedBanner);
                         // 상태 변경 성공 시 (READY -> GENERATING)에만 비동기 작업 시작
                         if (updatedBanner.getStatus() == BannerStatus.GENERATING) {
-                            System.out.println("개인 배너 생성 시작");
+                            log.info("개인 배너 생성 시작");
                             Long userImageId = finalUser.getImage().getId();
                             Long defaultImageId = defaultBannerMap.get(product.getId()).getImage().getId();
                             CompletableFuture<Image> imageFuture = imageService.generateImage(List.of(userImageId, defaultImageId),
@@ -80,17 +82,17 @@ public class BannerService {
                             );
                             imageFuture.thenAcceptAsync(generatedImage -> {
                                 bannerAsyncService.bannerStatusUpdate(finalUser.getId(), product.getId(), generatedImage, BannerStatus.COMPLETED);
-                                System.out.println("개인 배너 생성 후 연결 완료");
+                                log.info("개인 배너 생성 후 연결 완료");
                             }).exceptionally(ex -> {
                                 // 이미지 생성 실패 시, 상태를 READY로 롤백
                                 bannerAsyncService.bannerStatusUpdate(finalUser.getId(), product.getId(), null, BannerStatus.READY);
-                                System.err.println("개인 배너 생성 실패: " + ex.getMessage());
+                                log.error("개인 배너 생성 실패: {}", ex.getMessage(), ex);
                                 return null;
                             });
                         }
                         // statusUpdated가 false인 경우: 다른 요청이 먼저 처리했으므로, 아무 작업 없이 다음 루프로 진행
                     } catch (Exception e) {
-                        System.err.println("개인 배너 상태 업데이트 시도 중 예외 발생 for product " + product.getId() + ": " + e.getMessage());
+                        log.error("개인 배너 상태 업데이트 시도 중 예외 발생 for product {}: {}", product.getId(), e.getMessage(), e);
                     }
                 }
             }

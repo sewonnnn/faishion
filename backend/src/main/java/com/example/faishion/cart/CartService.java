@@ -3,12 +3,14 @@ package com.example.faishion.cart;
 import com.example.faishion.stock.Stock;
 import com.example.faishion.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -39,7 +41,7 @@ public class CartService {
     public void addItemToCart(User user, Stock stock, int quantity) {
         // 유저와 Stock ID로 장바구니에 이미 담긴 상품이 있는지 확인
         Optional<Cart> existCartItem = cartRepository.findByUserIdAndStockId(user.getId(), stock.getId());
-        System.out.println("existCartItem = " + existCartItem);
+        log.debug("장바구니 기존 항목 조회 결과: {}", existCartItem.isPresent() ? "존재" : "없음");
         if (existCartItem.isPresent()) {
             // 이미 있다면 기존 항목의 수량 증가
             Cart cartUpdate = existCartItem.get();

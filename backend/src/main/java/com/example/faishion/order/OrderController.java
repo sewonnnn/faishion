@@ -12,6 +12,7 @@ import com.example.faishion.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/order")
@@ -98,7 +100,7 @@ public class OrderController {
         order.setStatus("PENDING");
         order.setTotalAmount(request.getTotalAmount());
         orderRepository.save(order);
-        System.out.println("주문 저장 완료:"+order.getStatus());
+        log.info("주문 저장 완료: {}", order.getStatus());
 
         //  주문 상품 생성 및 재고 차감
         for (OrderCreateRequestDTO.OrderItemDTO itemDTO : request.getItems()) {
@@ -119,7 +121,7 @@ public class OrderController {
             stock.setQuantity(stock.getQuantity() - itemDTO.getQuantity());
             stockRepository.save(stock);
 
-            System.out.println("락 획득 후 주문 완료");
+            log.info("락 획득 후 주문 완료");
 
             // OrderItem 엔티티 생성
             OrderItem orderItem = new OrderItem();
@@ -129,7 +131,7 @@ public class OrderController {
             orderItem.setPrice(itemDTO.getPrice());
             orderItem.setCartId(itemDTO.getCartId()); //장바구니 아이디 넣기
 
-            System.out.println("삭제 장바구니 id:"+itemDTO.getCartId());
+            log.debug("삭제 장바구니 id: {}", itemDTO.getCartId());
             
             // 결제 성공 시 장바구니 상품 삭제를 위함
             if (itemDTO.getCartId() != null) {
@@ -192,7 +194,7 @@ public class OrderController {
     @GetMapping("/my-history")
     public ResponseEntity<List<OrderListResponseDTO>> getMyOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
        String userId = userDetails.getUsername(); // 유저 id
-        System.out.println(" 주문 내역 가져오기 유저 id:"+userId);
+        log.info("주문 내역 가져오기 유저 id: {}", userId);
 
         if (userDetails == null) {
             return ResponseEntity.status(401).build(); // 인증되지 않음 처리
@@ -218,11 +220,11 @@ public class OrderController {
 
         } catch (EntityNotFoundException e) {
             // ⭐ OrderService에서 던진 모든 404 관련 예외를 여기서 처리합니다.
-            System.err.println("주문 상세 조회 실패: " + e.getMessage());
+            log.warn("주문 상세 조회 실패: {}", e.getMessage());
             return ResponseEntity.notFound().build(); // 404 Not Found
         } catch (Exception e) {
             // 그 외 모든 예상치 못한 오류 (DB 오류 등)
-            System.err.println("주문 상세 조회 중 치명적인 오류 발생: " + e.getMessage());
+            log.error("주문 상세 조회 중 치명적인 오류 발생: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build(); // 500 Internal Server Error
         }
     }

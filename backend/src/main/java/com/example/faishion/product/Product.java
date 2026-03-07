@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -44,18 +45,22 @@ public class Product {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
+    @BatchSize(size = 20)
     private Set<Image> mainImageList = new HashSet<>(); // 썸네일
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
+    @BatchSize(size = 20)
     private Set<Image> detailImageList = new HashSet<>(); // 상세에 나오는 바디 사진
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
+    @BatchSize(size = 20)
     private Set<Stock> stockList = new HashSet<>(); //상품 옵션(재고)
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id DESC")
+    @BatchSize(size = 20)
     private Set<Review> reviewList = new HashSet<>(); //상품 옵션(재고)
 
     @ManyToOne(fetch = FetchType.LAZY)

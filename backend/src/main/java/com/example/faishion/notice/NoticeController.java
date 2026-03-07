@@ -1,12 +1,14 @@
 package com.example.faishion.notice;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notice")
@@ -19,7 +21,7 @@ public class NoticeController {
                                    @PageableDefault(size = 10,
                                            sort = "createdAt",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
-        System.out.println("컨트롤러 검색어: " + searchQuery);
+        log.debug("컨트롤러 검색어: {}", searchQuery);
         return noticeService.getNoticeList(searchQuery, pageable);
     }
 
@@ -46,7 +48,7 @@ public class NoticeController {
     // 게시물 삭제
     @DeleteMapping("/{id}")
     public void deleteNotice(@PathVariable long id) {
-        System.out.println("게시물 삭제 id:"+id);
+        log.info("게시물 삭제 id: {}", id);
         noticeService.deleteNotice(id);
     }
 }

@@ -15,6 +15,7 @@ import com.example.faishion.web.dto.AuthDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -107,10 +109,10 @@ public class AuthController {
 
     @PostMapping("/admin/login")
     public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> dto) {
-        System.out.println("로그인 시도");
+        log.info("관리자 로그인 시도");
         String id = dto.get("id");
         String password = dto.get("password");
-        System.out.println(id + ", " + password);
+        log.debug("관리자 로그인 id: {}", id);
 
         Admin admin = adminService.loginAdmin(id, password);
 

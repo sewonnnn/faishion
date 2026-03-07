@@ -3,7 +3,7 @@ package com.example.faishion.image;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
 public class ImageService {
     private final RestTemplate restTemplate;
@@ -84,19 +85,17 @@ public class ImageService {
         if (Files.exists(filePath)) {
             try {
                 Files.delete(filePath);
-                System.out.println("파일 시스템에서 삭제 성공: " + savedFileName);
+                log.info("파일 시스템에서 삭제 성공: {}", savedFileName);
             } catch (IOException e) {
-                // 파일 삭제 실패 시 예외 처리 (e.g., 로그 기록)
-                System.err.println("파일 삭제 실패: " + savedFileName + " - " + e.getMessage());
+                log.error("파일 삭제 실패: {} - {}", savedFileName, e.getMessage(), e);
                 throw new IOException("파일 삭제 실패: " + savedFileName, e);
             }
         } else {
-            // 파일 시스템에 파일이 없는 경우 (DB에만 정보가 남아있는 경우)
-            System.out.println("경고: 파일 시스템에 파일이 존재하지 않음: " + savedFileName);
+            log.warn("파일 시스템에 파일이 존재하지 않음: {}", savedFileName);
         }
         // 3. 데이터베이스에서 이미지 정보 삭제
         imageRepository.delete(image);
-        System.out.println("데이터베이스에서 삭제 성공: ID " + id);
+        log.info("데이터베이스에서 삭제 성공: ID {}", id);
     }
 
     @Transactional // DB와 파일 시스템 작업의 원자성을 보장
@@ -110,10 +109,9 @@ public class ImageService {
         if (Files.exists(oldFilePath)) {
             try {
                 Files.delete(oldFilePath);
-                System.out.println("기존 파일 삭제 성공: " + oldSavedName);
+                log.info("기존 파일 삭제 성공: {}", oldSavedName);
             } catch (IOException e) {
-                // 파일 삭제 실패 시에도 DB 업데이트를 시도하지 않도록 예외를 다시 던집니다.
-                System.err.println("기존 파일 삭제 실패: " + oldSavedName);
+                log.error("기존 파일 삭제 실패: {}", oldSavedName, e);
                 throw new IOException("기존 파일 삭제 실패: " + oldSavedName, e);
             }
         }

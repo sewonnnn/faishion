@@ -10,6 +10,7 @@ import com.example.faishion.user.*;
 import com.example.faishion.wish.WishRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -314,7 +316,7 @@ public class ProductService {
 
                 // Lock 트랜잭션 내부에서 상태가 GENERATING으로 바뀌었는지 확인 (즉, 내가 Lock 획득에 성공했는지 확인)
                 if (updatedBanner.getStatus() == BannerStatus.GENERATING) {
-                    System.out.println("기본 배너 생성 시작");
+                    log.info("기본 배너 생성 시작");
 
                     // --- (이후 비동기 작업 시작 로직은 동일) ---
                     CompletableFuture<Image> imageFuture;
@@ -331,23 +333,23 @@ public class ProductService {
                     if (imageFuture != null) {
                         imageFuture.thenAcceptAsync(generatedImage -> {
                             bannerAsyncService.bannerStatusUpdate(null, productId, generatedImage, BannerStatus.COMPLETED);
-                            System.out.println("기본 배너 생성 후 연결 완료");
+                            log.info("기본 배너 생성 후 연결 완료");
                         }).exceptionally(ex -> {
                             bannerAsyncService.bannerStatusUpdate(null, productId, null, BannerStatus.READY);
-                            System.err.println("기본 배너 생성 실패: " + ex.getMessage());
+                            log.error("기본 배너 생성 실패: {}", ex.getMessage(), ex);
                             return null;
                         });
                     }
                 } else {
-                    System.out.println("Banner Status is not READY or Lock acquisition failed.");
+                    log.warn("Banner Status is not READY or Lock acquisition failed.");
                 }
 
             } catch (PessimisticLockingFailureException e) {
                 // Lock 획득 실패는 예상된 경쟁 상황이므로, 로그만 남기고 정상 종료
-                System.err.println("Banner Lock 획득 실패: 다른 트랜잭션에서 처리 중 (예상된 경합).");
+                log.warn("Banner Lock 획득 실패: 다른 트랜잭션에서 처리 중 (예상된 경합).");
             } catch (Exception e) {
                 // 그 외 일반적인 오류 처리
-                System.err.println("Banner 처리 중 예외 발생: " + e.getMessage());
+                log.error("Banner 처리 중 예외 발생: {}", e.getMessage(), e);
             }
         }
         return pick;

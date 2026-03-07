@@ -214,11 +214,15 @@ public class ProductController {
 
                     map.put("isNew", p.getCreatedAt().isAfter(threeDaysAgo));
                     map.put("isSale", isDiscounting);
-                    map.put("isBest",productService.findBestProduct(p.getReviewList()));
+                    Double avgRating = (Double) objects[1];
+                    Long reviewCount = (Long) objects[2];
+                    Long wishCount = (Long) objects[3];
+
+                    map.put("isBest", avgRating >= 4.0);
 
                     map.put("name", p.getName());
                     map.put("finalPrice", isDiscounting ? p.getDiscountPrice() : p.getPrice());
-                    map.put("wish",productService.countByProduct(productService.findById(p.getId())));
+                    map.put("wish", wishCount);
                     if(isDiscounting) {
                         map.put("originalPrice", p.getPrice());
                         map.put("discountRate", (p.getPrice() - p.getDiscountPrice()) * 100 / p.getPrice());
@@ -229,8 +233,8 @@ public class ProductController {
                     map.put("imageUrl", p.getMainImageList().stream().findFirst().map(
                             image -> domain + "/api/image/" + image.getId()
                     ));
-                    map.put("reviewRating", objects.length > 1 ? objects[1] : 0.0);
-                    map.put("reviewCount", objects.length > 2 ? objects[2] : 0L);
+                    map.put("reviewRating", avgRating);
+                    map.put("reviewCount", reviewCount);
 
                     return map;
                 })

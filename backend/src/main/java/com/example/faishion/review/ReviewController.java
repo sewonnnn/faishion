@@ -6,6 +6,7 @@ import com.example.faishion.user.User;
 import com.example.faishion.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/review")
@@ -65,7 +67,7 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.CREATED).body("리뷰가 성공적으로 등록되었습니다.");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("리뷰 등록 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
@@ -106,14 +108,14 @@ public class ReviewController {
     // 신고 메서드
     @GetMapping("/isReported/{reviewId}")
     public boolean isReported(@PathVariable Long reviewid) {
-        System.out.println("reviewid : " +reviewid);
+        log.info("신고 요청 reviewId: {}", reviewid);
         if(reviewid == null){
             return false;
         }
         if(reviewService.reportReview(reviewid)){
-            System.out.println("신고에 성공했습니다.");
+            log.info("리뷰 신고 성공: {}", reviewid);
         }else{
-            System.out.println("신고 실패");
+            log.warn("리뷰 신고 실패: {}", reviewid);
         }
         return true;
     }
@@ -184,7 +186,7 @@ public class ReviewController {
             return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("리뷰 삭제 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("리뷰 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
